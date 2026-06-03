@@ -995,6 +995,45 @@
       }
     }
 
+    /* ── LANGUAGE SWITCHER ── */
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.1rem;
+      margin-left: 2rem;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      font-family: var(--ff-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: none;
+      padding: 0.3rem 0.45rem;
+      border-radius: 2px;
+      transition: color 0.25s, background 0.25s;
+      line-height: 1;
+    }
+
+    .lang-btn:hover {
+      color: var(--sand);
+    }
+
+    .lang-btn.active {
+      color: var(--midnight);
+      background: var(--sand);
+    }
+
+    .lang-sep {
+      color: var(--text-muted);
+      font-size: 0.55rem;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       nav {
@@ -1003,6 +1042,10 @@
 
       .nav-links {
         display: none;
+      }
+
+      .lang-switcher {
+        margin-left: 0;
       }
 
       section {
@@ -1072,51 +1115,54 @@
   <nav>
     <a href="#" class="nav-logo">Studio Forma</a>
     <ul class="nav-links">
-      <li><a href="#services">Services</a></li>
-      <li><a href="#process">Process</a></li>
-      <li><a href="#portfolio">Work</a></li>
-      <li><a href="#cta" class="nav-cta">Start a Project</a></li>
+      <li><a href="#services" data-i18n="nav.services">Servicios</a></li>
+      <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
+      <li><a href="#portfolio" data-i18n="nav.work">Trabajo</a></li>
+      <li><a href="#cta" class="nav-cta" data-i18n="nav.cta">Iniciar Proyecto</a></li>
     </ul>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="es">ES</button>
+      <span class="lang-sep">/</span>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <span class="lang-sep">/</span>
+      <button class="lang-btn" data-lang="fr">FR</button>
+    </div>
   </nav>
 
   <div id="scroll-container">
 
     <!-- HERO -->
     <section id="hero">
-      <p class="hero-eyebrow">Studio Forma — Digital Craftsmanship</p>
-      <h1 class="hero-title">We create web<br>experiences that<br><em>feel alive.</em></h1>
-      <p class="hero-sub">We design and develop websites, interfaces, and digital worlds for brands that want to stand
-        out.</p>
+      <p class="hero-eyebrow" data-i18n="hero.eyebrow">Studio Forma — Artesanía Digital</p>
+      <h1 class="hero-title" data-i18n="hero.title">Creamos experiencias web que <em>se sienten vivas.</em></h1>
+      <p class="hero-sub" data-i18n="hero.sub">Diseñamos y desarrollamos sitios, interfaces y mundos digitales para
+        marcas que quieren destacar.</p>
       <div class="hero-ctas">
-        <a href="#cta" class="btn-primary">Start a Project</a>
-        <a href="#services" class="btn-ghost">Explore Services</a>
+        <a href="#cta" class="btn-primary" data-i18n="hero.cta1">Iniciar Proyecto</a>
+        <a href="#services" class="btn-ghost" data-i18n="hero.cta2">Explorar Servicios</a>
       </div>
       <div class="hero-scroll-hint">
         <div class="scroll-line"></div>
-        <span class="scroll-label">Scroll to explore</span>
+        <span class="scroll-label" data-i18n="hero.scroll">Desplazar para explorar</span>
       </div>
     </section>
 
     <!-- MANIFESTO -->
     <section id="manifesto">
-      <p class="manifesto-label reveal">About the studio</p>
-      <h2 class="manifesto-text reveal reveal-delay-1">
-        Where <em>design</em> meets engineering,<br>and ideas become<br>digital reality.
-      </h2>
-      <p class="manifesto-body reveal reveal-delay-2">
-        We are a boutique studio at the intersection of technology and storytelling.
-        We combine strategic thinking, precision engineering, and obsessive attention to craft
-        to build digital products that leave a mark.
-      </p>
+      <p class="manifesto-label reveal" data-i18n="manifesto.label">Sobre el estudio</p>
+      <h2 class="manifesto-text reveal reveal-delay-1" data-i18n="manifesto.title">Donde el <em>diseño</em> encuentra la
+        ingeniería,<br>y las ideas se convierten<br>en realidad digital.</h2>
+      <p class="manifesto-body reveal reveal-delay-2" data-i18n="manifesto.body">Somos un estudio boutique en la
+        intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y
+        atención obsesiva al craft para construir productos digitales que dejan huella.</p>
     </section>
 
     <!-- CRAFT FACT 1 -->
     <div class="craft-fact-section">
       <div class="craft-fact-inner">
-        <span class="craft-number reveal">01 — Digital craft</span>
-        <p class="craft-text reveal reveal-delay-1">
-          A fast website <em>sells</em><br>before the user thinks<br>about leaving.
-        </p>
+        <span class="craft-number reveal" data-i18n="facts.label1">01 — Artesanía digital</span>
+        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f1">Un sitio rápido <em>vende</em><br>antes de que
+          el usuario<br>piense en irse.</p>
         <div class="craft-divider reveal reveal-delay-2"></div>
       </div>
     </div>
@@ -1125,8 +1171,8 @@
     <section id="services">
       <div class="section-header">
         <div>
-          <span class="section-label reveal">What we build</span>
-          <h2 class="section-title reveal reveal-delay-1">Our <em>craft</em></h2>
+          <span class="section-label reveal" data-i18n="services.label">Lo que construimos</span>
+          <h2 class="section-title reveal reveal-delay-1" data-i18n="services.title">Nuestro <em>craft</em></h2>
         </div>
       </div>
       <div class="services-grid">
@@ -1137,9 +1183,9 @@
             <path d="M10 26h12M16 22v4" stroke="currentColor" stroke-width="0.8" opacity="0.4" />
             <path d="M8 10l3 3-3 3M13 16h6" stroke="var(--cyan-soft)" stroke-width="0.8" />
           </svg>
-          <h3 class="service-name">Modern Web Development</h3>
-          <p class="service-desc">Performance-first sites built with modern frameworks. React, Next.js, and custom
-            architectures for complex digital products.</p>
+          <h3 class="service-name" data-i18n="services.s1.name">Desarrollo Web Moderno</h3>
+          <p class="service-desc" data-i18n="services.s1.desc">Sitios de alto rendimiento construidos con frameworks
+            modernos. React, Next.js y arquitecturas personalizadas para productos digitales complejos.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-2">
@@ -1150,9 +1196,9 @@
             <circle cx="16" cy="13" r="4" stroke="var(--gold)" stroke-width="0.8" />
             <path d="M16 9v-3M16 21v2M23 13h2M7 13h2" stroke="var(--gold)" stroke-width="0.6" opacity="0.6" />
           </svg>
-          <h3 class="service-name">High-Impact Landing Pages</h3>
-          <p class="service-desc">Conversion-engineered landing pages that blend brand storytelling with measurable
-            results.</p>
+          <h3 class="service-name" data-i18n="services.s2.name">Landing Pages de Alto Impacto</h3>
+          <p class="service-desc" data-i18n="services.s2.desc">Páginas de destino diseñadas para convertir, que combinan
+            narrativa de marca con resultados medibles.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-3">
@@ -1161,9 +1207,9 @@
             <path d="M16 4L4 10v12l12 6 12-6V10L16 4z" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
             <path d="M16 4v18M4 10l12 6 12-6" stroke="var(--cyan-soft)" stroke-width="0.6" />
           </svg>
-          <h3 class="service-name">Three.js 3D Experiences</h3>
-          <p class="service-desc">Immersive 3D web experiences, interactive scenes, and real-time rendered product
-            visualizations.</p>
+          <h3 class="service-name" data-i18n="services.s3.name">Experiencias 3D Three.js</h3>
+          <p class="service-desc" data-i18n="services.s3.desc">Escenas 3D inmersivas, experiencias interactivas y
+            visualizaciones de producto renderizadas en tiempo real.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-4">
@@ -1174,9 +1220,9 @@
             <rect x="17" y="11" width="11" height="4" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
             <rect x="4" y="17" width="24" height="11" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
           </svg>
-          <h3 class="service-name">UX/UI Interfaces</h3>
-          <p class="service-desc">Interface design where every pixel has purpose. From wireframe to high-fidelity
-            systems that feel intuitive.</p>
+          <h3 class="service-name" data-i18n="services.s4.name">Interfaces UX/UI</h3>
+          <p class="service-desc" data-i18n="services.s4.desc">Diseño de interfaces donde cada píxel tiene propósito.
+            Del wireframe al sistema de alta fidelidad que se siente intuitivo.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-5">
@@ -1189,9 +1235,9 @@
             <path d="M11 8h10M8 11v10M24 11v10M11 24h10M11 11l10 10" stroke="currentColor" stroke-width="0.6"
               opacity="0.3" stroke-dasharray="2 2" />
           </svg>
-          <h3 class="service-name">Automations & Integrations</h3>
-          <p class="service-desc">Custom automation pipelines, API integrations, and workflow systems that eliminate
-            friction at scale.</p>
+          <h3 class="service-name" data-i18n="services.s5.name">Automatizaciones e Integraciones</h3>
+          <p class="service-desc" data-i18n="services.s5.desc">Pipelines de automatización, integraciones de API y
+            sistemas de flujo que eliminan la fricción a escala.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-6">
@@ -1204,9 +1250,9 @@
             <path d="M4 28h24" stroke="currentColor" stroke-width="0.6" opacity="0.3" />
             <path d="M4 4v24" stroke="currentColor" stroke-width="0.6" opacity="0.3" />
           </svg>
-          <h3 class="service-name">Performance Optimization</h3>
-          <p class="service-desc">Technical audits and optimization cycles that turn slow products into lightning-fast
-            experiences.</p>
+          <h3 class="service-name" data-i18n="services.s6.name">Optimización de Rendimiento</h3>
+          <p class="service-desc" data-i18n="services.s6.desc">Auditorías técnicas y ciclos de optimización que
+            convierten productos lentos en experiencias ultrarrápidas.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-7">
@@ -1215,9 +1261,9 @@
             <rect x="5" y="8" width="22" height="16" rx="2" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
             <path d="M12 16h8M16 12v8" stroke="var(--gold)" stroke-width="0.8" />
           </svg>
-          <h3 class="service-name">Interactive Prototypes</h3>
-          <p class="service-desc">High-fidelity prototypes and proof-of-concepts that validate ideas before full
-            investment.</p>
+          <h3 class="service-name" data-i18n="services.s7.name">Prototipos Interactivos</h3>
+          <p class="service-desc" data-i18n="services.s7.desc">Prototipos de alta fidelidad y pruebas de concepto que
+            validan ideas antes de la inversión completa.</p>
           <span class="service-arrow">→</span>
         </div>
         <div class="service-card reveal reveal-delay-8">
@@ -1229,9 +1275,9 @@
               stroke-width="0.6" />
             <path d="M4 16h24" stroke="currentColor" stroke-width="0.6" opacity="0.4" />
           </svg>
-          <h3 class="service-name">Brand Digital Presence</h3>
-          <p class="service-desc">Full digital presence for brands, products, events, and businesses — from strategy to
-            launch.</p>
+          <h3 class="service-name" data-i18n="services.s8.name">Presencia Digital de Marca</h3>
+          <p class="service-desc" data-i18n="services.s8.desc">Presencia digital completa para marcas, productos,
+            eventos y negocios — de la estrategia al lanzamiento.</p>
           <span class="service-arrow">→</span>
         </div>
       </div>
@@ -1240,10 +1286,9 @@
     <!-- CRAFT FACT 2 -->
     <div class="craft-fact-section">
       <div class="craft-fact-inner">
-        <span class="craft-number reveal">02 — Digital craft</span>
-        <p class="craft-text reveal reveal-delay-1">
-          <em>Interaction</em> turns a page<br>into an experience.
-        </p>
+        <span class="craft-number reveal" data-i18n="facts.label2">02 — Artesanía digital</span>
+        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f2"><em>La interacción</em> convierte una
+          página<br>en una experiencia.</p>
         <div class="craft-divider reveal reveal-delay-2"></div>
       </div>
     </div>
@@ -1251,10 +1296,9 @@
     <!-- CRAFT FACT 3 -->
     <div class="craft-fact-section">
       <div class="craft-fact-inner">
-        <span class="craft-number reveal">03 — Digital craft</span>
-        <p class="craft-text reveal reveal-delay-1">
-          Design does not decorate;<br>it <em>guides, persuades,</em><br>and organizes.
-        </p>
+        <span class="craft-number reveal" data-i18n="facts.label3">03 — Artesanía digital</span>
+        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f3">El diseño no decora;<br><em>guía,
+            persuade</em><br>y organiza.</p>
         <div class="craft-divider reveal reveal-delay-2"></div>
       </div>
     </div>
@@ -1263,46 +1307,50 @@
     <section id="process">
       <div class="section-header">
         <div>
-          <span class="section-label reveal">How we work</span>
-          <h2 class="section-title reveal reveal-delay-1">The <em>process</em></h2>
+          <span class="section-label reveal" data-i18n="process.label">Cómo trabajamos</span>
+          <h2 class="section-title reveal reveal-delay-1" data-i18n="process.title">El <em>proceso</em></h2>
         </div>
       </div>
       <div class="process-steps">
         <div class="process-step reveal reveal-delay-1">
           <div class="process-dot"></div>
           <p class="process-num">01</p>
-          <h3 class="process-name">Discovery</h3>
-          <p class="process-desc">Deep dive into goals, users, competitors, and context.</p>
+          <h3 class="process-name" data-i18n="process.p1.name">Descubrimiento</h3>
+          <p class="process-desc" data-i18n="process.p1.desc">Inmersión en objetivos, usuarios, competencia y contexto.
+          </p>
         </div>
         <div class="process-step reveal reveal-delay-2">
           <div class="process-dot"></div>
           <p class="process-num">02</p>
-          <h3 class="process-name">Design</h3>
-          <p class="process-desc">Systems thinking meets visual craft. From concepts to UI specs.</p>
+          <h3 class="process-name" data-i18n="process.p2.name">Diseño</h3>
+          <p class="process-desc" data-i18n="process.p2.desc">Pensamiento sistémico y craft visual. De conceptos a specs
+            de UI.</p>
         </div>
         <div class="process-step reveal reveal-delay-3">
           <div class="process-dot"></div>
           <p class="process-num">03</p>
-          <h3 class="process-name">Prototype</h3>
-          <p class="process-desc">Validate before building. Interactive fidelity at speed.</p>
+          <h3 class="process-name" data-i18n="process.p3.name">Prototipo</h3>
+          <p class="process-desc" data-i18n="process.p3.desc">Validar antes de construir. Alta fidelidad interactiva a
+            velocidad.</p>
         </div>
         <div class="process-step reveal reveal-delay-4">
           <div class="process-dot"></div>
           <p class="process-num">04</p>
-          <h3 class="process-name">Development</h3>
-          <p class="process-desc">Clean code, modern stacks, measurable performance.</p>
+          <h3 class="process-name" data-i18n="process.p4.name">Desarrollo</h3>
+          <p class="process-desc" data-i18n="process.p4.desc">Código limpio, stacks modernos, rendimiento medible.</p>
         </div>
         <div class="process-step reveal reveal-delay-5">
           <div class="process-dot"></div>
           <p class="process-num">05</p>
-          <h3 class="process-name">Optimization</h3>
-          <p class="process-desc">Technical refinement until every metric is right.</p>
+          <h3 class="process-name" data-i18n="process.p5.name">Optimización</h3>
+          <p class="process-desc" data-i18n="process.p5.desc">Refinamiento técnico hasta que cada métrica sea correcta.
+          </p>
         </div>
         <div class="process-step reveal reveal-delay-6">
           <div class="process-dot"></div>
           <p class="process-num">06</p>
-          <h3 class="process-name">Launch & Iterate</h3>
-          <p class="process-desc">Deploy with confidence. Refine with data.</p>
+          <h3 class="process-name" data-i18n="process.p6.name">Lanzamiento e Iteración</h3>
+          <p class="process-desc" data-i18n="process.p6.desc">Deploy con confianza. Refinamiento con datos.</p>
         </div>
       </div>
     </section>
@@ -1310,10 +1358,9 @@
     <!-- CRAFT FACT 4 -->
     <div class="craft-fact-section">
       <div class="craft-fact-inner">
-        <span class="craft-number reveal">04 — Digital craft</span>
-        <p class="craft-text reveal reveal-delay-1">
-          3D should not be decoration;<br>it should <em>tell a story.</em>
-        </p>
+        <span class="craft-number reveal" data-i18n="facts.label4">04 — Artesanía digital</span>
+        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f4">El 3D no debe ser decoración;<br>debe
+          <em>contar una historia.</em></p>
         <div class="craft-divider reveal reveal-delay-2"></div>
       </div>
     </div>
@@ -1322,61 +1369,64 @@
     <section id="portfolio">
       <div class="section-header">
         <div>
-          <span class="section-label reveal">Selected work</span>
-          <h2 class="section-title reveal reveal-delay-1">The <em>work</em></h2>
+          <span class="section-label reveal" data-i18n="portfolio.label">Trabajo seleccionado</span>
+          <h2 class="section-title reveal reveal-delay-1" data-i18n="portfolio.title">El <em>trabajo</em></h2>
         </div>
       </div>
       <div class="portfolio-grid">
         <div class="portfolio-card reveal reveal-delay-1">
           <div class="portfolio-card-bg type-a"></div>
-          <span class="portfolio-tag">Interactive experience</span>
-          <h3 class="portfolio-title">Digital world for a premium fashion brand</h3>
-          <p class="portfolio-sub">Three.js environment · Scroll storytelling · Brand immersion</p>
+          <span class="portfolio-tag" data-i18n="portfolio.p1.tag">Experiencia interactiva</span>
+          <h3 class="portfolio-title" data-i18n="portfolio.p1.title">Mundo digital para una marca de moda premium</h3>
+          <p class="portfolio-sub" data-i18n="portfolio.p1.sub">Entorno Three.js · Scroll storytelling · Inmersión de
+            marca</p>
           <span class="portfolio-link">↗</span>
         </div>
         <div class="portfolio-card reveal reveal-delay-2">
           <div class="portfolio-card-bg type-b"></div>
-          <span class="portfolio-tag">Landing page</span>
-          <h3 class="portfolio-title">Launch campaign for a SaaS product</h3>
-          <p class="portfolio-sub">Conversion design · GSAP animations · A/B tested</p>
+          <span class="portfolio-tag" data-i18n="portfolio.p2.tag">Landing page</span>
+          <h3 class="portfolio-title" data-i18n="portfolio.p2.title">Campaña de lanzamiento para un producto SaaS</h3>
+          <p class="portfolio-sub" data-i18n="portfolio.p2.sub">Diseño de conversión · Animaciones GSAP · A/B testing
+          </p>
           <span class="portfolio-link">↗</span>
         </div>
         <div class="portfolio-card reveal reveal-delay-3">
           <div class="portfolio-card-bg type-c"></div>
-          <span class="portfolio-tag">3D campaign</span>
-          <h3 class="portfolio-title">3D environment for an automotive launch</h3>
-          <p class="portfolio-sub">WebGL · Particle systems · Real-time rendering</p>
+          <span class="portfolio-tag" data-i18n="portfolio.p3.tag">Campaña 3D</span>
+          <h3 class="portfolio-title" data-i18n="portfolio.p3.title">Entorno 3D para lanzamiento automotriz</h3>
+          <p class="portfolio-sub" data-i18n="portfolio.p3.sub">WebGL · Sistemas de partículas · Renderizado en tiempo
+            real</p>
           <span class="portfolio-link">↗</span>
         </div>
         <div class="portfolio-card reveal reveal-delay-4">
           <div class="portfolio-card-bg type-d"></div>
-          <span class="portfolio-tag">Automation system</span>
-          <h3 class="portfolio-title">Operations intelligence for a logistics company</h3>
-          <p class="portfolio-sub">Custom dashboard · API integrations · Real-time data</p>
+          <span class="portfolio-tag" data-i18n="portfolio.p4.tag">Sistema de automatización</span>
+          <h3 class="portfolio-title" data-i18n="portfolio.p4.title">Inteligencia operacional para empresa logística
+          </h3>
+          <p class="portfolio-sub" data-i18n="portfolio.p4.sub">Dashboard personalizado · Integraciones API · Datos en
+            tiempo real</p>
           <span class="portfolio-link">↗</span>
         </div>
       </div>
     </section>
 
-    <!-- CRAFT FACTS 5 & 6 -->
+    <!-- CRAFT FACT 5 -->
     <div class="craft-fact-section">
       <div class="craft-fact-inner">
-        <span class="craft-number reveal">05 — Digital craft</span>
-        <p class="craft-text reveal reveal-delay-1">
-          A good interface makes<br><em>technology disappear.</em>
-        </p>
+        <span class="craft-number reveal" data-i18n="facts.label5">05 — Artesanía digital</span>
+        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f5">Una buena interfaz hace que<br><em>la
+            tecnología desaparezca.</em></p>
         <div class="craft-divider reveal reveal-delay-2"></div>
       </div>
     </div>
 
     <!-- CTA -->
     <section id="cta">
-      <p class="cta-label reveal">Ready to begin?</p>
-      <h2 class="cta-title reveal reveal-delay-1">
-        Your next website doesn't have to look like<br><em>just another website.</em>
-      </h2>
+      <p class="cta-label reveal" data-i18n="cta.label">¿Listo para comenzar?</p>
+      <h2 class="cta-title reveal reveal-delay-1" data-i18n="cta.title">Tu próximo sitio no tiene que parecerse
+        a<br><em>cualquier otro sitio.</em></h2>
       <div class="hero-ctas reveal reveal-delay-2" style="margin-bottom: 4rem;">
-        <a href="mailto:hello@studioforma.co" class="btn-primary">Let's Talk About Your Project</a>
+        <a href="mailto:hello@studioforma.co" class="btn-primary" data-i18n="cta.btn">Hablemos de Tu Proyecto</a>
       </div>
       <div class="contact-row reveal reveal-delay-3">
         <a href="mailto:hello@studioforma.co" class="contact-item">
@@ -1395,32 +1445,182 @@
         </a>
       </div>
       <div class="contact-form-row reveal reveal-delay-4">
-        <input type="email" class="contact-input" placeholder="your@email.com">
-        <button class="btn-primary" style="white-space:nowrap;cursor:none;">Send a message →</button>
+        <input type="email" class="contact-input" data-i18n-placeholder="cta.placeholder">
+        <button class="btn-primary" style="white-space:nowrap;cursor:none;" data-i18n="cta.send">Enviar mensaje
+          →</button>
       </div>
     </section>
 
     <footer>
       <span class="footer-logo">Studio Forma</span>
-      <span class="footer-copy">© 2026 — Built with precision</span>
+      <span class="footer-copy" data-i18n="footer.copy">© 2026 — Construido con precisión</span>
     </footer>
 
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // ── CURSOR ──────────────────────────────────────────────────────────
-    const cursor = document.getElementById('cursor');
-    const cursorRing = document.getElementById('cursor-ring');
-    let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
+    // ═══════════════════════════════════════════════════════════════
+    // i18n SYSTEM
+    // ═══════════════════════════════════════════════════════════════
+    const T = {
+      es: {
+        "nav.services": "Servicios", "nav.process": "Proceso", "nav.work": "Trabajo", "nav.cta": "Iniciar Proyecto",
+        "hero.eyebrow": "Studio Forma — Artesanía Digital",
+        "hero.title": "Creamos experiencias web que <em>se sienten vivas.</em>",
+        "hero.sub": "Diseñamos y desarrollamos sitios, interfaces y mundos digitales para marcas que quieren destacar.",
+        "hero.cta1": "Iniciar Proyecto", "hero.cta2": "Explorar Servicios", "hero.scroll": "Desplazar para explorar",
+        "manifesto.label": "Sobre el estudio",
+        "manifesto.title": "Donde el <em>diseño</em> encuentra la ingeniería,<br>y las ideas se convierten<br>en realidad digital.",
+        "manifesto.body": "Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales que dejan huella.",
+        "facts.label1": "01 — Artesanía digital", "facts.f1": "Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.",
+        "facts.label2": "02 — Artesanía digital", "facts.f2": "<em>La interacción</em> convierte una página<br>en una experiencia.",
+        "facts.label3": "03 — Artesanía digital", "facts.f3": "El diseño no decora;<br><em>guía, persuade</em><br>y organiza.",
+        "facts.label4": "04 — Artesanía digital", "facts.f4": "El 3D no debe ser decoración;<br>debe <em>contar una historia.</em>",
+        "facts.label5": "05 — Artesanía digital", "facts.f5": "Una buena interfaz hace que<br><em>la tecnología desaparezca.</em>",
+        "services.label": "Lo que construimos", "services.title": "Nuestro <em>craft</em>",
+        "services.s1.name": "Desarrollo Web Moderno", "services.s1.desc": "Sitios de alto rendimiento con frameworks modernos. React, Next.js y arquitecturas personalizadas.",
+        "services.s2.name": "Landing Pages de Alto Impacto", "services.s2.desc": "Páginas diseñadas para convertir que combinan narrativa de marca con resultados medibles.",
+        "services.s3.name": "Experiencias 3D Three.js", "services.s3.desc": "Escenas 3D inmersivas, experiencias interactivas y visualizaciones en tiempo real.",
+        "services.s4.name": "Interfaces UX/UI", "services.s4.desc": "Diseño donde cada píxel tiene propósito. Del wireframe al sistema de alta fidelidad.",
+        "services.s5.name": "Automatizaciones e Integraciones", "services.s5.desc": "Pipelines de automatización, integraciones de API y sistemas de flujo a escala.",
+        "services.s6.name": "Optimización de Rendimiento", "services.s6.desc": "Auditorías técnicas que convierten productos lentos en experiencias ultrarrápidas.",
+        "services.s7.name": "Prototipos Interactivos", "services.s7.desc": "Prototipos de alta fidelidad que validan ideas antes de la inversión completa.",
+        "services.s8.name": "Presencia Digital de Marca", "services.s8.desc": "Presencia digital completa para marcas, productos y eventos — de la estrategia al lanzamiento.",
+        "process.label": "Cómo trabajamos", "process.title": "El <em>proceso</em>",
+        "process.p1.name": "Descubrimiento", "process.p1.desc": "Inmersión en objetivos, usuarios, competencia y contexto.",
+        "process.p2.name": "Diseño", "process.p2.desc": "Pensamiento sistémico y craft visual. De conceptos a specs de UI.",
+        "process.p3.name": "Prototipo", "process.p3.desc": "Validar antes de construir. Alta fidelidad interactiva a velocidad.",
+        "process.p4.name": "Desarrollo", "process.p4.desc": "Código limpio, stacks modernos, rendimiento medible.",
+        "process.p5.name": "Optimización", "process.p5.desc": "Refinamiento técnico hasta que cada métrica sea correcta.",
+        "process.p6.name": "Lanzamiento e Iteración", "process.p6.desc": "Deploy con confianza. Refinamiento con datos.",
+        "portfolio.label": "Trabajo seleccionado", "portfolio.title": "El <em>trabajo</em>",
+        "portfolio.p1.tag": "Experiencia interactiva", "portfolio.p1.title": "Mundo digital para una marca de moda premium", "portfolio.p1.sub": "Entorno Three.js · Scroll storytelling · Inmersión de marca",
+        "portfolio.p2.tag": "Landing page", "portfolio.p2.title": "Campaña de lanzamiento para un producto SaaS", "portfolio.p2.sub": "Diseño de conversión · Animaciones GSAP · A/B testing",
+        "portfolio.p3.tag": "Campaña 3D", "portfolio.p3.title": "Entorno 3D para lanzamiento automotriz", "portfolio.p3.sub": "WebGL · Sistemas de partículas · Renderizado en tiempo real",
+        "portfolio.p4.tag": "Sistema de automatización", "portfolio.p4.title": "Inteligencia operacional para empresa logística", "portfolio.p4.sub": "Dashboard personalizado · Integraciones API · Datos en tiempo real",
+        "cta.label": "¿Listo para comenzar?", "cta.title": "Tu próximo sitio no tiene que parecerse a<br><em>cualquier otro sitio.</em>",
+        "cta.btn": "Hablemos de Tu Proyecto", "cta.placeholder": "tu@email.com", "cta.send": "Enviar mensaje →",
+        "footer.copy": "© 2026 — Construido con precisión"
+      },
+      en: {
+        "nav.services": "Services", "nav.process": "Process", "nav.work": "Work", "nav.cta": "Start a Project",
+        "hero.eyebrow": "Studio Forma — Digital Craftsmanship",
+        "hero.title": "We create web experiences that <em>feel alive.</em>",
+        "hero.sub": "We design and develop websites, interfaces, and digital worlds for brands that want to stand out.",
+        "hero.cta1": "Start a Project", "hero.cta2": "Explore Services", "hero.scroll": "Scroll to explore",
+        "manifesto.label": "About the studio",
+        "manifesto.title": "Where <em>design</em> meets engineering,<br>and ideas become<br>digital reality.",
+        "manifesto.body": "We are a boutique studio at the intersection of technology and storytelling. We combine strategic thinking, precision engineering, and obsessive attention to craft to build digital products that leave a mark.",
+        "facts.label1": "01 — Digital craft", "facts.f1": "A fast website <em>sells</em><br>before the user thinks<br>about leaving.",
+        "facts.label2": "02 — Digital craft", "facts.f2": "<em>Interaction</em> turns a page<br>into an experience.",
+        "facts.label3": "03 — Digital craft", "facts.f3": "Design does not decorate;<br>it <em>guides, persuades,</em><br>and organizes.",
+        "facts.label4": "04 — Digital craft", "facts.f4": "3D should not be decoration;<br>it should <em>tell a story.</em>",
+        "facts.label5": "05 — Digital craft", "facts.f5": "A good interface makes<br><em>technology disappear.</em>",
+        "services.label": "What we build", "services.title": "Our <em>craft</em>",
+        "services.s1.name": "Modern Web Development", "services.s1.desc": "Performance-first sites with modern frameworks. React, Next.js, and custom architectures.",
+        "services.s2.name": "High-Impact Landing Pages", "services.s2.desc": "Conversion-engineered pages that blend brand storytelling with measurable results.",
+        "services.s3.name": "Three.js 3D Experiences", "services.s3.desc": "Immersive 3D scenes, interactive experiences, and real-time product visualizations.",
+        "services.s4.name": "UX/UI Interfaces", "services.s4.desc": "Interface design where every pixel has purpose. From wireframe to high-fidelity systems.",
+        "services.s5.name": "Automations & Integrations", "services.s5.desc": "Custom pipelines, API integrations, and workflow systems that eliminate friction at scale.",
+        "services.s6.name": "Performance Optimization", "services.s6.desc": "Technical audits and optimization cycles that turn slow products into lightning-fast experiences.",
+        "services.s7.name": "Interactive Prototypes", "services.s7.desc": "High-fidelity prototypes and proof-of-concepts that validate ideas before full investment.",
+        "services.s8.name": "Brand Digital Presence", "services.s8.desc": "Full digital presence for brands, products, events, and businesses — from strategy to launch.",
+        "process.label": "How we work", "process.title": "The <em>process</em>",
+        "process.p1.name": "Discovery", "process.p1.desc": "Deep dive into goals, users, competitors, and context.",
+        "process.p2.name": "Design", "process.p2.desc": "Systems thinking meets visual craft. From concepts to UI specs.",
+        "process.p3.name": "Prototype", "process.p3.desc": "Validate before building. Interactive fidelity at speed.",
+        "process.p4.name": "Development", "process.p4.desc": "Clean code, modern stacks, measurable performance.",
+        "process.p5.name": "Optimization", "process.p5.desc": "Technical refinement until every metric is right.",
+        "process.p6.name": "Launch & Iterate", "process.p6.desc": "Deploy with confidence. Refine with data.",
+        "portfolio.label": "Selected work", "portfolio.title": "The <em>work</em>",
+        "portfolio.p1.tag": "Interactive experience", "portfolio.p1.title": "Digital world for a premium fashion brand", "portfolio.p1.sub": "Three.js environment · Scroll storytelling · Brand immersion",
+        "portfolio.p2.tag": "Landing page", "portfolio.p2.title": "Launch campaign for a SaaS product", "portfolio.p2.sub": "Conversion design · GSAP animations · A/B tested",
+        "portfolio.p3.tag": "3D campaign", "portfolio.p3.title": "3D environment for an automotive launch", "portfolio.p3.sub": "WebGL · Particle systems · Real-time rendering",
+        "portfolio.p4.tag": "Automation system", "portfolio.p4.title": "Operations intelligence for a logistics company", "portfolio.p4.sub": "Custom dashboard · API integrations · Real-time data",
+        "cta.label": "Ready to begin?", "cta.title": "Your next website doesn't have to look like<br><em>just another website.</em>",
+        "cta.btn": "Let's Talk About Your Project", "cta.placeholder": "your@email.com", "cta.send": "Send a message →",
+        "footer.copy": "© 2026 — Built with precision"
+      },
+      fr: {
+        "nav.services": "Services", "nav.process": "Processus", "nav.work": "Travaux", "nav.cta": "Démarrer un projet",
+        "hero.eyebrow": "Studio Forma — Artisanat numérique",
+        "hero.title": "Nous créons des expériences web qui <em>semblent vivantes.</em>",
+        "hero.sub": "Nous concevons et développons des sites, interfaces et mondes numériques pour les marques qui veulent se démarquer.",
+        "hero.cta1": "Démarrer un projet", "hero.cta2": "Explorer les services", "hero.scroll": "Défiler pour explorer",
+        "manifesto.label": "À propos du studio",
+        "manifesto.title": "Là où le <em>design</em> rencontre l'ingénierie,<br>et les idées deviennent<br>réalité numérique.",
+        "manifesto.body": "Nous sommes un studio boutique à l'intersection de la technologie et du storytelling. Nous combinons pensée stratégique, ingénierie de précision et attention obsessionnelle au craft pour construire des produits numériques qui marquent les esprits.",
+        "facts.label1": "01 — Artisanat numérique", "facts.f1": "Un site rapide <em>vend</em><br>avant que l'utilisateur<br>ne pense à partir.",
+        "facts.label2": "02 — Artisanat numérique", "facts.f2": "<em>L'interaction</em> transforme une page<br>en une expérience.",
+        "facts.label3": "03 — Artisanat numérique", "facts.f3": "Le design ne décore pas ;<br>il <em>guide, persuade</em><br>et organise.",
+        "facts.label4": "04 — Artisanat numérique", "facts.f4": "La 3D ne doit pas être décoration ;<br>elle doit <em>raconter une histoire.</em>",
+        "facts.label5": "05 — Artisanat numérique", "facts.f5": "Une bonne interface fait<br><em>disparaître la technologie.</em>",
+        "services.label": "Ce que nous construisons", "services.title": "Notre <em>craft</em>",
+        "services.s1.name": "Développement web moderne", "services.s1.desc": "Sites haute performance avec des frameworks modernes. React, Next.js et architectures personnalisées.",
+        "services.s2.name": "Landing pages à fort impact", "services.s2.desc": "Pages conçues pour convertir, mêlant storytelling de marque et résultats mesurables.",
+        "services.s3.name": "Expériences 3D Three.js", "services.s3.desc": "Scènes 3D immersives, expériences interactives et visualisations produit en temps réel.",
+        "services.s4.name": "Interfaces UX/UI", "services.s4.desc": "Design où chaque pixel a un but. Du wireframe au système haute fidélité intuitif.",
+        "services.s5.name": "Automatisations et intégrations", "services.s5.desc": "Pipelines d'automatisation, intégrations API et systèmes de flux qui éliminent les frictions.",
+        "services.s6.name": "Optimisation des performances", "services.s6.desc": "Audits techniques et cycles d'optimisation qui transforment les produits lents en expériences rapides.",
+        "services.s7.name": "Prototypes interactifs", "services.s7.desc": "Prototypes haute fidélité qui valident les idées avant l'investissement complet.",
+        "services.s8.name": "Présence numérique de marque", "services.s8.desc": "Présence numérique complète pour marques, produits et événements — de la stratégie au lancement.",
+        "process.label": "Comment nous travaillons", "process.title": "Le <em>processus</em>",
+        "process.p1.name": "Découverte", "process.p1.desc": "Plongée dans les objectifs, utilisateurs, concurrents et contexte.",
+        "process.p2.name": "Design", "process.p2.desc": "Pensée systémique et craft visuel. Des concepts aux specs UI.",
+        "process.p3.name": "Prototype", "process.p3.desc": "Valider avant de construire. Haute fidélité interactive à vitesse.",
+        "process.p4.name": "Développement", "process.p4.desc": "Code propre, stacks modernes, performances mesurables.",
+        "process.p5.name": "Optimisation", "process.p5.desc": "Raffinement technique jusqu'à ce que chaque métrique soit correcte.",
+        "process.p6.name": "Lancement et itération", "process.p6.desc": "Déployer avec confiance. Affiner avec les données.",
+        "portfolio.label": "Travaux sélectionnés", "portfolio.title": "Le <em>travail</em>",
+        "portfolio.p1.tag": "Expérience interactive", "portfolio.p1.title": "Monde numérique pour une marque de mode premium", "portfolio.p1.sub": "Environnement Three.js · Scroll storytelling · Immersion de marque",
+        "portfolio.p2.tag": "Landing page", "portfolio.p2.title": "Campagne de lancement pour un produit SaaS", "portfolio.p2.sub": "Design de conversion · Animations GSAP · Tests A/B",
+        "portfolio.p3.tag": "Campagne 3D", "portfolio.p3.title": "Environnement 3D pour un lancement automobile", "portfolio.p3.sub": "WebGL · Systèmes de particules · Rendu en temps réel",
+        "portfolio.p4.tag": "Système d'automatisation", "portfolio.p4.title": "Intelligence opérationnelle pour une entreprise logistique", "portfolio.p4.sub": "Dashboard personnalisé · Intégrations API · Données en temps réel",
+        "cta.label": "Prêt à commencer ?", "cta.title": "Votre prochain site n'a pas à ressembler<br><em>à un site quelconque.</em>",
+        "cta.btn": "Parlons de votre projet", "cta.placeholder": "votre@email.com", "cta.send": "Envoyer un message →",
+        "footer.copy": "© 2026 — Construit avec précision"
+      }
+    };
 
-    document.addEventListener('mousemove', e => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursor.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+    let currentLang = localStorage.getItem('sf-lang') || 'es';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('sf-lang', lang);
+      document.documentElement.lang = lang;
+      const dict = T[lang];
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key] !== undefined) el.innerHTML = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (dict[key] !== undefined) el.placeholder = dict[key];
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyLang(btn.dataset.lang));
     });
 
+    applyLang(currentLang);
+
+    // ═══════════════════════════════════════════════════════════════
+    // CURSOR
+    // ═══════════════════════════════════════════════════════════════
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursor-ring');
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+    });
     function animateRing() {
       ringX += (mouseX - ringX) * 0.12;
       ringY += (mouseY - ringY) * 0.12;
@@ -1428,294 +1628,350 @@
       requestAnimationFrame(animateRing);
     }
     animateRing();
-
     document.querySelectorAll('a, button, .service-card, .portfolio-card').forEach(el => {
       el.addEventListener('mouseenter', () => document.body.classList.add('cursor-grow'));
       el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-grow'));
     });
 
-    // ── SCROLL PROGRESS ──────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    // SCROLL PROGRESS BAR
+    // ═══════════════════════════════════════════════════════════════
     const progressBar = document.getElementById('progress');
     window.addEventListener('scroll', () => {
-      const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      progressBar.style.width = scrolled + '%';
+      const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+      progressBar.style.width = pct + '%';
     });
 
-    // ── SCROLL REVEAL ────────────────────────────────────────────────────
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
+    // ═══════════════════════════════════════════════════════════════
+    // SCROLL REVEAL
+    // ═══════════════════════════════════════════════════════════════
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.12 });
-    reveals.forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // ── THREE.JS SCENE ───────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    // THREE.JS — BIOMOLECULAR CELL SCENE
+    // ═══════════════════════════════════════════════════════════════
     (function () {
       const canvas = document.getElementById('hero-canvas');
-
-      // WebGL check
       try {
-        const testCtx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!testCtx) throw new Error('no webgl');
-      } catch (e) {
+        const t = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!t) throw 0;
+      } catch (_) {
         document.getElementById('webgl-fallback').style.display = 'block';
         canvas.style.display = 'none';
         return;
       }
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const isMobile = window.innerWidth < 768;
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor(0x050b1a, 1);
+      renderer.setClearColor(0x030810, 1);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 0.85;
+      renderer.toneMappingExposure = 1.1;
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x050b1a, 0.018);
+      scene.fog = new THREE.FogExp2(0x030810, 0.022);
 
-      const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
-      camera.position.set(0, 4, 22);
-      camera.lookAt(0, 0, 0);
+      const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 160);
+      camera.position.set(0, 0, 28);
 
-      // ── Terrain ──
-      const terrainGeo = new THREE.PlaneGeometry(80, 120, 80, 100);
-      const positions = terrainGeo.attributes.position;
-      for (let i = 0; i < positions.count; i++) {
-        const x = positions.getX(i);
-        const z = positions.getY(i);
-        const wave =
-          Math.sin(x * 0.08 + z * 0.04) * 2.5 +
-          Math.sin(x * 0.15 + z * 0.12) * 1.2 +
-          Math.cos(x * 0.06 + z * 0.09) * 1.8 +
-          Math.sin(x * 0.25 + z * 0.18) * 0.5;
-        positions.setZ(i, wave);
+      // ── Shared materials ──────────────────────────────────────────
+      const matAtomC = new THREE.MeshStandardMaterial({ color: 0x7ab8c9, roughness: 0.35, metalness: 0.55, transparent: true, opacity: 0.88 });
+      const matAtomN = new THREE.MeshStandardMaterial({ color: 0xc8b89a, roughness: 0.4, metalness: 0.4, transparent: true, opacity: 0.80 });
+      const matAtomO = new THREE.MeshStandardMaterial({ color: 0xc9a84c, roughness: 0.3, metalness: 0.6, transparent: true, opacity: 0.82 });
+      const matAtomH = new THREE.MeshStandardMaterial({ color: 0x2a4a66, roughness: 0.6, metalness: 0.2, transparent: true, opacity: 0.55 });
+      const matBond = new THREE.MeshStandardMaterial({ color: 0x1a3050, roughness: 0.7, metalness: 0.3, transparent: true, opacity: 0.45 });
+      const matBondH = new THREE.MeshStandardMaterial({ color: 0xc8b89a, roughness: 0.5, metalness: 0.4, transparent: true, opacity: 0.30 });
+      const matRibbon = new THREE.MeshStandardMaterial({ color: 0x0d2a44, roughness: 0.8, metalness: 0.15, transparent: true, opacity: 0.38, side: THREE.DoubleSide });
+
+      // ── Shared geometries ─────────────────────────────────────────
+      const geoAtomLg = new THREE.SphereGeometry(0.38, 14, 10);
+      const geoAtomMd = new THREE.SphereGeometry(0.26, 12, 8);
+      const geoAtomSm = new THREE.SphereGeometry(0.16, 10, 7);
+
+      // ── Helper: create a cylinder bond between two Vector3 points ──
+      function makeBond(a, b, mat, radius = 0.06) {
+        const dir = new THREE.Vector3().subVectors(b, a);
+        const len = dir.length();
+        const geo = new THREE.CylinderGeometry(radius, radius, len, 7, 1);
+        const mesh = new THREE.Mesh(geo, mat);
+        const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
+        mesh.position.copy(mid);
+        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+        return mesh;
       }
-      positions.needsUpdate = true;
-      terrainGeo.computeVertexNormals();
 
-      const terrainMat = new THREE.MeshStandardMaterial({
-        color: 0x0a1628,
-        roughness: 0.92,
-        metalness: 0.08,
-        wireframe: false,
-      });
+      // ── Helper: build one amino acid residue ──────────────────────
+      // Backbone: N–Cα–C(=O)–  with a randomised side chain cluster
+      function buildResidue(origin, type) {
+        const g = new THREE.Group();
+        g.position.copy(origin);
 
-      const terrain = new THREE.Mesh(terrainGeo, terrainMat);
-      terrain.rotation.x = -Math.PI / 2;
-      terrain.position.y = -3;
-      scene.add(terrain);
+        // Atom type selection
+        const types = [
+          [matAtomN, matAtomC, matAtomO],   // polar
+          [matAtomC, matAtomC, matAtomN],   // aliphatic
+          [matAtomO, matAtomC, matAtomC],   // acidic
+          [matAtomN, matAtomO, matAtomN],   // basic
+        ];
+        const [mA, mB, mC] = types[type % 4];
 
-      // ── Wireframe overlay on terrain ──
-      const wireMat = new THREE.MeshBasicMaterial({
-        color: 0x0e2040,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.18,
-      });
-      const terrainWire = new THREE.Mesh(terrainGeo, wireMat);
-      terrainWire.rotation.x = -Math.PI / 2;
-      terrainWire.position.y = -2.98;
-      scene.add(terrainWire);
+        // Backbone positions (local)
+        const posN = new THREE.Vector3(-0.75, 0, 0);
+        const posCa = new THREE.Vector3(0, 0, 0);
+        const posC = new THREE.Vector3(0.72, 0.35, 0);
+        const posO = new THREE.Vector3(1.1, 1.0, 0.25);
 
-      // ── Stars / particle field ──
-      const starCount = window.innerWidth < 768 ? 800 : 2500;
-      const starGeo = new THREE.BufferGeometry();
-      const starPositions = new Float32Array(starCount * 3);
-      const starColors = new Float32Array(starCount * 3);
-      const c1 = new THREE.Color(0xc8b89a);
-      const c2 = new THREE.Color(0x7ab8c9);
-      const c3 = new THREE.Color(0xffffff);
+        // Backbone atoms
+        const atomN = new THREE.Mesh(geoAtomMd, mA); atomN.position.copy(posN);
+        const atomCa = new THREE.Mesh(geoAtomLg, mB); atomCa.position.copy(posCa);
+        const atomC = new THREE.Mesh(geoAtomMd, mB); atomC.position.copy(posC);
+        const atomO = new THREE.Mesh(geoAtomSm, mC); atomO.position.copy(posO);
+        g.add(atomN, atomCa, atomC, atomO);
 
-      for (let i = 0; i < starCount; i++) {
-        starPositions[i * 3] = (Math.random() - 0.5) * 120;
-        starPositions[i * 3 + 1] = Math.random() * 40 + 2;
-        starPositions[i * 3 + 2] = (Math.random() - 0.5) * 120;
-        const c = [c1, c2, c3][Math.floor(Math.random() * 3)];
-        starColors[i * 3] = c.r;
-        starColors[i * 3 + 1] = c.g;
-        starColors[i * 3 + 2] = c.b;
+        // Backbone bonds
+        g.add(makeBond(posN, posCa, matBond, 0.07));
+        g.add(makeBond(posCa, posC, matBond, 0.07));
+        g.add(makeBond(posC, posO, matBond, 0.055));
+
+        // Side chain: 1–3 atoms hanging off Cα
+        const scCount = 1 + (type % 3);
+        const scMats = [mA, mB, mC, matAtomH];
+        let prevPos = posCa;
+        for (let s = 0; s < scCount; s++) {
+          const angle = (s / scCount) * Math.PI * 1.6 - Math.PI * 0.6;
+          const scPos = new THREE.Vector3(
+            prevPos.x + Math.cos(angle) * 0.68,
+            prevPos.y - 0.55 - s * 0.1,
+            prevPos.z + Math.sin(angle) * 0.5
+          );
+          const scGeo = s === 0 ? geoAtomMd : geoAtomSm;
+          const scMat = scMats[s % scMats.length];
+          const scAtom = new THREE.Mesh(scGeo, scMat);
+          scAtom.position.copy(scPos);
+          g.add(scAtom);
+          g.add(makeBond(prevPos, scPos, matBondH, 0.045));
+          prevPos = scPos;
+        }
+
+        return g;
       }
-      starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-      starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-      const starMat = new THREE.PointsMaterial({
-        size: 0.12,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.75,
-        sizeAttenuation: true,
-      });
-      const stars = new THREE.Points(starGeo, starMat);
-      scene.add(stars);
+      // ── Helper: build one alpha-helix segment ─────────────────────
+      function buildHelix(origin, residueCount, helixRadius, pitch, startAngle) {
+        const g = new THREE.Group();
+        g.position.copy(origin);
+        const residues = [];
 
-      // ── Mid-field particles (larger glowing dots) ──
-      const glowCount = window.innerWidth < 768 ? 60 : 180;
-      const glowGeo = new THREE.BufferGeometry();
-      const glowPos = new Float32Array(glowCount * 3);
-      for (let i = 0; i < glowCount; i++) {
-        glowPos[i * 3] = (Math.random() - 0.5) * 60;
-        glowPos[i * 3 + 1] = Math.random() * 15 - 1;
-        glowPos[i * 3 + 2] = (Math.random() - 0.5) * 60;
+        for (let i = 0; i < residueCount; i++) {
+          const angle = startAngle + i * (Math.PI * 2 / 3.6); // 3.6 residues/turn
+          const y = i * pitch;
+          const x = Math.cos(angle) * helixRadius;
+          const z = Math.sin(angle) * helixRadius;
+          const residue = buildResidue(new THREE.Vector3(x, y, z), i);
+          residue.rotation.y = angle + Math.PI * 0.5;
+          g.add(residue);
+          residues.push(new THREE.Vector3(x, y, z));
+        }
+
+        // Ribbon backbone tube approximation (simple cylinders between adjacent Cα)
+        for (let i = 0; i < residues.length - 1; i++) {
+          g.add(makeBond(residues[i], residues[i + 1], matRibbon, 0.18));
+        }
+
+        return g;
       }
-      glowGeo.setAttribute('position', new THREE.BufferAttribute(glowPos, 3));
-      const glowMat = new THREE.PointsMaterial({
-        size: 0.5,
-        color: 0x7ab8c9,
-        transparent: true,
-        opacity: 0.35,
-        sizeAttenuation: true,
-      });
-      const glowParticles = new THREE.Points(glowGeo, glowMat);
-      scene.add(glowParticles);
 
-      // ── Abstract floating figure (r128-safe: cylinder + spheres) ──
-      const figureGroup = new THREE.Group();
+      // ── Helper: build a beta-strand ───────────────────────────────
+      function buildStrand(origin, residueCount) {
+        const g = new THREE.Group();
+        g.position.copy(origin);
+        const pts = [];
+        for (let i = 0; i < residueCount; i++) {
+          const pos = new THREE.Vector3(i * 1.4, Math.sin(i * Math.PI) * 0.22, 0);
+          const res = buildResidue(pos, i + 2);
+          res.rotation.y = i % 2 === 0 ? 0 : Math.PI;
+          g.add(res);
+          pts.push(pos);
+        }
+        for (let i = 0; i < pts.length - 1; i++) {
+          g.add(makeBond(pts[i], pts[i + 1], matRibbon, 0.13));
+        }
+        return g;
+      }
 
-      const figureMat = new THREE.MeshStandardMaterial({
-        color: 0xc8b89a,
-        roughness: 0.8,
-        metalness: 0.1,
-        transparent: true,
-        opacity: 0.5,
-      });
+      // ── Build molecular structures scattered in space ─────────────
+      const moleculeCount = isMobile ? 6 : 12;
+      const molecules = [];
+      const seed = [ // hand-placed for drama, rest are random
+        { type: 'helix', pos: [-4, 1, 2], rot: [0.3, 0.6, 0], res: 9, r: 1.1, pitch: 0.9, ang: 0 },
+        { type: 'helix', pos: [5, -2, -3], rot: [-0.2, -0.4, 0.1], res: 7, r: 0.9, pitch: 1.0, ang: 1.2 },
+        { type: 'strand', pos: [2, 3, 6], rot: [0.1, 0.8, -0.2], res: 5 },
+        { type: 'strand', pos: [-6, 0, -1], rot: [-0.3, 0.2, 0.4], res: 6 },
+        { type: 'helix', pos: [0, -4, 8], rot: [0.5, -0.3, 0.15], res: 6, r: 1.0, pitch: 0.85, ang: 0.5 },
+        { type: 'strand', pos: [-3, -3, -6], rot: [0.2, -0.5, 0.3], res: 4 },
+      ];
 
-      // Torso (cylinder)
-      const torsoGeo = new THREE.CylinderGeometry(0.16, 0.2, 0.75, 10);
-      const torso = new THREE.Mesh(torsoGeo, figureMat);
-      torso.position.y = 0;
-      figureGroup.add(torso);
+      const rng = (a, b) => a + Math.random() * (b - a);
+      for (let i = seed.length; i < moleculeCount; i++) {
+        seed.push(
+          Math.random() > 0.5
+            ? { type: 'helix', pos: [rng(-12, 12), rng(-8, 8), rng(-12, 12)], rot: [rng(-0.6, 0.6), rng(-1, 1), rng(-0.4, 0.4)], res: 5 + Math.floor(Math.random() * 5), r: 0.8 + Math.random() * 0.5, pitch: 0.8 + Math.random() * 0.4, ang: Math.random() * Math.PI * 2 }
+            : { type: 'strand', pos: [rng(-12, 12), rng(-8, 8), rng(-12, 12)], rot: [rng(-0.5, 0.5), rng(-1, 1), rng(-0.4, 0.4)], res: 4 + Math.floor(Math.random() * 4) }
+        );
+      }
 
-      // Shoulder cap (sphere at top of cylinder)
-      const shoulderGeo = new THREE.SphereGeometry(0.16, 10, 8);
-      const shoulder = new THREE.Mesh(shoulderGeo, figureMat);
-      shoulder.position.y = 0.375;
-      figureGroup.add(shoulder);
-
-      // Hip cap (sphere at bottom of cylinder)
-      const hipGeo = new THREE.SphereGeometry(0.2, 10, 8);
-      const hip = new THREE.Mesh(hipGeo, figureMat);
-      hip.position.y = -0.375;
-      figureGroup.add(hip);
-
-      // Head
-      const headGeo = new THREE.SphereGeometry(0.2, 12, 8);
-      const head = new THREE.Mesh(headGeo, figureMat);
-      head.position.y = 0.7;
-      figureGroup.add(head);
-
-      // Subtle glow ring around figure
-      const ringGeo = new THREE.RingGeometry(0.6, 0.65, 32);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x7ab8c9,
-        transparent: true,
-        opacity: 0.12,
-        side: THREE.DoubleSide,
-      });
-      const glowRing = new THREE.Mesh(ringGeo, ringMat);
-      glowRing.rotation.x = -Math.PI / 2;
-      glowRing.position.y = -0.6;
-      figureGroup.add(glowRing);
-
-      figureGroup.position.set(0, -0.8, 0);
-      scene.add(figureGroup);
-
-      // ── Lights ──
-      const ambientLight = new THREE.AmbientLight(0x060d1a, 3);
-      scene.add(ambientLight);
-
-      const moonLight = new THREE.DirectionalLight(0x7ab8c9, 0.8);
-      moonLight.position.set(-10, 20, 10);
-      scene.add(moonLight);
-
-      const warmLight = new THREE.PointLight(0xc9a84c, 0.6, 30);
-      warmLight.position.set(5, 5, 5);
-      scene.add(warmLight);
-
-      const backLight = new THREE.PointLight(0x1a3a5c, 1.2, 50);
-      backLight.position.set(-8, 8, -10);
-      scene.add(backLight);
-
-      // ── Mouse parallax ──
-      let targetMouseX = 0, targetMouseY = 0;
-      let currentMouseX = 0, currentMouseY = 0;
-
-      document.addEventListener('mousemove', e => {
-        targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-        targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      seed.forEach(s => {
+        const mesh = s.type === 'helix'
+          ? buildHelix(new THREE.Vector3(...s.pos), s.res, s.r, s.pitch, s.ang)
+          : buildStrand(new THREE.Vector3(...s.pos), s.res);
+        mesh.rotation.set(...s.rot);
+        scene.add(mesh);
+        molecules.push({ mesh, baseRot: [...s.rot], speed: 0.03 + Math.random() * 0.04, phase: Math.random() * Math.PI * 2 });
       });
 
-      // ── Scroll tracking ──
-      let scrollProgress = 0;
+      // ── Floating ambient particles (organelle-like) ───────────────
+      const partCount = isMobile ? 120 : 350;
+      const partGeo = new THREE.BufferGeometry();
+      const partPos = new Float32Array(partCount * 3);
+      const partCol = new Float32Array(partCount * 3);
+      const colors = [
+        new THREE.Color(0x7ab8c9), new THREE.Color(0xc8b89a),
+        new THREE.Color(0xc9a84c), new THREE.Color(0x1a4a6a),
+        new THREE.Color(0x2a6a4a),
+      ];
+      for (let i = 0; i < partCount; i++) {
+        partPos[i * 3] = (Math.random() - 0.5) * 50;
+        partPos[i * 3 + 1] = (Math.random() - 0.5) * 30;
+        partPos[i * 3 + 2] = (Math.random() - 0.5) * 50;
+        const c = colors[Math.floor(Math.random() * colors.length)];
+        partCol[i * 3] = c.r; partCol[i * 3 + 1] = c.g; partCol[i * 3 + 2] = c.b;
+      }
+      partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+      partGeo.setAttribute('color', new THREE.BufferAttribute(partCol, 3));
+      const partMat = new THREE.PointsMaterial({ size: 0.1, vertexColors: true, transparent: true, opacity: 0.55, sizeAttenuation: true });
+      scene.add(new THREE.Points(partGeo, partMat));
+
+      // ── Cell membrane glow ring (billboard torus) ─────────────────
+      const torusGeo = new THREE.TorusGeometry(18, 0.12, 8, 80);
+      const torusMat = new THREE.MeshBasicMaterial({ color: 0x0d3a52, transparent: true, opacity: 0.25 });
+      const torus1 = new THREE.Mesh(torusGeo, torusMat);
+      torus1.rotation.x = Math.PI * 0.3; scene.add(torus1);
+      const torus2 = new THREE.Mesh(new THREE.TorusGeometry(14, 0.08, 8, 60), new THREE.MeshBasicMaterial({ color: 0x1a5a3a, transparent: true, opacity: 0.15 }));
+      torus2.rotation.x = Math.PI * 0.6; torus2.rotation.z = Math.PI * 0.2; scene.add(torus2);
+
+      // ── Lights ────────────────────────────────────────────────────
+      scene.add(new THREE.AmbientLight(0x030810, 6));
+
+      const cyanLight = new THREE.PointLight(0x7ab8c9, 3.5, 35);
+      cyanLight.position.set(-6, 4, 8); scene.add(cyanLight);
+
+      const goldLight = new THREE.PointLight(0xc9a84c, 2.0, 28);
+      goldLight.position.set(8, -3, 4); scene.add(goldLight);
+
+      const deepLight = new THREE.PointLight(0x1a3a5c, 1.5, 40);
+      deepLight.position.set(0, 8, -10); scene.add(deepLight);
+
+      const greenLight = new THREE.PointLight(0x0d3a2a, 1.2, 30);
+      greenLight.position.set(-10, -5, 5); scene.add(greenLight);
+
+      // ── Scroll → smooth camera path ───────────────────────────────
+      // Camera travels a cinematic spline through the molecular field
+      const camPath = [
+        { pos: new THREE.Vector3(0, 0, 28), target: new THREE.Vector3(0, 0, 0) },
+        { pos: new THREE.Vector3(-4, 2, 18), target: new THREE.Vector3(-1, 0, -4) },
+        { pos: new THREE.Vector3(3, 1, 10), target: new THREE.Vector3(1, -1, -2) },
+        { pos: new THREE.Vector3(-2, -2, 4), target: new THREE.Vector3(0, 0, -8) },
+        { pos: new THREE.Vector3(4, 3, -2), target: new THREE.Vector3(0, 0, -12) },
+        { pos: new THREE.Vector3(0, 0, -10), target: new THREE.Vector3(0, 0, -20) },
+      ];
+
+      // Smooth interpolated scroll value
+      let rawScroll = 0;
+      let smoothScroll = 0;
       window.addEventListener('scroll', () => {
-        scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+        rawScroll = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
       });
 
-      // ── Resize ──
+      // Mouse parallax
+      let mx = 0, my = 0, cmx = 0, cmy = 0;
+      document.addEventListener('mousemove', e => {
+        mx = (e.clientX / window.innerWidth - 0.5) * 2;
+        my = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // ── Animate ──
+      // ── Animate ───────────────────────────────────────────────────
       const clock = new THREE.Clock();
-      let figureWalkZ = 0;
+
+      function lerpVec3(a, b, t) {
+        return new THREE.Vector3(
+          a.x + (b.x - a.x) * t,
+          a.y + (b.y - a.y) * t,
+          a.z + (b.z - a.z) * t
+        );
+      }
+
+      function getCamState(s) {
+        // s in [0,1] — map to camPath segments
+        const n = camPath.length - 1;
+        const idx = Math.min(Math.floor(s * n), n - 1);
+        const t = (s * n) - idx;
+        // smooth step for extra cinematic ease
+        const st = t * t * (3 - 2 * t);
+        return {
+          pos: lerpVec3(camPath[idx].pos, camPath[idx + 1].pos, st),
+          target: lerpVec3(camPath[idx].target, camPath[idx + 1].target, st),
+        };
+      }
 
       function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
-        const delta = clock.getDelta ? 0.016 : 0.016;
 
-        // Smooth mouse
-        currentMouseX += (targetMouseX - currentMouseX) * 0.035;
-        currentMouseY += (targetMouseY - currentMouseY) * 0.035;
+        // Smooth scroll interpolation — fast but not instant
+        smoothScroll += (rawScroll - smoothScroll) * 0.06;
 
-        // Camera drift based on scroll + mouse
-        camera.position.x = currentMouseX * 2.5;
-        camera.position.y = 4 - scrollProgress * 6 + currentMouseY * -0.8;
-        camera.position.z = 22 - scrollProgress * 8;
-        camera.lookAt(0, -1, -5);
+        // Mouse smoothing
+        cmx += (mx - cmx) * 0.04;
+        cmy += (my - cmy) * 0.04;
 
-        // Terrain animation
-        const pos = terrainGeo.attributes.position;
-        for (let i = 0; i < pos.count; i++) {
-          const x = pos.getX(i);
-          const z = pos.getY(i);
-          const wave =
-            Math.sin(x * 0.08 + z * 0.04 + t * 0.12) * 2.5 +
-            Math.sin(x * 0.15 + z * 0.12 + t * 0.08) * 1.2 +
-            Math.cos(x * 0.06 + z * 0.09 - t * 0.1) * 1.8 +
-            Math.sin(x * 0.25 + z * 0.18 + t * 0.15) * 0.5;
-          pos.setZ(i, wave);
-        }
-        pos.needsUpdate = true;
-        terrainGeo.computeVertexNormals();
+        // Camera path
+        const state = getCamState(smoothScroll);
+        camera.position.copy(state.pos);
+        camera.position.x += cmx * 1.8;
+        camera.position.y += cmy * -1.2;
+        camera.lookAt(state.target);
 
-        // Stars slow rotation
-        stars.rotation.y = t * 0.005;
+        // Molecules — slow independent rotation + gentle oscillation
+        molecules.forEach((m, i) => {
+          m.mesh.rotation.y = m.baseRot[1] + t * m.speed + m.phase;
+          m.mesh.rotation.x = m.baseRot[0] + Math.sin(t * 0.2 + m.phase) * 0.06;
+          m.mesh.rotation.z = m.baseRot[2] + Math.cos(t * 0.15 + m.phase) * 0.04;
+          // Gentle float
+          m.mesh.position.y = (m.mesh.position.y || 0);
+          const basePosY = seed[i] ? seed[i].pos[1] : 0;
+          m.mesh.position.y = basePosY + Math.sin(t * 0.18 + m.phase) * 0.35;
+        });
 
-        // Glow particles float
-        const gp = glowGeo.attributes.position;
-        for (let i = 0; i < glowCount; i++) {
-          gp.setY(i, gp.getY(i) + Math.sin(t * 0.3 + i * 0.8) * 0.002);
-        }
-        gp.needsUpdate = true;
+        // Torus membrane pulsing
+        torus1.rotation.z = t * 0.04;
+        torus2.rotation.y = t * 0.03;
+        torusMat.opacity = 0.18 + Math.sin(t * 0.5) * 0.07;
 
-        // Figure movement and float
-        figureWalkZ = Math.sin(t * 0.3) * 0.3;
-        figureGroup.position.z = figureWalkZ;
-        figureGroup.position.y = -0.8 + Math.sin(t * 0.6) * 0.08;
-        figureGroup.rotation.y = t * 0.15;
-        glowRing.rotation.z = t * 0.4;
-        glowMat.opacity = 0.3 + Math.sin(t * 0.8) * 0.1;
-
-        // Color shift on scroll
-        const scrollHue = scrollProgress;
-        warmLight.intensity = 0.6 + scrollHue * 0.4;
-        moonLight.intensity = 0.8 - scrollHue * 0.3;
+        // Light breathing
+        cyanLight.intensity = 3.5 + Math.sin(t * 0.6) * 0.8;
+        goldLight.intensity = 2.0 + Math.cos(t * 0.4 + 1.0) * 0.5;
+        cyanLight.position.x = -6 + Math.sin(t * 0.25) * 3;
+        goldLight.position.z = 4 + Math.cos(t * 0.2) * 3;
 
         renderer.render(scene, camera);
       }
