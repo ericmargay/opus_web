@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Studio Forma — Web Experiences That Feel Alive</title>
+  <title>Aminoacid Studio — Web Experiences That Feel Alive</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -1113,7 +1113,7 @@
   <div id="webgl-fallback"></div>
 
   <nav>
-    <a href="#" class="nav-logo">Studio Forma</a>
+    <a href="#" class="nav-logo">Aminoacid Studio</a>
     <ul class="nav-links">
       <li><a href="#services" data-i18n="nav.services">Servicios</a></li>
       <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
@@ -1133,7 +1133,7 @@
 
     <!-- HERO -->
     <section id="hero">
-      <p class="hero-eyebrow" data-i18n="hero.eyebrow">Studio Forma — Artesanía Digital</p>
+      <p class="hero-eyebrow" data-i18n="hero.eyebrow">Aminoacid Studio — Artesanía Digital</p>
       <h1 class="hero-title" data-i18n="hero.title">Creamos experiencias web que <em>se sienten vivas.</em></h1>
       <p class="hero-sub" data-i18n="hero.sub">Diseñamos y desarrollamos sitios, interfaces y mundos digitales para
         marcas que quieren destacar.</p>
@@ -1452,7 +1452,7 @@
     </section>
 
     <footer>
-      <span class="footer-logo">Studio Forma</span>
+      <span class="footer-logo">Aminoacid Studio</span>
       <span class="footer-copy" data-i18n="footer.copy">© 2026 — Construido con precisión</span>
     </footer>
 
@@ -1466,7 +1466,7 @@
     const T = {
       es: {
         "nav.services": "Servicios", "nav.process": "Proceso", "nav.work": "Trabajo", "nav.cta": "Iniciar Proyecto",
-        "hero.eyebrow": "Studio Forma — Artesanía Digital",
+        "hero.eyebrow": "Aminoacid Studio — Artesanía Digital",
         "hero.title": "Creamos experiencias web que <em>se sienten vivas.</em>",
         "hero.sub": "Diseñamos y desarrollamos sitios, interfaces y mundos digitales para marcas que quieren destacar.",
         "hero.cta1": "Iniciar Proyecto", "hero.cta2": "Explorar Servicios", "hero.scroll": "Desplazar para explorar",
@@ -1505,7 +1505,7 @@
       },
       en: {
         "nav.services": "Services", "nav.process": "Process", "nav.work": "Work", "nav.cta": "Start a Project",
-        "hero.eyebrow": "Studio Forma — Digital Craftsmanship",
+        "hero.eyebrow": "Aminoacid Studio — Digital Craftsmanship",
         "hero.title": "We create web experiences that <em>feel alive.</em>",
         "hero.sub": "We design and develop websites, interfaces, and digital worlds for brands that want to stand out.",
         "hero.cta1": "Start a Project", "hero.cta2": "Explore Services", "hero.scroll": "Scroll to explore",
@@ -1544,7 +1544,7 @@
       },
       fr: {
         "nav.services": "Services", "nav.process": "Processus", "nav.work": "Travaux", "nav.cta": "Démarrer un projet",
-        "hero.eyebrow": "Studio Forma — Artisanat numérique",
+        "hero.eyebrow": "Aminoacid Studio — Artisanat numérique",
         "hero.title": "Nous créons des expériences web qui <em>semblent vivantes.</em>",
         "hero.sub": "Nous concevons et développons des sites, interfaces et mondes numériques pour les marques qui veulent se démarquer.",
         "hero.cta1": "Démarrer un projet", "hero.cta2": "Explorer les services", "hero.scroll": "Défiler pour explorer",
@@ -1678,218 +1678,212 @@
       const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 160);
       camera.position.set(0, 0, 28);
 
-      // ── Shared materials ──────────────────────────────────────────
-      const matAtomC = new THREE.MeshStandardMaterial({ color: 0x7ab8c9, roughness: 0.35, metalness: 0.55, transparent: true, opacity: 0.88 });
-      const matAtomN = new THREE.MeshStandardMaterial({ color: 0xc8b89a, roughness: 0.4, metalness: 0.4, transparent: true, opacity: 0.80 });
-      const matAtomO = new THREE.MeshStandardMaterial({ color: 0xc9a84c, roughness: 0.3, metalness: 0.6, transparent: true, opacity: 0.82 });
-      const matAtomH = new THREE.MeshStandardMaterial({ color: 0x2a4a66, roughness: 0.6, metalness: 0.2, transparent: true, opacity: 0.55 });
-      const matBond = new THREE.MeshStandardMaterial({ color: 0x1a3050, roughness: 0.7, metalness: 0.3, transparent: true, opacity: 0.45 });
-      const matBondH = new THREE.MeshStandardMaterial({ color: 0xc8b89a, roughness: 0.5, metalness: 0.4, transparent: true, opacity: 0.30 });
-      const matRibbon = new THREE.MeshStandardMaterial({ color: 0x0d2a44, roughness: 0.8, metalness: 0.15, transparent: true, opacity: 0.38, side: THREE.DoubleSide });
+      // ── Vivid metallic materials (one per amino acid "type") ─────
+      // Low roughness + high metalness = mirror-like shine as in reference image
+      function mkMat(hex) {
+        return new THREE.MeshStandardMaterial({ color: hex, roughness: 0.08, metalness: 0.88, envMapIntensity: 1.2 });
+      }
+      // 8 vivid atom colors — red, yellow-green, purple, blue, orange, cyan, magenta, gold
+      const ATOM_COLORS = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
+      // Bond colors: darker version of atom color
+      const BOND_COLORS = [0x880011, 0x557700, 0x551188, 0x004499, 0x883300, 0x006655, 0x880055, 0x886600];
+
+      // Build material sets per molecule index (0-7)
+      function matSet(idx) {
+        const a = ATOM_COLORS[idx % 8];
+        const b = ATOM_COLORS[(idx + 2) % 8];
+        const c = ATOM_COLORS[(idx + 4) % 8];
+        const bond = new THREE.MeshStandardMaterial({ color: BOND_COLORS[idx % 8], roughness: 0.25, metalness: 0.7 });
+        return { mA: mkMat(a), mB: mkMat(b), mC: mkMat(c), bond };
+      }
 
       // ── Shared geometries ─────────────────────────────────────────
-      const geoAtomLg = new THREE.SphereGeometry(0.38, 14, 10);
-      const geoAtomMd = new THREE.SphereGeometry(0.26, 12, 8);
-      const geoAtomSm = new THREE.SphereGeometry(0.16, 10, 7);
+      const geoAtomLg = new THREE.SphereGeometry(0.42, 16, 12);
+      const geoAtomMd = new THREE.SphereGeometry(0.28, 14, 10);
+      const geoAtomSm = new THREE.SphereGeometry(0.18, 12, 8);
 
-      // ── Helper: create a cylinder bond between two Vector3 points ──
-      function makeBond(a, b, mat, radius = 0.06) {
+      // ── Helper: cylinder bond ────────────────────────────────────
+      function makeBond(a, b, mat, radius = 0.08) {
         const dir = new THREE.Vector3().subVectors(b, a);
         const len = dir.length();
-        const geo = new THREE.CylinderGeometry(radius, radius, len, 7, 1);
+        const geo = new THREE.CylinderGeometry(radius, radius, len, 9, 1);
         const mesh = new THREE.Mesh(geo, mat);
-        const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
-        mesh.position.copy(mid);
+        mesh.position.copy(new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5));
         mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
         return mesh;
       }
 
-      // ── Helper: build one amino acid residue ──────────────────────
-      // Backbone: N–Cα–C(=O)–  with a randomised side chain cluster
-      function buildResidue(origin, type) {
+      // ── Build one residue with per-molecule material set ─────────
+      function buildResidue(origin, typeOffset, mats) {
         const g = new THREE.Group();
         g.position.copy(origin);
 
-        // Atom type selection
-        const types = [
-          [matAtomN, matAtomC, matAtomO],   // polar
-          [matAtomC, matAtomC, matAtomN],   // aliphatic
-          [matAtomO, matAtomC, matAtomC],   // acidic
-          [matAtomN, matAtomO, matAtomN],   // basic
-        ];
-        const [mA, mB, mC] = types[type % 4];
-
-        // Backbone positions (local)
-        const posN = new THREE.Vector3(-0.75, 0, 0);
+        const posN = new THREE.Vector3(-0.78, 0, 0);
         const posCa = new THREE.Vector3(0, 0, 0);
-        const posC = new THREE.Vector3(0.72, 0.35, 0);
-        const posO = new THREE.Vector3(1.1, 1.0, 0.25);
+        const posC = new THREE.Vector3(0.74, 0.38, 0);
+        const posO = new THREE.Vector3(1.15, 1.05, 0.28);
 
-        // Backbone atoms
-        const atomN = new THREE.Mesh(geoAtomMd, mA); atomN.position.copy(posN);
-        const atomCa = new THREE.Mesh(geoAtomLg, mB); atomCa.position.copy(posCa);
-        const atomC = new THREE.Mesh(geoAtomMd, mB); atomC.position.copy(posC);
-        const atomO = new THREE.Mesh(geoAtomSm, mC); atomO.position.copy(posO);
+        const atomN = new THREE.Mesh(geoAtomMd, mats.mA); atomN.position.copy(posN);
+        const atomCa = new THREE.Mesh(geoAtomLg, mats.mB); atomCa.position.copy(posCa);
+        const atomC = new THREE.Mesh(geoAtomMd, mats.mB); atomC.position.copy(posC);
+        const atomO = new THREE.Mesh(geoAtomSm, mats.mC); atomO.position.copy(posO);
         g.add(atomN, atomCa, atomC, atomO);
+        g.add(makeBond(posN, posCa, mats.bond, 0.09));
+        g.add(makeBond(posCa, posC, mats.bond, 0.09));
+        g.add(makeBond(posC, posO, mats.bond, 0.06));
 
-        // Backbone bonds
-        g.add(makeBond(posN, posCa, matBond, 0.07));
-        g.add(makeBond(posCa, posC, matBond, 0.07));
-        g.add(makeBond(posC, posO, matBond, 0.055));
-
-        // Side chain: 1–3 atoms hanging off Cα
-        const scCount = 1 + (type % 3);
-        const scMats = [mA, mB, mC, matAtomH];
+        const scCount = 1 + (typeOffset % 3);
         let prevPos = posCa;
+        const scMatsArr = [mats.mA, mats.mC, mats.mB];
         for (let s = 0; s < scCount; s++) {
           const angle = (s / scCount) * Math.PI * 1.6 - Math.PI * 0.6;
           const scPos = new THREE.Vector3(
-            prevPos.x + Math.cos(angle) * 0.68,
-            prevPos.y - 0.55 - s * 0.1,
-            prevPos.z + Math.sin(angle) * 0.5
+            prevPos.x + Math.cos(angle) * 0.72,
+            prevPos.y - 0.58 - s * 0.12,
+            prevPos.z + Math.sin(angle) * 0.52
           );
-          const scGeo = s === 0 ? geoAtomMd : geoAtomSm;
-          const scMat = scMats[s % scMats.length];
-          const scAtom = new THREE.Mesh(scGeo, scMat);
+          const scAtom = new THREE.Mesh(s === 0 ? geoAtomMd : geoAtomSm, scMatsArr[s % 3]);
           scAtom.position.copy(scPos);
           g.add(scAtom);
-          g.add(makeBond(prevPos, scPos, matBondH, 0.045));
+          g.add(makeBond(prevPos, scPos, mats.bond, 0.055));
           prevPos = scPos;
         }
-
         return g;
       }
 
-      // ── Helper: build one alpha-helix segment ─────────────────────
-      function buildHelix(origin, residueCount, helixRadius, pitch, startAngle) {
-        const g = new THREE.Group();
-        g.position.copy(origin);
-        const residues = [];
-
-        for (let i = 0; i < residueCount; i++) {
-          const angle = startAngle + i * (Math.PI * 2 / 3.6); // 3.6 residues/turn
-          const y = i * pitch;
-          const x = Math.cos(angle) * helixRadius;
-          const z = Math.sin(angle) * helixRadius;
-          const residue = buildResidue(new THREE.Vector3(x, y, z), i);
-          residue.rotation.y = angle + Math.PI * 0.5;
-          g.add(residue);
-          residues.push(new THREE.Vector3(x, y, z));
-        }
-
-        // Ribbon backbone tube approximation (simple cylinders between adjacent Cα)
-        for (let i = 0; i < residues.length - 1; i++) {
-          g.add(makeBond(residues[i], residues[i + 1], matRibbon, 0.18));
-        }
-
-        return g;
-      }
-
-      // ── Helper: build a beta-strand ───────────────────────────────
-      function buildStrand(origin, residueCount) {
+      // ── Build alpha-helix with material set ──────────────────────
+      function buildHelix(origin, residueCount, helixRadius, pitch, startAngle, mats) {
         const g = new THREE.Group();
         g.position.copy(origin);
         const pts = [];
         for (let i = 0; i < residueCount; i++) {
-          const pos = new THREE.Vector3(i * 1.4, Math.sin(i * Math.PI) * 0.22, 0);
-          const res = buildResidue(pos, i + 2);
+          const angle = startAngle + i * (Math.PI * 2 / 3.6);
+          const y = i * pitch;
+          const x = Math.cos(angle) * helixRadius;
+          const z = Math.sin(angle) * helixRadius;
+          const res = buildResidue(new THREE.Vector3(x, y, z), i, mats);
+          res.rotation.y = angle + Math.PI * 0.5;
+          g.add(res);
+          pts.push(new THREE.Vector3(x, y, z));
+        }
+        const ribbonMat = new THREE.MeshStandardMaterial({ color: mats.bond.color, roughness: 0.4, metalness: 0.5, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
+        for (let i = 0; i < pts.length - 1; i++) g.add(makeBond(pts[i], pts[i + 1], ribbonMat, 0.2));
+        return g;
+      }
+
+      // ── Build beta-strand with material set ──────────────────────
+      function buildStrand(origin, residueCount, mats) {
+        const g = new THREE.Group();
+        g.position.copy(origin);
+        const pts = [];
+        for (let i = 0; i < residueCount; i++) {
+          const pos = new THREE.Vector3(i * 1.5, Math.sin(i * Math.PI) * 0.25, 0);
+          const res = buildResidue(pos, i + 1, mats);
           res.rotation.y = i % 2 === 0 ? 0 : Math.PI;
           g.add(res);
           pts.push(pos);
         }
-        for (let i = 0; i < pts.length - 1; i++) {
-          g.add(makeBond(pts[i], pts[i + 1], matRibbon, 0.13));
-        }
+        const ribbonMat = new THREE.MeshStandardMaterial({ color: mats.bond.color, roughness: 0.4, metalness: 0.5, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+        for (let i = 0; i < pts.length - 1; i++) g.add(makeBond(pts[i], pts[i + 1], ribbonMat, 0.15));
         return g;
       }
 
-      // ── Build molecular structures scattered in space ─────────────
-      const moleculeCount = isMobile ? 6 : 12;
-      const molecules = [];
-      const seed = [ // hand-placed for drama, rest are random
-        { type: 'helix', pos: [-4, 1, 2], rot: [0.3, 0.6, 0], res: 9, r: 1.1, pitch: 0.9, ang: 0 },
-        { type: 'helix', pos: [5, -2, -3], rot: [-0.2, -0.4, 0.1], res: 7, r: 0.9, pitch: 1.0, ang: 1.2 },
-        { type: 'strand', pos: [2, 3, 6], rot: [0.1, 0.8, -0.2], res: 5 },
-        { type: 'strand', pos: [-6, 0, -1], rot: [-0.3, 0.2, 0.4], res: 6 },
-        { type: 'helix', pos: [0, -4, 8], rot: [0.5, -0.3, 0.15], res: 6, r: 1.0, pitch: 0.85, ang: 0.5 },
-        { type: 'strand', pos: [-3, -3, -6], rot: [0.2, -0.5, 0.3], res: 4 },
+      // ── 8 named molecules, one per page section ───────────────────
+      // Each has a fixed world position that the camera will orbit when
+      // the user scrolls to the corresponding section.
+      // Sections: Hero, Manifesto, Fact1, Services, Fact2, Process, Portfolio, CTA
+      const MOLECULES = [
+        // 0 Hero      — large red helix center-stage
+        { type: 'helix', pos: [0.0, 0.0, 0.0], rot: [0.15, 0.0, 0.0], res: 10, r: 1.2, pitch: 0.95, ang: 0.0, mIdx: 0 },
+        // 1 Manifesto — yellow-green strand, left
+        { type: 'strand', pos: [-5.0, 1.5, -4.0], rot: [0.1, 0.5, -0.1], res: 7, mIdx: 1 },
+        // 2 Fact 1    — purple helix, upper right
+        { type: 'helix', pos: [5.5, 2.0, -3.0], rot: [-0.2, -0.4, 0.2], res: 8, r: 1.0, pitch: 0.9, ang: 1.0, mIdx: 2 },
+        // 3 Services  — blue strand, lower left
+        { type: 'strand', pos: [-4.0, -3.0, -8.0], rot: [0.25, 0.3, 0.1], res: 6, mIdx: 3 },
+        // 4 Fact 2    — orange helix, deep center
+        { type: 'helix', pos: [1.5, 1.0, -12.0], rot: [0.1, -0.2, 0.0], res: 9, r: 1.1, pitch: 1.0, ang: 0.5, mIdx: 4 },
+        // 5 Process   — cyan strand, right mid-depth
+        { type: 'strand', pos: [6.0, 0.0, -16.0], rot: [-0.1, 0.6, 0.2], res: 5, mIdx: 5 },
+        // 6 Portfolio — magenta helix, left deep
+        { type: 'helix', pos: [-5.0, -1.0, -20.0], rot: [0.2, -0.3, -0.1], res: 8, r: 0.9, pitch: 0.85, ang: 2.0, mIdx: 6 },
+        // 7 CTA       — gold strand, final
+        { type: 'strand', pos: [0.5, 2.0, -26.0], rot: [0.0, 0.1, 0.0], res: 7, mIdx: 7 },
       ];
 
-      const rng = (a, b) => a + Math.random() * (b - a);
-      for (let i = seed.length; i < moleculeCount; i++) {
-        seed.push(
-          Math.random() > 0.5
-            ? { type: 'helix', pos: [rng(-12, 12), rng(-8, 8), rng(-12, 12)], rot: [rng(-0.6, 0.6), rng(-1, 1), rng(-0.4, 0.4)], res: 5 + Math.floor(Math.random() * 5), r: 0.8 + Math.random() * 0.5, pitch: 0.8 + Math.random() * 0.4, ang: Math.random() * Math.PI * 2 }
-            : { type: 'strand', pos: [rng(-12, 12), rng(-8, 8), rng(-12, 12)], rot: [rng(-0.5, 0.5), rng(-1, 1), rng(-0.4, 0.4)], res: 4 + Math.floor(Math.random() * 4) }
-        );
-      }
-
-      seed.forEach(s => {
+      const molecules = [];
+      MOLECULES.forEach((s, idx) => {
+        const mats = matSet(s.mIdx);
         const mesh = s.type === 'helix'
-          ? buildHelix(new THREE.Vector3(...s.pos), s.res, s.r, s.pitch, s.ang)
-          : buildStrand(new THREE.Vector3(...s.pos), s.res);
+          ? buildHelix(new THREE.Vector3(...s.pos), s.res, s.r, s.pitch, s.ang, mats)
+          : buildStrand(new THREE.Vector3(...s.pos), s.res, mats);
         mesh.rotation.set(...s.rot);
         scene.add(mesh);
-        molecules.push({ mesh, baseRot: [...s.rot], speed: 0.03 + Math.random() * 0.04, phase: Math.random() * Math.PI * 2 });
+        molecules.push({ mesh, baseRot: [...s.rot], speed: 0.018 + idx * 0.004, phase: idx * 0.8 });
       });
 
-      // ── Floating ambient particles (organelle-like) ───────────────
-      const partCount = isMobile ? 120 : 350;
+      // ── Ambient particles (vivid, matching color palette) ─────────
+      const partCount = isMobile ? 150 : 400;
       const partGeo = new THREE.BufferGeometry();
       const partPos = new Float32Array(partCount * 3);
       const partCol = new Float32Array(partCount * 3);
-      const colors = [
-        new THREE.Color(0x7ab8c9), new THREE.Color(0xc8b89a),
-        new THREE.Color(0xc9a84c), new THREE.Color(0x1a4a6a),
-        new THREE.Color(0x2a6a4a),
-      ];
+      const partColors = ATOM_COLORS.map(h => new THREE.Color(h));
       for (let i = 0; i < partCount; i++) {
-        partPos[i * 3] = (Math.random() - 0.5) * 50;
-        partPos[i * 3 + 1] = (Math.random() - 0.5) * 30;
-        partPos[i * 3 + 2] = (Math.random() - 0.5) * 50;
-        const c = colors[Math.floor(Math.random() * colors.length)];
-        partCol[i * 3] = c.r; partCol[i * 3 + 1] = c.g; partCol[i * 3 + 2] = c.b;
+        partPos[i * 3] = (Math.random() - 0.5) * 40;
+        partPos[i * 3 + 1] = (Math.random() - 0.5) * 25;
+        partPos[i * 3 + 2] = (Math.random() - 0.5) * 60;
+        const c = partColors[Math.floor(Math.random() * partColors.length)];
+        partCol[i * 3] = c.r * 0.6; partCol[i * 3 + 1] = c.g * 0.6; partCol[i * 3 + 2] = c.b * 0.6;
       }
       partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
       partGeo.setAttribute('color', new THREE.BufferAttribute(partCol, 3));
-      const partMat = new THREE.PointsMaterial({ size: 0.1, vertexColors: true, transparent: true, opacity: 0.55, sizeAttenuation: true });
+      const partMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.6, sizeAttenuation: true });
       scene.add(new THREE.Points(partGeo, partMat));
 
-      // ── Cell membrane glow ring (billboard torus) ─────────────────
-      const torusGeo = new THREE.TorusGeometry(18, 0.12, 8, 80);
-      const torusMat = new THREE.MeshBasicMaterial({ color: 0x0d3a52, transparent: true, opacity: 0.25 });
-      const torus1 = new THREE.Mesh(torusGeo, torusMat);
+      // ── Cell membrane toroids ────────────────────────────────────
+      const torusMat = new THREE.MeshBasicMaterial({ color: 0x1a0a3a, transparent: true, opacity: 0.2 });
+      const torus1 = new THREE.Mesh(new THREE.TorusGeometry(20, 0.1, 8, 90), torusMat);
       torus1.rotation.x = Math.PI * 0.3; scene.add(torus1);
-      const torus2 = new THREE.Mesh(new THREE.TorusGeometry(14, 0.08, 8, 60), new THREE.MeshBasicMaterial({ color: 0x1a5a3a, transparent: true, opacity: 0.15 }));
+      const torus2 = new THREE.Mesh(new THREE.TorusGeometry(15, 0.07, 8, 70),
+        new THREE.MeshBasicMaterial({ color: 0x0a2a1a, transparent: true, opacity: 0.15 }));
       torus2.rotation.x = Math.PI * 0.6; torus2.rotation.z = Math.PI * 0.2; scene.add(torus2);
 
-      // ── Lights ────────────────────────────────────────────────────
-      scene.add(new THREE.AmbientLight(0x030810, 6));
+      // ── Lights ───────────────────────────────────────────────────
+      scene.add(new THREE.AmbientLight(0x050208, 5));
 
-      const cyanLight = new THREE.PointLight(0x7ab8c9, 3.5, 35);
-      cyanLight.position.set(-6, 4, 8); scene.add(cyanLight);
+      // Key light — white-ish to let vivid colors show true
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+      keyLight.position.set(5, 10, 8); scene.add(keyLight);
 
-      const goldLight = new THREE.PointLight(0xc9a84c, 2.0, 28);
-      goldLight.position.set(8, -3, 4); scene.add(goldLight);
+      // Accent lights matching the color palette — drift for drama
+      const redLight = new THREE.PointLight(0xff2244, 2.5, 30); redLight.position.set(-5, 3, 6); scene.add(redLight);
+      const blueLight = new THREE.PointLight(0x1188ff, 2.0, 28); blueLight.position.set(6, -2, 4); scene.add(blueLight);
+      const purpLight = new THREE.PointLight(0xaa22ff, 1.8, 25); purpLight.position.set(0, 6, -5); scene.add(purpLight);
+      const goldLight = new THREE.PointLight(0xffcc00, 1.5, 22); goldLight.position.set(-4, -4, -8); scene.add(goldLight);
 
-      const deepLight = new THREE.PointLight(0x1a3a5c, 1.5, 40);
-      deepLight.position.set(0, 8, -10); scene.add(deepLight);
-
-      const greenLight = new THREE.PointLight(0x0d3a2a, 1.2, 30);
-      greenLight.position.set(-10, -5, 5); scene.add(greenLight);
-
-      // ── Scroll → smooth camera path ───────────────────────────────
-      // Camera travels a cinematic spline through the molecular field
+      // ── Camera waypoints — one per molecule/section ──────────────
+      // Each waypoint positions camera to orbit that specific molecule
+      // with a slight offset so it's not dead-center (more cinematic)
       const camPath = [
-        { pos: new THREE.Vector3(0, 0, 28), target: new THREE.Vector3(0, 0, 0) },
-        { pos: new THREE.Vector3(-4, 2, 18), target: new THREE.Vector3(-1, 0, -4) },
-        { pos: new THREE.Vector3(3, 1, 10), target: new THREE.Vector3(1, -1, -2) },
-        { pos: new THREE.Vector3(-2, -2, 4), target: new THREE.Vector3(0, 0, -8) },
-        { pos: new THREE.Vector3(4, 3, -2), target: new THREE.Vector3(0, 0, -12) },
-        { pos: new THREE.Vector3(0, 0, -10), target: new THREE.Vector3(0, 0, -20) },
+        // 0 Hero: pull-back wide view of mol#0 (red helix center)
+        { pos: new THREE.Vector3(0.0, 1.5, 10.0), target: new THREE.Vector3(0.0, 0.3, 0.0) },
+        // 1 Manifesto: swoop left to yellow-green strand
+        { pos: new THREE.Vector3(-3.5, 3.0, 0.5), target: new THREE.Vector3(-5.0, 1.5, -4.0) },
+        // 2 Fact 1: arc to purple helix upper right
+        { pos: new THREE.Vector3(7.5, 3.5, 1.0), target: new THREE.Vector3(5.5, 2.0, -3.0) },
+        // 3 Services: descend to blue strand lower left
+        { pos: new THREE.Vector3(-2.5, -1.5, -3.5), target: new THREE.Vector3(-4.0, -3.0, -8.0) },
+        // 4 Fact 2: push deep to orange helix
+        { pos: new THREE.Vector3(3.5, 2.5, -7.0), target: new THREE.Vector3(1.5, 1.0, -12.0) },
+        // 5 Process: slide right to cyan strand
+        { pos: new THREE.Vector3(8.5, 1.0, -12.5), target: new THREE.Vector3(6.0, 0.0, -16.0) },
+        // 6 Portfolio: sweep left to magenta helix
+        { pos: new THREE.Vector3(-3.0, 0.5, -16.5), target: new THREE.Vector3(-5.0, -1.0, -20.0) },
+        // 7 CTA: final approach to gold strand, slight top-down
+        { pos: new THREE.Vector3(2.0, 5.0, -21.5), target: new THREE.Vector3(0.5, 2.0, -26.0) },
       ];
 
-      // Smooth interpolated scroll value
+      // Smooth scroll value
       let rawScroll = 0;
       let smoothScroll = 0;
       window.addEventListener('scroll', () => {
@@ -1909,7 +1903,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // ── Animate ───────────────────────────────────────────────────
+      // ── Animate ─────────────────────────────────────────────────
       const clock = new THREE.Clock();
 
       function lerpVec3(a, b, t) {
@@ -1921,57 +1915,65 @@
       }
 
       function getCamState(s) {
-        // s in [0,1] — map to camPath segments
         const n = camPath.length - 1;
-        const idx = Math.min(Math.floor(s * n), n - 1);
-        const t = (s * n) - idx;
-        // smooth step for extra cinematic ease
-        const st = t * t * (3 - 2 * t);
+        const raw = Math.min(s * n, n - 0.001);
+        const idx = Math.floor(raw);
+        const frac = raw - idx;
+        // Smooth step — ease in/out between waypoints
+        const st = frac * frac * (3 - 2 * frac);
         return {
-          pos: lerpVec3(camPath[idx].pos, camPath[idx + 1].pos, st),
-          target: lerpVec3(camPath[idx].target, camPath[idx + 1].target, st),
+          pos: lerpVec3(camPath[idx].pos, camPath[Math.min(idx + 1, n)].pos, st),
+          target: lerpVec3(camPath[idx].target, camPath[Math.min(idx + 1, n)].target, st),
         };
       }
+
+      // Light colors that animate per section (matched to molecule palette)
+      const sectionLightColors = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
 
       function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
 
-        // Smooth scroll interpolation — fast but not instant
-        smoothScroll += (rawScroll - smoothScroll) * 0.06;
+        // Smooth scroll — lerp factor 0.055 = snappy but damped
+        smoothScroll += (rawScroll - smoothScroll) * 0.055;
 
-        // Mouse smoothing
+        // Mouse smooth
         cmx += (mx - cmx) * 0.04;
         cmy += (my - cmy) * 0.04;
 
         // Camera path
         const state = getCamState(smoothScroll);
         camera.position.copy(state.pos);
-        camera.position.x += cmx * 1.8;
-        camera.position.y += cmy * -1.2;
+        camera.position.x += cmx * 1.5;
+        camera.position.y += cmy * -1.0;
         camera.lookAt(state.target);
 
-        // Molecules — slow independent rotation + gentle oscillation
+        // Molecules — individual slow rotation + float, no full spin (keeps detail visible)
         molecules.forEach((m, i) => {
-          m.mesh.rotation.y = m.baseRot[1] + t * m.speed + m.phase;
-          m.mesh.rotation.x = m.baseRot[0] + Math.sin(t * 0.2 + m.phase) * 0.06;
-          m.mesh.rotation.z = m.baseRot[2] + Math.cos(t * 0.15 + m.phase) * 0.04;
-          // Gentle float
-          m.mesh.position.y = (m.mesh.position.y || 0);
-          const basePosY = seed[i] ? seed[i].pos[1] : 0;
-          m.mesh.position.y = basePosY + Math.sin(t * 0.18 + m.phase) * 0.35;
+          m.mesh.rotation.y = m.baseRot[1] + Math.sin(t * m.speed + m.phase) * 0.22;
+          m.mesh.rotation.x = m.baseRot[0] + Math.cos(t * m.speed * 0.7 + m.phase) * 0.12;
+          m.mesh.rotation.z = m.baseRot[2] + Math.sin(t * m.speed * 0.5 + m.phase + 1) * 0.08;
+          m.mesh.position.y = MOLECULES[i].pos[1] + Math.sin(t * 0.2 + m.phase) * 0.3;
         });
 
-        // Torus membrane pulsing
-        torus1.rotation.z = t * 0.04;
-        torus2.rotation.y = t * 0.03;
-        torusMat.opacity = 0.18 + Math.sin(t * 0.5) * 0.07;
+        // Torus pulsing
+        torus1.rotation.z = t * 0.03;
+        torus2.rotation.y = t * 0.025;
+        torusMat.opacity = 0.14 + Math.sin(t * 0.4) * 0.06;
 
-        // Light breathing
-        cyanLight.intensity = 3.5 + Math.sin(t * 0.6) * 0.8;
-        goldLight.intensity = 2.0 + Math.cos(t * 0.4 + 1.0) * 0.5;
-        cyanLight.position.x = -6 + Math.sin(t * 0.25) * 3;
-        goldLight.position.z = 4 + Math.cos(t * 0.2) * 3;
+        // Color-matched accent lights drift and breathe
+        const secIdx = Math.min(Math.floor(smoothScroll * (camPath.length - 1)), camPath.length - 2);
+        const col = new THREE.Color(sectionLightColors[secIdx]);
+        redLight.color.lerp(col, 0.02);
+        redLight.intensity = 2.5 + Math.sin(t * 0.55) * 0.7;
+        blueLight.intensity = 2.0 + Math.cos(t * 0.42 + 1.2) * 0.5;
+        purpLight.intensity = 1.8 + Math.sin(t * 0.38 + 2.1) * 0.4;
+        goldLight.intensity = 1.5 + Math.cos(t * 0.30 + 0.5) * 0.35;
+
+        // Drift accent lights slowly for ambient movement
+        redLight.position.x = -5 + Math.sin(t * 0.18) * 2.5;
+        blueLight.position.z = 4 + Math.cos(t * 0.15) * 2;
+        purpLight.position.y = 6 + Math.sin(t * 0.12) * 1.5;
 
         renderer.render(scene, camera);
       }
