@@ -1635,461 +1635,757 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // ═══════════════════════════════════════════════════════════════
-    // THREE.JS — BIOMOLECULAR CELL SCENE
+    // AMINOACID STUDIO — 3D EXPERIENCE v4
+    // S0  0–15%   aminoácidos en célula
+    // S1  15–30%  clusters dispersos + rayos eléctricos
+    // S2  30–44%  neurona isométrica + pulso axón→dendritas  
+    // S3  44–58%  red neuronal + rayos eléctricos entre neuronas
+    // S4  58–68%  fondo espacial azul profundo
+    // S5  68–80%  cabeza 3D malla tornasol + cerebro partículas
+    // S6  80–92%  cabeza alejada + degradado espiritual
+    // S7  92–100% fade cósmico
     // ═══════════════════════════════════════════════════════════════
     (function () {
       const canvas = document.getElementById('hero-canvas');
-      try {
-        const t = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!t) throw 0;
-      } catch (_) {
-        document.getElementById('webgl-fallback').style.display = 'block';
-        canvas.style.display = 'none';
-        return;
-      }
+      try { const _t = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); if (!_t) throw 0; }
+      catch (_) { document.getElementById('webgl-fallback').style.display = 'block'; canvas.style.display = 'none'; return; }
 
       const isMobile = window.innerWidth < 768;
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile, alpha: false });
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor(0x030810, 1);
+      renderer.setClearColor(0x020508, 1);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
+      renderer.toneMappingExposure = 1.3;
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x030810, 0.022);
+      const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 1500);
+      camera.position.set(0, 0, 18);
 
-      const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 160);
-      camera.position.set(0, 0, 28);
-
-      // ── Vivid metallic materials (one per amino acid "type") ─────
-      // Low roughness + high metalness = mirror-like shine as in reference image
-      function mkMat(hex) {
-        return new THREE.MeshStandardMaterial({ color: hex, roughness: 0.08, metalness: 0.88, envMapIntensity: 1.2 });
-      }
-      // 8 vivid atom colors — red, yellow-green, purple, blue, orange, cyan, magenta, gold
-      const ATOM_COLORS = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
-      // Bond colors: darker version of atom color
-      const BOND_COLORS = [0x880011, 0x557700, 0x551188, 0x004499, 0x883300, 0x006655, 0x880055, 0x886600];
-
-      // Build material sets per molecule index (0-7)
-      function matSet(idx) {
-        const a = ATOM_COLORS[idx % 8];
-        const b = ATOM_COLORS[(idx + 2) % 8];
-        const c = ATOM_COLORS[(idx + 4) % 8];
-        const bond = new THREE.MeshStandardMaterial({ color: BOND_COLORS[idx % 8], roughness: 0.25, metalness: 0.7 });
-        return { mA: mkMat(a), mB: mkMat(b), mC: mkMat(c), bond };
-      }
-
-      // ── Shared geometries ─────────────────────────────────────────
-      const geoAtomLg = new THREE.SphereGeometry(0.42, 16, 12);
-      const geoAtomMd = new THREE.SphereGeometry(0.28, 14, 10);
-      const geoAtomSm = new THREE.SphereGeometry(0.18, 12, 8);
-
-      // ── Helper: cylinder bond ────────────────────────────────────
-      function makeBond(a, b, mat, radius = 0.08) {
-        const dir = new THREE.Vector3().subVectors(b, a);
-        const len = dir.length();
-        const geo = new THREE.CylinderGeometry(radius, radius, len, 9, 1);
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.copy(new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5));
-        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
-        return mesh;
-      }
-
-      // ── Build one residue with per-molecule material set ─────────
-      function buildResidue(origin, typeOffset, mats) {
-        const g = new THREE.Group();
-        g.position.copy(origin);
-
-        const posN = new THREE.Vector3(-0.78, 0, 0);
-        const posCa = new THREE.Vector3(0, 0, 0);
-        const posC = new THREE.Vector3(0.74, 0.38, 0);
-        const posO = new THREE.Vector3(1.15, 1.05, 0.28);
-
-        const atomN = new THREE.Mesh(geoAtomMd, mats.mA); atomN.position.copy(posN);
-        const atomCa = new THREE.Mesh(geoAtomLg, mats.mB); atomCa.position.copy(posCa);
-        const atomC = new THREE.Mesh(geoAtomMd, mats.mB); atomC.position.copy(posC);
-        const atomO = new THREE.Mesh(geoAtomSm, mats.mC); atomO.position.copy(posO);
-        g.add(atomN, atomCa, atomC, atomO);
-        g.add(makeBond(posN, posCa, mats.bond, 0.09));
-        g.add(makeBond(posCa, posC, mats.bond, 0.09));
-        g.add(makeBond(posC, posO, mats.bond, 0.06));
-
-        const scCount = 1 + (typeOffset % 3);
-        let prevPos = posCa;
-        const scMatsArr = [mats.mA, mats.mC, mats.mB];
-        for (let s = 0; s < scCount; s++) {
-          const angle = (s / scCount) * Math.PI * 1.6 - Math.PI * 0.6;
-          const scPos = new THREE.Vector3(
-            prevPos.x + Math.cos(angle) * 0.72,
-            prevPos.y - 0.58 - s * 0.12,
-            prevPos.z + Math.sin(angle) * 0.52
-          );
-          const scAtom = new THREE.Mesh(s === 0 ? geoAtomMd : geoAtomSm, scMatsArr[s % 3]);
-          scAtom.position.copy(scPos);
-          g.add(scAtom);
-          g.add(makeBond(prevPos, scPos, mats.bond, 0.055));
-          prevPos = scPos;
-        }
-        return g;
-      }
-
-      // ── Build alpha-helix with material set ──────────────────────
-      function buildHelix(origin, residueCount, helixRadius, pitch, startAngle, mats) {
-        const g = new THREE.Group();
-        g.position.copy(origin);
-        const pts = [];
-        for (let i = 0; i < residueCount; i++) {
-          const angle = startAngle + i * (Math.PI * 2 / 3.6);
-          const y = i * pitch;
-          const x = Math.cos(angle) * helixRadius;
-          const z = Math.sin(angle) * helixRadius;
-          const res = buildResidue(new THREE.Vector3(x, y, z), i, mats);
-          res.rotation.y = angle + Math.PI * 0.5;
-          g.add(res);
-          pts.push(new THREE.Vector3(x, y, z));
-        }
-        const ribbonMat = new THREE.MeshStandardMaterial({ color: mats.bond.color, roughness: 0.4, metalness: 0.5, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
-        for (let i = 0; i < pts.length - 1; i++) g.add(makeBond(pts[i], pts[i + 1], ribbonMat, 0.2));
-        return g;
-      }
-
-      // ── Build beta-strand with material set ──────────────────────
-      function buildStrand(origin, residueCount, mats) {
-        const g = new THREE.Group();
-        g.position.copy(origin);
-        const pts = [];
-        for (let i = 0; i < residueCount; i++) {
-          const pos = new THREE.Vector3(i * 1.5, Math.sin(i * Math.PI) * 0.25, 0);
-          const res = buildResidue(pos, i + 1, mats);
-          res.rotation.y = i % 2 === 0 ? 0 : Math.PI;
-          g.add(res);
-          pts.push(pos);
-        }
-        const ribbonMat = new THREE.MeshStandardMaterial({ color: mats.bond.color, roughness: 0.4, metalness: 0.5, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
-        for (let i = 0; i < pts.length - 1; i++) g.add(makeBond(pts[i], pts[i + 1], ribbonMat, 0.15));
-        return g;
-      }
-
-      // ── HYPERREALISTIC STARS ─────────────────────────────────────
-      // Two layers: tiny distant stars + larger solar/corona stars
-      function buildStarField() {
-        // Layer 1: distant stars — tiny white/blue-white points
-        const N1 = isMobile ? 600 : 1800;
-        const g1 = new THREE.BufferGeometry();
-        const p1 = new Float32Array(N1 * 3);
-        const c1 = new Float32Array(N1 * 3);
-        const s1 = new Float32Array(N1); // individual sizes
-        for (let i = 0; i < N1; i++) {
-          // Distribute on a large sphere shell so no flat plane clusters
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          const r = 40 + Math.random() * 60;
-          p1[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-          p1[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-          p1[i * 3 + 2] = r * Math.cos(phi);
-          // Star colors: blue-white, white, warm-white
-          const col = Math.random();
-          if (col < 0.3) { c1[i * 3] = 0.7; c1[i * 3 + 1] = 0.85; c1[i * 3 + 2] = 1.0; }       // blue-white
-          else if (col < 0.7) { c1[i * 3] = 1.0; c1[i * 3 + 1] = 1.0; c1[i * 3 + 2] = 1.0; }    // pure white
-          else { c1[i * 3] = 1.0; c1[i * 3 + 1] = 0.92; c1[i * 3 + 2] = 0.78; }                  // warm/yellow
-          s1[i] = 0.04 + Math.random() * 0.12;
-        }
-        g1.setAttribute('position', new THREE.BufferAttribute(p1, 3));
-        g1.setAttribute('color', new THREE.BufferAttribute(c1, 3));
-        const m1 = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.88, sizeAttenuation: true });
-        scene.add(new THREE.Points(g1, m1));
-
-        // Layer 2: solar/corona stars — larger, glowing, fewer
-        const N2 = isMobile ? 30 : 80;
-        const g2 = new THREE.BufferGeometry();
-        const p2 = new Float32Array(N2 * 3);
-        const c2 = new Float32Array(N2 * 3);
-        // Solar colors: deep orange, yellow, white-yellow, red giant
-        const solarPalette = [
-          [1.0, 0.55, 0.05], [1.0, 0.85, 0.2], [1.0, 1.0, 0.85],
-          [1.0, 0.25, 0.1], [0.6, 0.8, 1.0], [1.0, 0.95, 0.6],
-        ];
-        for (let i = 0; i < N2; i++) {
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          const r = 35 + Math.random() * 45;
-          p2[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-          p2[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-          p2[i * 3 + 2] = r * Math.cos(phi);
-          const sc = solarPalette[Math.floor(Math.random() * solarPalette.length)];
-          c2[i * 3] = sc[0]; c2[i * 3 + 1] = sc[1]; c2[i * 3 + 2] = sc[2];
-        }
-        g2.setAttribute('position', new THREE.BufferAttribute(p2, 3));
-        g2.setAttribute('color', new THREE.BufferAttribute(c2, 3));
-        const m2 = new THREE.PointsMaterial({ size: 0.45, vertexColors: true, transparent: true, opacity: 0.9, sizeAttenuation: true });
-        const solarStars = new THREE.Points(g2, m2);
-        scene.add(solarStars);
-
-        // Layer 3: ultra-bright corona giants — rendered as small bright meshes
-        // so they get specular bloom from the lighting
-        const N3 = isMobile ? 8 : 20;
-        const giantGeo = new THREE.SphereGeometry(0.22, 8, 6);
-        const giantColors = [0xff8800, 0xffdd44, 0xff3311, 0xaaccff, 0xffff88];
-        for (let i = 0; i < N3; i++) {
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          const r = 28 + Math.random() * 30;
-          const mat = new THREE.MeshStandardMaterial({
-            color: giantColors[i % giantColors.length],
-            roughness: 0.0, metalness: 0.0,
-            emissive: giantColors[i % giantColors.length],
-            emissiveIntensity: 2.5 + Math.random() * 2,
-          });
-          const star = new THREE.Mesh(giantGeo, mat);
-          star.position.set(
-            r * Math.sin(phi) * Math.cos(theta),
-            r * Math.sin(phi) * Math.sin(theta),
-            r * Math.cos(phi)
-          );
-          scene.add(star);
-        }
-
-        return { stars2: solarStars, mat2: m2 };
-      }
-
-      const { stars2, mat2 } = buildStarField();
-
-      // ── 8 named molecules, one per page section ───────────────────
-      // All Y positions set to 0 or small offset so they're screen-centered.
-      // Rotations are deliberately non-axis-aligned (all three axes twisted).
-      const MOLECULES = [
-        // 0 Hero      — red helix, dead center
-        { type: 'helix', pos: [0.0, 0.0, 0.0], rot: [0.55, 0.30, 0.40], res: 10, r: 1.2, pitch: 0.95, ang: 0.0, mIdx: 0 },
-        // 1 Manifesto — yellow-green strand, left
-        { type: 'strand', pos: [-5.0, 0.0, -4.0], rot: [0.65, 0.50, -0.45], res: 7, mIdx: 1 },
-        // 2 Fact 1    — purple helix, right
-        { type: 'helix', pos: [5.5, 0.0, -3.0], rot: [-0.50, -0.55, 0.60], res: 8, r: 1.0, pitch: 0.9, ang: 1.0, mIdx: 2 },
-        // 3 Services  — blue strand, lower-left
-        { type: 'strand', pos: [-4.0, -0.5, -8.0], rot: [0.70, 0.35, 0.55], res: 6, mIdx: 3 },
-        // 4 Fact 2    — orange helix, center-deep
-        { type: 'helix', pos: [1.5, 0.0, -12.0], rot: [0.45, -0.60, 0.35], res: 9, r: 1.1, pitch: 1.0, ang: 0.5, mIdx: 4 },
-        // 5 Process   — cyan strand, right
-        { type: 'strand', pos: [6.0, 0.0, -16.0], rot: [-0.55, 0.65, 0.40], res: 5, mIdx: 5 },
-        // 6 Portfolio — magenta helix, left
-        { type: 'helix', pos: [-5.0, 0.0, -20.0], rot: [0.60, -0.40, -0.50], res: 8, r: 0.9, pitch: 0.85, ang: 2.0, mIdx: 6 },
-        // 7 CTA       — gold strand, final center
-        { type: 'strand', pos: [0.5, 0.0, -26.0], rot: [0.50, 0.45, 0.30], res: 7, mIdx: 7 },
-      ];
-
-      // Track all individual atom meshes per molecule for raycasting
-      const moleculeAtoms = []; // array of {molIdx, meshes:[]}
-
-      const molecules = [];
-      MOLECULES.forEach((s, idx) => {
-        const mats = matSet(s.mIdx);
-        let mesh;
-        const atomMeshes = [];
-
-        // Intercept mesh creation to collect atom meshes
-        const origAdd = THREE.Group.prototype.add;
-        // We'll collect atoms after build instead
-        mesh = s.type === 'helix'
-          ? buildHelix(new THREE.Vector3(...s.pos), s.res, s.r, s.pitch, s.ang, mats)
-          : buildStrand(new THREE.Vector3(...s.pos), s.res, mats);
-        mesh.rotation.set(...s.rot);
-        scene.add(mesh);
-
-        // Collect all Mesh children recursively for raycasting
-        mesh.traverse(child => {
-          if (child.isMesh) atomMeshes.push(child);
-        });
-        moleculeAtoms.push({ molIdx: idx, meshes: atomMeshes, baseMats: atomMeshes.map(m => m.material) });
-
-        molecules.push({ mesh, baseRot: [...s.rot], speed: 0.018 + idx * 0.004, phase: idx * 0.8 });
-      });
-
-      // ── Cell membrane toroids ────────────────────────────────────
-      const torusMat = new THREE.MeshBasicMaterial({ color: 0x1a0a3a, transparent: true, opacity: 0.2 });
-      const torus1 = new THREE.Mesh(new THREE.TorusGeometry(20, 0.1, 8, 90), torusMat);
-      torus1.rotation.x = Math.PI * 0.3; scene.add(torus1);
-      const torus2 = new THREE.Mesh(new THREE.TorusGeometry(15, 0.07, 8, 70),
-        new THREE.MeshBasicMaterial({ color: 0x0a2a1a, transparent: true, opacity: 0.15 }));
-      torus2.rotation.x = Math.PI * 0.6; torus2.rotation.z = Math.PI * 0.2; scene.add(torus2);
-
-      // ── Lights ───────────────────────────────────────────────────
-      scene.add(new THREE.AmbientLight(0x050208, 5));
-      const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
-      keyLight.position.set(5, 10, 8); scene.add(keyLight);
-
-      const redLight = new THREE.PointLight(0xff2244, 2.5, 30); redLight.position.set(-5, 3, 6); scene.add(redLight);
-      const blueLight = new THREE.PointLight(0x1188ff, 2.0, 28); blueLight.position.set(6, -2, 4); scene.add(blueLight);
-      const purpLight = new THREE.PointLight(0xaa22ff, 1.8, 25); purpLight.position.set(0, 6, -5); scene.add(purpLight);
-      const goldLight = new THREE.PointLight(0xffcc00, 1.5, 22); goldLight.position.set(-4, -4, -8); scene.add(goldLight);
-
-      // ── Camera waypoints (Y=0 centered) ─────────────────────────
-      const camPath = [
-        { pos: new THREE.Vector3(0.0, 0.0, 10.0), target: new THREE.Vector3(0.0, 0.0, 0.0) },
-        { pos: new THREE.Vector3(-3.5, 0.5, 0.5), target: new THREE.Vector3(-5.0, 0.0, -4.0) },
-        { pos: new THREE.Vector3(7.5, 0.5, 1.0), target: new THREE.Vector3(5.5, 0.0, -3.0) },
-        { pos: new THREE.Vector3(-2.5, -0.5, -3.5), target: new THREE.Vector3(-4.0, -0.5, -8.0) },
-        { pos: new THREE.Vector3(3.5, 0.5, -7.0), target: new THREE.Vector3(1.5, 0.0, -12.0) },
-        { pos: new THREE.Vector3(8.5, 0.0, -12.5), target: new THREE.Vector3(6.0, 0.0, -16.0) },
-        { pos: new THREE.Vector3(-3.0, 0.5, -16.5), target: new THREE.Vector3(-5.0, 0.0, -20.0) },
-        { pos: new THREE.Vector3(2.0, 1.5, -21.5), target: new THREE.Vector3(0.5, 0.0, -26.0) },
-      ];
-
-      // ── Raycaster hover system ───────────────────────────────────
-      const raycaster = new THREE.Raycaster();
-      const mouseNDC = new THREE.Vector2();
-      // Hover emissive material — bright white pulse
-      const hoverMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.0, metalness: 1.0, emissive: 0xffffff, emissiveIntensity: 0.0 });
-
-      let hoveredMesh = null;
-      let hoverPulse = 0;   // 0→1 animation progress
-      let hoverActive = false;
-
-      // Flat list of all atom meshes across all molecules
-      const allAtoms = moleculeAtoms.flatMap(m => m.meshes);
-
-      document.addEventListener('mousemove', e => {
-        mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
-        mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      });
-
-      // Glow point light that follows hovered atom
-      const hoverLight = new THREE.PointLight(0xffffff, 0, 6);
-      scene.add(hoverLight);
-
-      // Smooth scroll value
-      let rawScroll = 0;
-      let smoothScroll = 0;
+      // ── Scroll + mouse ────────────────────────────────────────────
+      let rawScroll = 0, smoothScroll = 0;
       window.addEventListener('scroll', () => {
         rawScroll = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
       });
-
-      // Mouse parallax (separate from NDC)
       let mx = 0, my = 0, cmx = 0, cmy = 0;
       document.addEventListener('mousemove', e => {
-        mx = (e.clientX / window.innerWidth - 0.5) * 2;
-        my = (e.clientY / window.innerHeight - 0.5) * 2;
+        mx = (e.clientX / window.innerWidth - 0.5) * 2; my = (e.clientY / window.innerHeight - 0.5) * 2;
       });
-
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // ── Animate ─────────────────────────────────────────────────
-      const clock = new THREE.Clock();
+      // ── Utils ─────────────────────────────────────────────────────
+      function rand(a, b) { return a + Math.random() * (b - a); }
+      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+      function eio(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+      // Smooth fade-in/fade-out band
+      function band(s, lo, hi) {
+        const w = (hi - lo) * 0.15;
+        return clamp((s - lo) / w, 0, 1) * clamp((hi - s) / w, 0, 1);
+      }
+      function fadeIn(s, lo, dur) { return clamp((s - lo) / dur, 0, 1); }
+      function fadeOut(s, hi, dur) { return clamp((hi - s) / dur, 0, 1); }
 
-      function lerpVec3(a, b, t) {
-        return new THREE.Vector3(
-          a.x + (b.x - a.x) * t,
-          a.y + (b.y - a.y) * t,
-          a.z + (b.z - a.z) * t
-        );
+      // ── Atom colors — vivid metallic (original palette) ──────────
+      const AC = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
+
+      function atomMat(hex) {
+        return new THREE.MeshStandardMaterial({
+          color: hex, roughness: 0.07, metalness: 0.90,
+          transparent: true, opacity: 1.0
+        });
+      }
+      function bondMat(hex) {
+        return new THREE.MeshStandardMaterial({
+          color: hex, roughness: 0.22, metalness: 0.72,
+          transparent: true, opacity: 0.88
+        });
       }
 
-      function getCamState(s) {
-        const n = camPath.length - 1;
-        const raw = Math.min(s * n, n - 0.001);
-        const idx = Math.floor(raw);
-        const frac = raw - idx;
-        const st = frac * frac * (3 - 2 * frac);
+      const gLg = new THREE.SphereGeometry(0.30, 16, 12);
+      const gMd = new THREE.SphereGeometry(0.20, 14, 10);
+      const gSm = new THREE.SphereGeometry(0.12, 12, 8);
+
+      function mkBond(a, b, color, r) {
+        r = r || 0.065;
+        const dir = new THREE.Vector3().subVectors(b, a), len = dir.length();
+        if (len < 0.001) return new THREE.Object3D();
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 8, 1), bondMat(color));
+        m.position.copy(a).lerp(b, 0.5);
+        m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+        return m;
+      }
+
+      function buildResidue(origin, ci) {
+        const g = new THREE.Group(); g.position.copy(origin);
+        const cA = AC[ci % 8], cB = AC[(ci + 2) % 8], cC = AC[(ci + 4) % 8];
+        const pN = new THREE.Vector3(-0.70, 0, 0), pCa = new THREE.Vector3(0, 0, 0),
+          pC = new THREE.Vector3(0.66, 0.32, 0), pO = new THREE.Vector3(1.02, 0.90, 0.20);
+        const n = new THREE.Mesh(gMd, atomMat(cA)); n.position.copy(pN); g.add(n);
+        const ca = new THREE.Mesh(gLg, atomMat(cB)); ca.position.copy(pCa); g.add(ca);
+        const c = new THREE.Mesh(gMd, atomMat(cB)); c.position.copy(pC); g.add(c);
+        const o = new THREE.Mesh(gSm, atomMat(cC)); o.position.copy(pO); g.add(o);
+        g.add(mkBond(pN, pCa, cA, 0.075)); g.add(mkBond(pCa, pC, cB, 0.075)); g.add(mkBond(pC, pO, cC, 0.05));
+        const scP = new THREE.Vector3(Math.cos(ci * 1.1) * 0.60, -0.50, Math.sin(ci * 1.1) * 0.44);
+        const sc = new THREE.Mesh(gMd, atomMat(AC[(ci + 1) % 8])); sc.position.copy(scP); g.add(sc);
+        g.add(mkBond(pCa, scP, AC[(ci + 1) % 8], 0.04));
+        return g;
+      }
+
+      function buildHelix(origin, n, hr, pitch, ang0, ci) {
+        const g = new THREE.Group(); g.position.copy(origin); const pts = [];
+        for (let i = 0; i < n; i++) {
+          const a = ang0 + i * (Math.PI * 2 / 3.6), y = i * pitch;
+          const pos = new THREE.Vector3(Math.cos(a) * hr, y, Math.sin(a) * hr);
+          const res = buildResidue(pos, ci + i); res.rotation.y = a + Math.PI * 0.5; g.add(res); pts.push(pos);
+        }
+        for (let i = 0; i < pts.length - 1; i++) g.add(mkBond(pts[i], pts[i + 1], AC[ci % 8], 0.14));
+        return g;
+      }
+
+      function buildStrand(origin, n, ci) {
+        const g = new THREE.Group(); g.position.copy(origin); const pts = [];
+        for (let i = 0; i < n; i++) {
+          const pos = new THREE.Vector3(i * 1.25, Math.sin(i * Math.PI) * 0.18, 0);
+          const res = buildResidue(pos, ci + i); res.rotation.y = i % 2 ? Math.PI : 0; g.add(res); pts.push(pos);
+        }
+        for (let i = 0; i < pts.length - 1; i++) g.add(mkBond(pts[i], pts[i + 1], AC[ci % 8], 0.11));
+        return g;
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // S0+S1 — ALL AMINO CLUSTERS in one unified group
+      // S0: camera close, only center cluster visible
+      // S1: camera zooms out revealing all clusters drifting toward each other
+      // ═══════════════════════════════════════════════════════════════
+
+      // All clusters live in one group, always in scene
+      const grpAmino = new THREE.Group(); scene.add(grpAmino);
+
+      // Center cluster (the hero one — visible from frame 0)
+      const aDefs = [
+        { fn: 'helix', pos: [-3.0, -0.8, 1.0], rot: [0.55, 0.30, 0.40], n: 7, hr: 0.90, pitch: 0.85, ang: 0.0, ci: 0 },
+        { fn: 'strand', pos: [2.1, -0.4, -1.4], rot: [0.65, 0.50, -0.40], n: 5, ci: 1 },
+        { fn: 'helix', pos: [0.2, -1.6, 1.9], rot: [-0.5, -0.5, 0.60], n: 6, hr: 0.80, pitch: 0.85, ang: 1.0, ci: 2 },
+        { fn: 'strand', pos: [-1.1, 0.7, -1.7], rot: [0.70, 0.35, 0.55], n: 5, ci: 3 },
+        { fn: 'helix', pos: [3.0, -1.4, 0.5], rot: [0.45, -0.6, 0.35], n: 5, hr: 0.75, pitch: 0.80, ang: 0.5, ci: 4 },
+        { fn: 'strand', pos: [-2.7, 0.3, -0.5], rot: [-0.5, 0.65, 0.40], n: 4, ci: 5 },
+      ];
+      const aMs = aDefs.map(d => {
+        const m = d.fn === 'helix'
+          ? buildHelix(new THREE.Vector3(...d.pos), d.n, d.hr, d.pitch, d.ang, d.ci)
+          : buildStrand(new THREE.Vector3(...d.pos), d.n, d.ci);
+        m.rotation.set(...d.rot); grpAmino.add(m);
+        return { mesh: m, br: [...d.rot], ph: Math.random() * Math.PI * 2, sp: 0.013 + Math.random() * 0.009 };
+      });
+
+      // Organelle dots (center cluster)
+      const orgG = new THREE.BufferGeometry(); const NP = 180;
+      const oP = new Float32Array(NP * 3), oC = new Float32Array(NP * 3);
+      for (let i = 0; i < NP; i++) {
+        const r = rand(0.5, 6), th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+        oP[i * 3] = r * Math.sin(ph) * Math.cos(th); oP[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th); oP[i * 3 + 2] = r * Math.cos(ph);
+        const c = new THREE.Color(AC[i % 8]); oC[i * 3] = c.r * 0.4; oC[i * 3 + 1] = c.g * 0.4; oC[i * 3 + 2] = c.b * 0.4;
+      }
+      orgG.setAttribute('position', new THREE.BufferAttribute(oP, 3));
+      orgG.setAttribute('color', new THREE.BufferAttribute(oC, 3));
+      const orgM = new THREE.PointsMaterial({ size: 0.07, vertexColors: true, transparent: true, opacity: 0.55, sizeAttenuation: true });
+      grpAmino.add(new THREE.Points(orgG, orgM));
+
+      // ── 4 distant clusters (revealed by zoom-out) ──────────────────
+      // Base positions = far apart. During S1 they drift toward each other slowly.
+      const CLUSTER_BASE = [
+        new THREE.Vector3(-14, 3, -8),
+        new THREE.Vector3(13, 2, -10),
+        new THREE.Vector3(-6, -8, -12),
+        new THREE.Vector3(9, -5, -6),
+      ];
+      // Current positions (will be animated)
+      const clusterPos = CLUSTER_BASE.map(p => p.clone());
+      // Each cluster is a group of amino meshes + its own rotation
+      const clusterGroups = CLUSTER_BASE.map((base, ci) => {
+        const g = new THREE.Group();
+        g.position.copy(base);
+        // 3 structures per cluster
+        for (let k = 0; k < 3; k++) {
+          const d = aDefs[(k + ci * 2) % aDefs.length];
+          const off = new THREE.Vector3(rand(-1.5, 1.5), rand(-1.5, 1.5), rand(-1.5, 1.5));
+          const m = d.fn === 'helix'
+            ? buildHelix(off, Math.max(3, d.n - 1), d.hr, d.pitch, d.ang + ci + k, d.ci + ci * 3 + k)
+            : buildStrand(off, d.n, d.ci + ci * 3 + k);
+          m.rotation.set(rand(-1.2, 1.2), rand(-1.2, 1.2), rand(-1.2, 1.2));
+          g.add(m);
+        }
+        grpAmino.add(g);
+        return { g, base: base.clone(), ph: Math.random() * Math.PI * 2, rotSp: rand(0.008, 0.014) };
+      });
+
+      // ── Attraction target positions ────────────────────────────────
+      // As S1 progresses, clusters drift toward the center cluster (0,0,0)
+      // but stop before reaching it — slow collision feel
+      // Midpoint between each cluster and center, slightly past midway
+      const ATTRACT_TARGET = CLUSTER_BASE.map(b => b.clone().multiplyScalar(0.35)); // 35% toward center
+
+      // Legacy compat — grpS0/grpS1 point to same group
+      const grpS0 = grpAmino;
+      const grpS1 = grpAmino; // same group, camera reveals them
+
+      // ═══════════════════════════════════════════════════════════════
+      // S2 — SINGLE NEURON (isometric view)
+      // ═══════════════════════════════════════════════════════════════
+      const grpS2 = new THREE.Group(); grpS2.visible = false; scene.add(grpS2);
+      grpS2.rotation.x = 0.52; grpS2.rotation.y = 0.79;
+
+      const somaM = new THREE.MeshPhongMaterial({ color: 0xdd8844, specular: 0xffddaa, shininess: 150, emissive: 0xff6600, emissiveIntensity: 0, transparent: true, opacity: 0.95 });
+      const axonM = new THREE.MeshPhongMaterial({ color: 0xeeaa55, specular: 0xffddaa, shininess: 80, transparent: true, opacity: 0.90 });
+      const myM = new THREE.MeshPhongMaterial({ color: 0xfffaf0, specular: 0xffffff, shininess: 200, transparent: true, opacity: 0.65 });
+
+      const somaR = 1.2;
+      const soma = new THREE.Mesh(new THREE.SphereGeometry(somaR, 32, 24), somaM); grpS2.add(soma);
+      // Nucleus
+      const nucleusMesh = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 10),
+        new THREE.MeshPhongMaterial({ color: 0x331100, specular: 0x440000, shininess: 30, transparent: true, opacity: 0.75 }));
+      nucleusMesh.position.set(0.15, 0.1, 0); grpS2.add(nucleusMesh);
+
+      // Nucleolus
+      const nucleolusMesh = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8),
+        new THREE.MeshPhongMaterial({ color: 0x662200, specular: 0x880000, shininess: 50, transparent: true, opacity: 0.9 }));
+      nucleolusMesh.position.set(0.22, 0.15, 0.05); grpS2.add(nucleolusMesh);
+
+      const ASEGS = 14; const axPts = [new THREE.Vector3(0, -somaR, 0)];
+      for (let i = 0; i < ASEGS; i++) {
+        const pr = axPts[axPts.length - 1];
+        const nr = new THREE.Vector3(pr.x + Math.sin(i * 0.42) * 0.24, pr.y - 1.55, pr.z + Math.cos(i * 0.55) * 0.18);
+        const r = Math.max(0.025, (0.22 - i * 0.013));
+        const seg = mkBond(pr, nr, 0xeeaa55, r);
+        grpS2.add(seg); axPts.push(nr);
+      }
+      for (let i = 1; i < ASEGS - 1; i += 2) {
+        const sh = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.07, 8, 20), myM);
+        sh.position.copy(axPts[i]); sh.rotation.x = Math.PI / 2; grpS2.add(sh);
+      }
+      // Axon terminals
+      for (let b = 0; b < 6; b++) {
+        const a2 = (b / 6) * Math.PI * 2;
+        const btn = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8),
+          new THREE.MeshPhongMaterial({ color: 0xff8833, specular: 0xffaa44, shininess: 180, emissive: 0xff5500, emissiveIntensity: 0.5, transparent: true, opacity: 0.92 }));
+        btn.position.set(axPts[ASEGS].x + Math.cos(a2) * 0.55, axPts[ASEGS].y, axPts[ASEGS].z + Math.sin(a2) * 0.55);
+        grpS2.add(btn);
+      }
+      // Dendrites
+      const dTips = [];
+      for (let d = 0; d < 8; d++) {
+        const ba = (d / 8) * Math.PI * 2; let prv2 = new THREE.Vector3(0, 0, 0);
+        for (let seg = 0; seg < 5; seg++) {
+          const r2 = Math.max(0.020, (0.18 - seg * 0.030));
+          const len = rand(0.80, 1.30);
+          const nxt2 = new THREE.Vector3(
+            prv2.x + Math.cos(ba + rand(-0.4, 0.4)) * len + rand(-0.15, 0.15),
+            prv2.y + rand(0.1, 0.6) * len, prv2.z + Math.sin(ba + rand(-0.4, 0.4)) * len + rand(-0.15, 0.15)
+          );
+          grpS2.add(mkBond(prv2, nxt2, 0xcc8844, r2)); prv2 = nxt2;
+          if (seg === 4) {
+            // Each tip gets its OWN material instance to avoid shared-material crash
+            const tipMat = new THREE.MeshPhongMaterial({ color: 0xffdd44, specular: 0xffffff, shininess: 200, emissive: 0xffaa00, emissiveIntensity: 0, transparent: true, opacity: 0.92 });
+            const tip = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), tipMat);
+            tip.position.copy(nxt2); grpS2.add(tip); dTips.push({ mesh: tip, mat: tipMat });
+          }
+        }
+      }
+      // Pulse sphere + halo
+      const pulseCoreMat = new THREE.MeshPhongMaterial({ color: 0x88ffee, specular: 0xffffff, shininess: 300, emissive: 0x44ffcc, emissiveIntensity: 5, transparent: true, opacity: 0.95 });
+      const pulseCore = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), pulseCoreMat); grpS2.add(pulseCore);
+      const pulseHaloMat = new THREE.MeshBasicMaterial({ color: 0x44ffcc, transparent: true, opacity: 0.08, side: THREE.DoubleSide });
+      const pulseHalo = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 10), pulseHaloMat); grpS2.add(pulseHalo);
+      // Point light that travels with pulse
+      const pulseLight = new THREE.PointLight(0x44ffcc, 0, 8); grpS2.add(pulseLight);
+
+      // ═══════════════════════════════════════════════════════════════
+      // S3 — NEURAL NETWORK with ELECTRIC BOLT SYNAPSES
+      // ═══════════════════════════════════════════════════════════════
+      const grpS3 = new THREE.Group(); grpS3.visible = false; scene.add(grpS3);
+      const NDEF = [
+        { p: [0, 0, 0], r: [0.0, 0.0, 0.0], sc: 0.58 },
+        { p: [-10, 5, -4], r: [0.8, 0.3, -0.4], sc: 0.52 },
+        { p: [9, 3, -6], r: [-0.5, 0.6, 0.3], sc: 0.48 },
+        { p: [-5, -6, -3], r: [0.6, -0.4, 0.7], sc: 0.50 },
+        { p: [4, -5, -8], r: [0.3, 0.8, -0.5], sc: 0.46 },
+        { p: [0, 8, -10], r: [-0.4, -0.3, 0.6], sc: 0.48 },
+        { p: [-9, 1, -9], r: [0.7, 0.5, -0.3], sc: 0.44 },
+        { p: [8, -2, -13], r: [-0.6, 0.4, 0.5], sc: 0.44 },
+      ];
+
+      function buildMini(g, sc) {
+        // soma
+        g.add(new THREE.Mesh(new THREE.SphereGeometry(1.1 * sc, 16, 12),
+          new THREE.MeshPhongMaterial({ color: 0xdd8844, specular: 0xffddaa, shininess: 130, emissive: 0xff6600, emissiveIntensity: 0.1, transparent: true, opacity: 0.92 })));
+        // axon
+        let pr = new THREE.Vector3(0, -1.1 * sc, 0);
+        for (let i = 0; i < 8; i++) {
+          const r = Math.max(0.020, (0.16 - i * 0.015)) * sc;
+          const nx = new THREE.Vector3(pr.x + Math.sin(i * 0.4) * 0.20 * sc, pr.y - 1.4 * sc, pr.z + Math.cos(i * 0.55) * 0.16 * sc);
+          g.add(mkBond(pr, nx, 0xeeaa55, r)); pr = nx;
+          if (i % 2 === 1) {
+            const sh = new THREE.Mesh(new THREE.TorusGeometry(0.20 * sc, 0.055 * sc, 6, 14),
+              new THREE.MeshPhongMaterial({ color: 0xfffaf0, specular: 0xffffff, shininess: 200, transparent: true, opacity: 0.55 }));
+            sh.position.copy(pr); sh.rotation.x = Math.PI / 2; g.add(sh);
+          }
+        }
+        // dendrites
+        for (let d = 0; d < 6; d++) {
+          const ba = (d / 6) * Math.PI * 2; let p2 = new THREE.Vector3(0, 0, 0);
+          for (let seg = 0; seg < 4; seg++) {
+            const r2 = Math.max(0.014, (0.11 - seg * 0.020)) * sc;
+            const len = rand(0.60, 0.95) * sc;
+            const n2 = new THREE.Vector3(p2.x + Math.cos(ba + rand(-0.4, 0.4)) * len, p2.y + rand(0.1, 0.5) * len, p2.z + Math.sin(ba + rand(-0.4, 0.4)) * len);
+            g.add(mkBond(p2, n2, 0xcc8844, r2)); p2 = n2;
+          }
+        }
+      }
+
+      const nGrps = NDEF.map(def => {
+        const g = new THREE.Group(); g.position.set(...def.p); g.rotation.set(...def.r);
+        buildMini(g, def.sc); grpS3.add(g);
+        return { g, ph: Math.random() * Math.PI * 2 };
+      });
+
+      // ELECTRIC BOLT synapses — stochastic random flashes like real lightning
+      const synPairs = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [0, 3], [1, 4], [2, 6]];
+      const synBolts = synPairs.map(([ia, ib]) => {
+        const a3 = new THREE.Vector3(...NDEF[ia].p), b3 = new THREE.Vector3(...NDEF[ib].p);
+        const dist = a3.distanceTo(b3);
+        if (dist > 26) return null;
+        const NSEG = 22;
+        const pts = Array.from({ length: NSEG }, () => new THREE.Vector3());
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const mat = new THREE.LineBasicMaterial({ color: 0x66ffdd, transparent: true, opacity: 0, linewidth: 1 });
+        const line = new THREE.Line(geo, mat); grpS3.add(line);
         return {
-          pos: lerpVec3(camPath[idx].pos, camPath[Math.min(idx + 1, n)].pos, st),
-          target: lerpVec3(camPath[idx].target, camPath[Math.min(idx + 1, n)].target, st),
+          line, geo, pts, a: a3, b: b3, mat, dist,
+          active: false, nextFire: rand(0.1, 3.0), holdTime: 0,
+          cooldown: rand(0.5, 2.5)
+        };
+      }).filter(Boolean);
+
+      // Spark particles along bolts
+      const NS2 = 60, spkG2 = new THREE.BufferGeometry(), spkP2 = new Float32Array(NS2 * 3);
+      const spkSt2 = Array.from({ length: NS2 }, () => ({ t: Math.random(), sp: rand(0.007, 0.022), bi: Math.floor(Math.random() * synBolts.length) }));
+      spkG2.setAttribute('position', new THREE.BufferAttribute(spkP2, 3));
+      const spkM2 = new THREE.PointsMaterial({ size: 0.22, color: 0x99ffee, transparent: true, opacity: 0, sizeAttenuation: true });
+      grpS3.add(new THREE.Points(spkG2, spkM2));
+
+      // ═══════════════════════════════════════════════════════════════
+      // S5+S6 — HUMAN HEAD (iridescent mesh + brain particles)
+      // ═══════════════════════════════════════════════════════════════
+      const grpHead = new THREE.Group(); grpHead.visible = false; scene.add(grpHead);
+
+      // ── Iridescent skin using onBeforeCompile ────────────────────
+      // Simulates thin-film interference: colour shifts with viewing angle
+      const skinBase = new THREE.MeshStandardMaterial({
+        color: 0x99bbcc, roughness: 0.08, metalness: 0.88,
+        transparent: true, opacity: 0.38, side: THREE.DoubleSide, depthWrite: false,
+      });
+      skinBase.onBeforeCompile = function (shader) {
+        shader.fragmentShader = shader.fragmentShader.replace(
+          'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
+          `// Iridescent thin-film shift based on view angle
+      vec3 viewN = normalize(vNormal);
+      float vd = abs(dot(viewN, normalize(cameraPosition - vViewPosition)));
+      float shift = vd * 3.14159;
+      vec3 irid = vec3(
+        0.5+0.5*sin(shift+0.0),
+        0.5+0.5*sin(shift+2.094),
+        0.5+0.5*sin(shift+4.189)
+      ) * 0.35;
+      gl_FragColor = vec4( outgoingLight + irid, diffuseColor.a );`
+        );
+      };
+      skinBase.needsUpdate = true;
+
+      const wireSkinM = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.09, wireframe: true });
+
+      // Cranium (head shape)
+      const cranGeo = new THREE.SphereGeometry(5.0, 64, 44);
+      const cranium = new THREE.Mesh(cranGeo, skinBase);
+      cranium.scale.set(0.92, 1.02, 0.86); grpHead.add(cranium);
+      const cranWire = new THREE.Mesh(cranGeo, wireSkinM);
+      cranWire.scale.copy(cranium.scale).multiplyScalar(1.003); grpHead.add(cranWire);
+
+      // Forehead bump
+      const fbump = new THREE.Mesh(new THREE.SphereGeometry(4.2, 40, 30), skinBase);
+      fbump.scale.set(0.80, 0.55, 0.52); fbump.position.set(0, 2.2, 3.2); grpHead.add(fbump);
+      const fbWire = new THREE.Mesh(new THREE.SphereGeometry(4.2, 24, 18), wireSkinM);
+      fbWire.scale.copy(fbump.scale).multiplyScalar(1.003); fbWire.position.copy(fbump.position); grpHead.add(fbWire);
+
+      // Jaw/lower face
+      const jawGeo = new THREE.SphereGeometry(3.6, 44, 30);
+      const jaw = new THREE.Mesh(jawGeo, skinBase);
+      jaw.scale.set(0.78, 1.05, 0.68); jaw.position.set(0, -3.8, 0.3); grpHead.add(jaw);
+      const jawWire = new THREE.Mesh(jawGeo, wireSkinM);
+      jawWire.scale.copy(jaw.scale).multiplyScalar(1.003); jawWire.position.copy(jaw.position); grpHead.add(jawWire);
+
+      // Neck
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.8, 3.0, 24), skinBase);
+      neck.position.set(0, -6.4, 0); grpHead.add(neck);
+
+      // Eye socket depressions (dark ellipsoids)
+      [-1.8, 1.8].forEach(ex => {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 12),
+          new THREE.MeshBasicMaterial({ color: 0x000811, transparent: true, opacity: 0.85 }));
+        eye.scale.set(1, 0.65, 0.5); eye.position.set(ex, 0.6, 4.2); grpHead.add(eye);
+        // Subtle rim highlight
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.65, 0.06, 8, 24),
+          new THREE.MeshBasicMaterial({ color: 0x88bbdd, transparent: true, opacity: 0.35 }));
+        rim.scale.set(1, 0.65, 1); rim.position.copy(eye.position); rim.position.z += 0.12;
+        rim.rotation.x = Math.PI * 0.15; grpHead.add(rim);
+      });
+
+      // Nose ridge
+      const nose = new THREE.Mesh(new THREE.SphereGeometry(0.55, 12, 10), skinBase);
+      nose.scale.set(0.65, 1.1, 0.85); nose.position.set(0, -0.5, 4.5); grpHead.add(nose);
+
+      // Lips hint
+      const lips = new THREE.Mesh(new THREE.SphereGeometry(0.9, 14, 10), skinBase);
+      lips.scale.set(1.3, 0.4, 0.65); lips.position.set(0, -1.9, 4.1); grpHead.add(lips);
+
+      // Extra iridescent shimmer layers
+      const shimA = new THREE.Mesh(cranGeo, new THREE.MeshBasicMaterial({ color: 0xcc44ff, transparent: true, opacity: 0.035, side: THREE.DoubleSide, depthWrite: false }));
+      shimA.scale.copy(cranium.scale).multiplyScalar(1.007); grpHead.add(shimA);
+      const shimB = new THREE.Mesh(cranGeo, new THREE.MeshBasicMaterial({ color: 0x44ffaa, transparent: true, opacity: 0.028, side: THREE.DoubleSide, depthWrite: false }));
+      shimB.scale.copy(cranium.scale).multiplyScalar(1.014); grpHead.add(shimB);
+      const shimC = new THREE.Mesh(cranGeo, new THREE.MeshBasicMaterial({ color: 0xff6633, transparent: true, opacity: 0.018, side: THREE.DoubleSide, depthWrite: false }));
+      shimC.scale.copy(cranium.scale).multiplyScalar(1.021); grpHead.add(shimC);
+
+      // ── Brain particles inside head ───────────────────────────────
+      const BN = isMobile ? 12000 : 36000;
+      const bGeo = new THREE.BufferGeometry();
+      const bP = new Float32Array(BN * 3), bC = new Float32Array(BN * 3);
+      function fN(x, y, z) { return (Math.sin(x * 2.1 + y * 1.7) * 0.5 + Math.cos(y * 2.3 + z * 1.9) * 0.5 + Math.sin(z * 1.5 + x * 2.7) * 0.3) * 0.5; }
+      function bCol(nr) {
+        if (nr < 0.22) return [0.40, 0.06, 0.06];
+        if (nr < 0.42) return [0.67, 0.20, 0.07];
+        if (nr < 0.60) return [0.80, 0.40, 0.20];
+        if (nr < 0.73) return [0.73, 0.47, 0.33];
+        if (nr < 0.83) return [0.65, 0.40, 0.35];
+        return Math.abs(fN(nr * 3, nr * 2, nr)) > 0.22 ? [0.27, 0.13, 0.13] : [0.80, 0.53, 0.47];
+      }
+      let fi = 0, tri = 0;
+      while (fi < BN && tri < BN * 5) {
+        tri++;
+        const u = rand(-1, 1), v = rand(-1, 1), w = rand(-1, 1);
+        if (u * u + v * v + w * w > 1) continue;
+        const xw = u * 3.9, yw = v * 4.4 + 0.3, zw = w * 3.5;
+        const nr = Math.sqrt(u * u + v * v + w * w);
+        const fold = fN(xw * 0.09, yw * 0.09, zw * 0.1) * 0.70;
+        const th = Math.atan2(v, u);
+        bP[fi * 3] = xw + fold * Math.cos(th); bP[fi * 3 + 1] = yw + fold * 0.42; bP[fi * 3 + 2] = zw + fold * Math.sin(th);
+        const [r2, g2, b2] = bCol(nr); bC[fi * 3] = r2; bC[fi * 3 + 1] = g2; bC[fi * 3 + 2] = b2; fi++;
+      }
+      bGeo.setAttribute('position', new THREE.BufferAttribute(bP, 3));
+      bGeo.setAttribute('color', new THREE.BufferAttribute(bC, 3));
+      const brainM = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0, sizeAttenuation: true });
+      const brainPts = new THREE.Points(bGeo, brainM); brainPts.position.set(0, 0.3, 0); grpHead.add(brainPts);
+
+      // Neural surface sparks
+      const SNS = 120, bsG = new THREE.BufferGeometry(), bsP3 = new Float32Array(SNS * 3);
+      const bsSt3 = Array.from({ length: SNS }, () => ({ th: Math.random() * Math.PI * 2, ph: Math.random() * Math.PI, t: Math.random(), sp: rand(0.003, 0.012) }));
+      bsG.setAttribute('position', new THREE.BufferAttribute(bsP3, 3));
+      const bsM = new THREE.PointsMaterial({ size: 0.35, color: 0xffcc55, transparent: true, opacity: 0, sizeAttenuation: true });
+      grpHead.add(new THREE.Points(bsG, bsM));
+
+      // Inner glow sphere
+      const innerGlow = new THREE.Mesh(new THREE.SphereGeometry(3.8, 20, 14),
+        new THREE.MeshBasicMaterial({ color: 0xff6622, transparent: true, opacity: 0, side: THREE.BackSide }));
+      innerGlow.scale.set(0.92, 1.0, 0.86); grpHead.add(innerGlow);
+
+      // Spiritual bg sphere
+      const spirM = new THREE.MeshBasicMaterial({ color: 0x220044, transparent: true, opacity: 0, side: THREE.BackSide });
+      scene.add(new THREE.Mesh(new THREE.SphereGeometry(400, 16, 10), spirM));
+
+      // ═══════════════════════════════════════════════════════════════
+      // STARS
+      // ═══════════════════════════════════════════════════════════════
+      const SN = isMobile ? 900 : 2400;
+      const sG = new THREE.BufferGeometry(); const sP = new Float32Array(SN * 3), sC = new Float32Array(SN * 3);
+      for (let i = 0; i < SN; i++) {
+        const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), r = rand(100, 260);
+        sP[i * 3] = r * Math.sin(ph) * Math.cos(th); sP[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th); sP[i * 3 + 2] = r * Math.cos(ph);
+        const p = Math.random();
+        if (p < 0.3) { sC[i * 3] = 0.70; sC[i * 3 + 1] = 0.85; sC[i * 3 + 2] = 1.0; }
+        else if (p < 0.7) { sC[i * 3] = 1; sC[i * 3 + 1] = 1; sC[i * 3 + 2] = 1; }
+        else { sC[i * 3] = 1; sC[i * 3 + 1] = 0.92; sC[i * 3 + 2] = 0.78; }
+      }
+      sG.setAttribute('position', new THREE.BufferAttribute(sP, 3));
+      sG.setAttribute('color', new THREE.BufferAttribute(sC, 3));
+      const starM = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.72, sizeAttenuation: true });
+      scene.add(new THREE.Points(sG, starM));
+      // Solar giants
+      const gCols = [0xff8800, 0xffdd44, 0xff3311, 0xaaccff, 0xffff88];
+      const gG3 = new THREE.SphereGeometry(0.22, 8, 6);
+      for (let i = 0; i < (isMobile ? 8 : 22); i++) {
+        const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), r = rand(80, 180);
+        const gm = new THREE.MeshStandardMaterial({ color: gCols[i % 5], roughness: 0, metalness: 0, emissive: gCols[i % 5], emissiveIntensity: 3 + Math.random() * 2 });
+        const gs = new THREE.Mesh(gG3, gm); gs.position.set(r * Math.sin(ph) * Math.cos(th), r * Math.sin(ph) * Math.sin(th), r * Math.cos(ph)); scene.add(gs);
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // LIGHTS
+      // ═══════════════════════════════════════════════════════════════
+      scene.add(new THREE.AmbientLight(0x0a0820, 6));
+      const sunL = new THREE.DirectionalLight(0xffffff, 2.0); sunL.position.set(8, 14, 10); scene.add(sunL);
+      const fillL = new THREE.PointLight(0x4466ff, 2.5, 120); fillL.position.set(-14, 7, 9); scene.add(fillL);
+      const rimL = new THREE.PointLight(0xff5522, 2.0, 100); rimL.position.set(10, -9, -14); scene.add(rimL);
+      const headKeyL = new THREE.PointLight(0xeeeeff, 0, 50); headKeyL.position.set(6, 10, 14); scene.add(headKeyL);
+      const headFillL = new THREE.PointLight(0xff8844, 0, 40); headFillL.position.set(-8, 4, -6); scene.add(headFillL);
+      const brainGlowL = new THREE.PointLight(0xff6622, 0, 24); brainGlowL.position.set(0, 0.5, 0); scene.add(brainGlowL);
+
+      // ═══════════════════════════════════════════════════════════════
+      // CAMERA KEYFRAMES
+      // ═══════════════════════════════════════════════════════════════
+      const CAMS = [
+        { s: 0.00, p: [0, 0, 10], t: [0, 0, 0] },      // S0 hero — tight on center cluster
+        { s: 0.06, p: [1, 0.5, 12], t: [0, 0, 0] },    // S0 breathe slightly
+        { s: 0.13, p: [2, 1.5, 22], t: [0, 0, -2] },   // S1 start pull back — first cluster appears
+        { s: 0.20, p: [-3, 3, 35], t: [0, 0, -5] },    // S1 wider — two more clusters visible
+        { s: 0.27, p: [4, 4, 48], t: [0, 0, -8] },     // S1 full reveal — all 4 clusters + attraction
+        { s: 0.33, p: [4, 20, 44], t: [0, 0, 0] },     // S2 isometric neuron approach
+        { s: 0.44, p: [3, 17, 35], t: [0, -4, 0] },    // S2 neuron settled
+        { s: 0.48, p: [1, 11, 58], t: [0, 0, -7] },    // S3 pull out for network
+        { s: 0.58, p: [0, 9, 70], t: [0, 2, -8] },     // S3 wide network
+        { s: 0.66, p: [7, 16, 84], t: [0, 0, -5] },    // S4 space blue
+        { s: 0.71, p: [1, 3, 44], t: [0, 0, 0] },      // S5 head approach
+        { s: 0.80, p: [-2, 1, 30], t: [0, -0.5, 0] },  // S5 head close
+        { s: 0.88, p: [3, 5, 42], t: [0, 0, 0] },      // S6 process wider
+        { s: 1.00, p: [0, 7, 60], t: [0, 0, 0] },      // S7 cosmic fade
+      ];
+      function getCam(s) {
+        let lo = 0, hi = 1;
+        for (let i = 0; i < CAMS.length - 1; i++) { if (s >= CAMS[i].s && s <= CAMS[i + 1].s) { lo = i; hi = i + 1; break; } }
+        const span = CAMS[hi].s - CAMS[lo].s, f = span < 0.001 ? 0 : eio((s - CAMS[lo].s) / span);
+        const lp = CAMS[lo].p, hp = CAMS[hi].p, lt = CAMS[lo].t, ht = CAMS[hi].t;
+        return {
+          pos: new THREE.Vector3(lp[0] + (hp[0] - lp[0]) * f, lp[1] + (hp[1] - lp[1]) * f, lp[2] + (hp[2] - lp[2]) * f),
+          tgt: new THREE.Vector3(lt[0] + (ht[0] - lt[0]) * f, lt[1] + (ht[1] - lt[1]) * f, lt[2] + (ht[2] - lt[2]) * f),
         };
       }
 
-      const sectionLightColors = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
+      // Background colour keyframes
+      const BG = [
+        { s: 0.00, c: [0.008, 0.020, 0.031] },
+        { s: 0.55, c: [0.008, 0.020, 0.031] },
+        { s: 0.65, c: [0.012, 0.038, 0.100] },
+        { s: 0.76, c: [0.022, 0.016, 0.094] },
+        { s: 0.82, c: [0.038, 0.008, 0.122] },
+        { s: 0.93, c: [0.030, 0.005, 0.090] },
+        { s: 1.00, c: [0.008, 0.020, 0.031] },
+      ];
+      function getBg(s) {
+        let lo = 0, hi = BG.length - 1;
+        for (let i = 0; i < BG.length - 1; i++) { if (s >= BG[i].s && s <= BG[i + 1].s) { lo = i; hi = i + 1; break; } }
+        const span = BG[hi].s - BG[lo].s, f = span < 0.001 ? 0 : (s - BG[lo].s) / span;
+        const a = BG[lo].c, b = BG[hi].c;
+        return new THREE.Color(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f);
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // ANIMATE
+      // ═══════════════════════════════════════════════════════════════
+      const clock = new THREE.Clock();
+      let pulseT = 0;
+      let prevT = 0;
+
+      function setGroupAlpha(grp, alpha) {
+        grp.traverse(child => {
+          if (child.isMesh && child.material) {
+            const m = child.material;
+            if (Array.isArray(m)) { m.forEach(mat => { if (mat.transparent && mat.opacity !== undefined) mat.opacity = Math.min(mat._base || mat.opacity, alpha); }); }
+            else if (m.transparent && m.opacity !== undefined) {
+              if (m._base === undefined) m._base = m.opacity;
+              m.opacity = m._base * alpha;
+            }
+          }
+        });
+      }
 
       function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
+        const dt = Math.min(t - prevT, 0.05); prevT = t; // cap dt to avoid huge jumps
+        smoothScroll += (rawScroll - smoothScroll) * 0.050;
+        cmx += (mx - cmx) * 0.04; cmy += (my - cmy) * 0.04;
+        const s = smoothScroll;
 
-        smoothScroll += (rawScroll - smoothScroll) * 0.055;
-        cmx += (mx - cmx) * 0.04;
-        cmy += (my - cmy) * 0.04;
+        // Background + fog
+        const bg = getBg(s);
+        renderer.setClearColor(bg, 1);
+        scene.fog = new THREE.FogExp2(bg.getHex(), 0.006);
+        spirM.opacity = clamp((s - 0.77) * 5, 0, 1) * (0.06 + Math.sin(t * 0.28) * 0.02);
+        spirM.color.set(s > 0.83 ? 0x330066 : 0x220044);
 
-        // Camera path
-        const state = getCamState(smoothScroll);
-        camera.position.copy(state.pos);
-        camera.position.x += cmx * 1.5;
-        camera.position.y += cmy * -1.0;
-        camera.lookAt(state.target);
+        // Camera
+        const cam = getCam(s);
+        camera.position.copy(cam.pos);
+        camera.position.x += cmx * 2.0; camera.position.y += cmy * -1.0;
+        camera.lookAt(cam.tgt);
 
-        // Molecules — all axes twisted, oscillating around base rotation
-        molecules.forEach((m, i) => {
-          const sp = m.speed, ph = m.phase;
-          m.mesh.rotation.y = m.baseRot[1] + Math.sin(t * sp + ph) * 0.28;
-          m.mesh.rotation.x = m.baseRot[0] + Math.cos(t * sp * 0.7 + ph) * 0.20;
-          m.mesh.rotation.z = m.baseRot[2] + Math.sin(t * sp * 0.5 + ph + 1.2) * 0.15;
-          m.mesh.position.y = MOLECULES[i].pos[1] + Math.sin(t * 0.2 + ph) * 0.25;
-        });
+        // Compute section alphas
+        // grpAmino is always visible (S0 from frame 0, S1 as zoom-out reveals clusters)
+        const aminoAlpha = clamp(fadeOut(s, 0.38, 0.07), 0, 1); // fade out when S2 takes over
+        const aS1reveal = clamp(fadeIn(s, 0.10, 0.08), 0, 1);  // 0→1 as clusters reveal
+        const aS2 = clamp(fadeIn(s, 0.28, 0.06), 0, 1) * clamp(fadeOut(s, 0.54, 0.07), 0, 1);
+        const aS3 = clamp(fadeIn(s, 0.42, 0.06), 0, 1) * clamp(fadeOut(s, 0.74, 0.07), 0, 1);
+        const aHd = clamp(fadeIn(s, 0.65, 0.07), 0, 1) * clamp(fadeOut(s, 0.97, 0.06), 0, 1);
 
-        // Torus membrane pulsing
-        torus1.rotation.z = t * 0.03;
-        torus2.rotation.y = t * 0.025;
-        torusMat.opacity = 0.14 + Math.sin(t * 0.4) * 0.06;
+        grpAmino.visible = aminoAlpha > 0.001;
+        grpS2.visible = aS2 > 0.001; grpS3.visible = aS3 > 0.001; grpHead.visible = aHd > 0.001;
 
-        // Section light color shift
-        const secIdx = Math.min(Math.floor(smoothScroll * (camPath.length - 1)), camPath.length - 2);
-        const col = new THREE.Color(sectionLightColors[secIdx]);
-        redLight.color.lerp(col, 0.025);
-        redLight.intensity = 2.5 + Math.sin(t * 0.55) * 0.7;
-        blueLight.intensity = 2.0 + Math.cos(t * 0.42 + 1.2) * 0.5;
-        purpLight.intensity = 1.8 + Math.sin(t * 0.38 + 2.1) * 0.4;
-        goldLight.intensity = 1.5 + Math.cos(t * 0.30 + 0.5) * 0.35;
-        redLight.position.x = -5 + Math.sin(t * 0.18) * 2.5;
-        blueLight.position.z = 4 + Math.cos(t * 0.15) * 2;
-        purpLight.position.y = 6 + Math.sin(t * 0.12) * 1.5;
+        // ── Center amino cluster — always on from frame 0 ─────────
+        if (grpAmino.visible) {
+          aMs.forEach(m => {
+            const sp = m.sp, ph = m.ph;
+            m.mesh.rotation.y = m.br[1] + Math.sin(t * sp + ph) * 0.22;
+            m.mesh.rotation.x = m.br[0] + Math.cos(t * sp * 0.7 + ph) * 0.16;
+            m.mesh.rotation.z = m.br[2] + Math.sin(t * sp * 0.5 + ph + 1.2) * 0.12;
+          });
+          orgM.opacity = aminoAlpha * 0.55;
 
-        // Solar star twinkle
-        mat2.opacity = 0.8 + Math.sin(t * 1.4) * 0.1;
+          // ── Distant clusters: appear + drift toward center (slow collision) ──
+          clusterGroups.forEach((cg, ci) => {
+            // Fade in as camera pulls back
+            const clusterAlpha = clamp((aS1reveal - ci * 0.08), 0, 1) * aminoAlpha;
+            cg.g.traverse(ch => {
+              if (ch.isMesh && ch.material && ch.material.opacity !== undefined)
+                ch.material.opacity = ch.material._base !== undefined
+                  ? ch.material._base * clusterAlpha
+                  : clusterAlpha;
+            });
 
-        // ── Raycaster hover ──────────────────────────────────────
-        raycaster.setFromCamera(mouseNDC, camera);
-        const hits = raycaster.intersectObjects(allAtoms, false);
+            // Gravitational attraction — lerp from BASE toward ATTRACT_TARGET
+            // aS1reveal drives how far they've drifted (0 = at base, 1 = near target)
+            // Add gentle oscillation so it feels alive (not a straight slide)
+            const attract = eio(clamp(aS1reveal * 1.4 - ci * 0.12, 0, 1)); // staggered per cluster
+            const osc = new THREE.Vector3(
+              Math.sin(t * 0.18 + cg.ph) * 0.6,
+              Math.cos(t * 0.14 + cg.ph * 1.3) * 0.4,
+              Math.sin(t * 0.11 + cg.ph * 0.7) * 0.5
+            );
+            const base = CLUSTER_BASE[ci];
+            const tgt = ATTRACT_TARGET[ci];
+            cg.g.position.set(
+              base.x + (tgt.x - base.x) * attract + osc.x,
+              base.y + (tgt.y - base.y) * attract + osc.y,
+              base.z + (tgt.z - base.z) * attract + osc.z
+            );
 
-        if (hits.length > 0) {
-          const hit = hits[0].object;
-          if (hit !== hoveredMesh) {
-            // Restore previous
-            if (hoveredMesh) {
-              hoveredMesh.material = hoveredMesh._origMat;
-              hoveredMesh._origMat = undefined;
-            }
-            hoveredMesh = hit;
-            // Store original and clone for hover
-            hit._origMat = hit.material;
-            const glow = hit.material.clone();
-            glow.emissive = new THREE.Color(hit.material.color);
-            glow.emissiveIntensity = 1.8;
-            glow.roughness = 0.0;
-            hit.material = glow;
-            hoverActive = true;
-            hoverPulse = 0;
-          }
-          // Position hover light at hit point
-          hoverLight.position.copy(hits[0].point);
-          hoverLight.color.set(hoveredMesh.material.color);
-          hoverLight.intensity = 4.0 + Math.sin(t * 6) * 1.5; // rapid pulse
-          hoverLight.distance = 5;
-          // Pulse emissive
-          if (hoveredMesh.material.emissiveIntensity !== undefined) {
-            hoveredMesh.material.emissiveIntensity = 1.8 + Math.sin(t * 8) * 0.8;
-          }
-          // Scale atom up slightly
-          hoveredMesh.scale.setScalar(1.18 + Math.sin(t * 8) * 0.06);
-        } else {
-          if (hoveredMesh) {
-            hoveredMesh.material = hoveredMesh._origMat;
-            hoveredMesh._origMat = undefined;
-            hoveredMesh.scale.setScalar(1.0);
-            hoveredMesh = null;
-          }
-          hoverLight.intensity = 0;
-          hoverActive = false;
+            // Slow rotation on all axes
+            cg.g.rotation.y += cg.rotSp;
+            cg.g.rotation.x += cg.rotSp * 0.6;
+          });
         }
+
+        // ── S2 neuron + pulse ────────────────────────────────────
+        if (grpS2.visible) {
+          pulseT = (pulseT + 0.0065) % 1.0;
+          const pi = clamp(Math.floor(pulseT * (axPts.length - 1)), 0, axPts.length - 2);
+          const pf = pulseT * (axPts.length - 1) - pi;
+          const pp = axPts[pi].clone().lerp(axPts[pi + 1], pf);
+          pulseCore.position.copy(pp); pulseHalo.position.copy(pp); pulseLight.position.copy(pp);
+          pulseCoreMat.opacity = aS2 * 0.94;
+          pulseHaloMat.opacity = aS2 * 0.10;
+          pulseLight.intensity = aS2 * (4 + Math.sin(t * 10) * 2);
+          pulseCoreMat.emissiveIntensity = 3.5 + Math.sin(t * 14) * 2;
+          const atTip = pulseT > 0.88;
+          dTips.forEach((dt, di) => {
+            dt.mat.emissiveIntensity = atTip ? (4 + Math.sin(t * 22 + di * 0.8) * 2) : 0;
+            dt.mat.opacity = aS2 * (atTip ? 0.96 : 0.80);
+          });
+          somaM.emissiveIntensity = pulseT < 0.10 ? (2.5 + Math.sin(t * 8) * 1) : 0;
+          grpS2.rotation.z = Math.sin(t * 0.06) * 0.035;
+        }
+
+        // ── S3 network + stochastic electric bolts ────────────────
+        if (grpS3.visible) {
+          grpS3.rotation.y = t * 0.013;
+          nGrps.forEach((ng, i) => { ng.g.rotation.x += 0.00025; ng.g.rotation.y += 0.00035 + i * 0.00008; });
+          synBolts.forEach(sb => {
+            if (!sb) return;
+            sb.nextFire -= dt;
+            if (!sb.active && sb.nextFire <= 0) {
+              sb.active = true;
+              sb.holdTime = rand(0.04, 0.16); // short flash: 40–160ms
+              sb.nextFire = Infinity;
+            }
+            if (sb.active) {
+              sb.holdTime -= dt;
+              if (sb.holdTime <= 0) {
+                sb.active = false;
+                sb.nextFire = rand(0.4, 3.0); // random cooldown
+              }
+              // Regenerate jagged lightning path every frame
+              const N = sb.pts.length, jAmp = Math.min(sb.dist * 0.20, 3.0);
+              for (let k = 0; k < N; k++) {
+                const f = k / (N - 1), jit = (k > 0 && k < N - 1);
+                sb.pts[k].set(
+                  sb.a.x + (sb.b.x - sb.a.x) * f + (jit ? rand(-jAmp, jAmp) : 0),
+                  sb.a.y + (sb.b.y - sb.a.y) * f + (jit ? rand(-jAmp, jAmp) : 0),
+                  sb.a.z + (sb.b.z - sb.a.z) * f + (jit ? rand(-jAmp, jAmp) * 0.6 : 0)
+                );
+              }
+              sb.geo.setFromPoints(sb.pts);
+              sb.mat.opacity = aS3 * (0.65 + Math.random() * 0.35);
+              sb.mat.color.set(Math.random() > 0.4 ? 0x66ffdd : 0xaaffff);
+            } else {
+              sb.mat.opacity = 0;
+            }
+          });
+          // Spark travel along active bolts
+          const spArr = spkG2.attributes.position.array;
+          spkSt2.forEach((sp2, i) => {
+            sp2.t += sp2.sp; if (sp2.t > 1) { sp2.t = 0; sp2.bi = Math.floor(Math.random() * synBolts.length); }
+            const sb2 = synBolts[sp2.bi]; if (!sb2 || !sb2.active) return;
+            const lp3 = sb2.a.clone().lerp(sb2.b, sp2.t);
+            spArr[i * 3] = lp3.x; spArr[i * 3 + 1] = lp3.y; spArr[i * 3 + 2] = lp3.z;
+          });
+          spkG2.attributes.position.needsUpdate = true;
+          spkM2.opacity = aS3 * 0.80;
+        }
+
+        // ── Head S5+S6 ───────────────────────────────────────────
+        if (grpHead.visible) {
+          headKeyL.intensity = aHd * (3.5 + Math.sin(t * 0.4) * 0.5);
+          headFillL.intensity = aHd * (2.0 + Math.sin(t * 0.6) * 0.4);
+          brainGlowL.intensity = aHd * (1.8 + Math.sin(t * 1.2) * 0.8);
+          // skin
+          skinBase.opacity = aHd * 0.36 + Math.sin(t * 0.8) * 0.03;
+          wireSkinM.opacity = aHd * 0.09 + Math.sin(t * 0.5) * 0.015;
+          // iridescent shimmer
+          shimA.material.opacity = aHd * 0.045 + Math.sin(t * 0.88) * 0.020;
+          shimB.material.opacity = aHd * 0.035 + Math.cos(t * 0.72) * 0.016;
+          shimC.material.opacity = aHd * 0.022 + Math.sin(t * 1.10) * 0.010;
+          shimA.rotation.y = t * 0.04; shimB.rotation.y = -t * 0.03; shimC.rotation.y = t * 0.05;
+          // inner glow
+          innerGlow.material.opacity = aHd * (0.08 + Math.sin(t * 1.0) * 0.04);
+          // brain
+          brainM.opacity = aHd * 0.82;
+          bsM.opacity = aHd * (0.52 + Math.sin(t * 1.9) * 0.26);
+          // Animate surface sparks
+          const bs3 = bsG.attributes.position.array;
+          bsSt3.forEach((bs, i) => {
+            bs.t += bs.sp; if (bs.t > 1) { bs.t = 0; bs.th = Math.random() * Math.PI * 2; bs.ph = Math.random() * Math.PI; }
+            const th3 = bs.th + bs.t * Math.PI * 0.5, ph3 = bs.ph + bs.t * Math.PI * 0.28;
+            bs3[i * 3] = 3.85 * Math.sin(ph3) * Math.cos(th3);
+            bs3[i * 3 + 1] = 4.35 * Math.sin(ph3) * Math.sin(th3) * 0.92 + 0.3;
+            bs3[i * 3 + 2] = 3.45 * Math.cos(ph3);
+          });
+          bsG.attributes.position.needsUpdate = true;
+          grpHead.rotation.y = Math.sin(t * 0.07) * 0.12;
+        }
+
+        // Stars twinkle
+        starM.opacity = 0.60 + Math.sin(t * 1.3) * 0.10;
 
         renderer.render(scene, camera);
       }
