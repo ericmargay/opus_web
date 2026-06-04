@@ -2849,25 +2849,39 @@
         if (!animId) animId = requestAnimationFrame(animateLetterFilters);
       }
 
-      function handlePointer(px, py, speed) {
+      // ── Vibration (mobile only — Vibration API, silent fail on iOS) ─
+      const canVibrate = 'vibrate' in navigator;
+      let vibCooldown = 0; // timestamp of last vibration
+
+      function vibrateSubtle(intensity) {
+        if (!canVibrate) return;
+        const now = performance.now();
+        // Cooldown: minimum 180ms between vibrations — subtle, not buzzing
+        if (now - vibCooldown < 180) return;
+        vibCooldown = now;
+        // Map intensity (0–26) to pulse duration (4–18ms) — very short = subtle
+        const dur = Math.round(4 + (intensity / 26) * 14);
+        navigator.vibrate(dur);
+      }
+
+      function handlePointer(px, py, speed, isTouch) {
         if (!audioCtx) initAudio();
         let anyHit = false;
+        let maxIntensity = 0;
         wordFilters.forEach(wf => {
           const r = wf.span.getBoundingClientRect();
           if (r.width === 0) return;
-          // Distance from pointer to letter center
           const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
           const dx = px - cx, dy = py - cy;
-          // Influence radius = 120px, falls off with distance
           const dist = Math.sqrt(dx * dx + dy * dy);
           const influence = clamp(1 - dist / 120, 0, 1);
           if (influence > 0) {
             const intensity = influence * (18 + speed * 0.3);
             wf.target = clamp(intensity, 0, 26);
             anyHit = true;
-            // Play pad when a letter is meaningfully distorted
+            maxIntensity = Math.max(maxIntensity, intensity);
+            // Play organ note when a word is meaningfully distorted
             if (intensity > 6 && audioCtx && (performance.now() - padTriggeredAt) > 1500) {
-              // Resume context if suspended (browser autoplay policy)
               if (audioCtx.state === 'suspended') audioCtx.resume();
               padTriggeredAt = performance.now();
               playPad(audioCtx, masterGain);
@@ -2876,11 +2890,14 @@
             wf.target = 0;
           }
         });
+        // Vibrate on touch only (no vibration for mouse — would be jarring on desktop)
+        if (isTouch && anyHit && maxIntensity > 4) vibrateSubtle(maxIntensity);
         startAnim();
       }
 
       function releaseAll() {
         wordFilters.forEach(wf => { wf.target = 0; });
+        if (canVibrate) navigator.vibrate(0); // stop any ongoing vibration
         startAnim();
       }
 
@@ -2888,14 +2905,14 @@
       document.addEventListener('mousemove', e => {
         const speed = Math.abs(e.clientX - lastMx) + Math.abs(e.clientY - lastMy);
         lastMx = e.clientX; lastMy = e.clientY;
-        handlePointer(e.clientX, e.clientY, speed);
+        handlePointer(e.clientX, e.clientY, speed, false);
       }, { passive: true });
 
       // ── Touch ─────────────────────────────────────────────────────
       document.addEventListener('touchstart', () => { if (!audioCtx) initAudio(); }, { passive: true });
       document.addEventListener('touchmove', e => {
         const t = e.touches[0];
-        handlePointer(t.clientX, t.clientY, 0);
+        handlePointer(t.clientX, t.clientY, 0, true);
       }, { passive: true });
       document.addEventListener('touchend', releaseAll, { passive: true });
 
