@@ -159,22 +159,6 @@
       color: var(--sand);
     }
 
-    .nav-cta {
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--midnight) !important;
-      background: var(--sand);
-      padding: 0.6rem 1.5rem;
-      border-radius: 2px;
-      transition: background 0.3s, transform 0.2s !important;
-    }
-
-    .nav-cta:hover {
-      background: var(--sand-light) !important;
-      color: var(--midnight) !important;
-    }
-
     /* ── SECTIONS ── */
     section {
       min-height: 100vh;
@@ -399,8 +383,8 @@
 
     /* ── CRAFT FACT ── */
     .craft-fact-section {
-      min-height: 60vh;
-      padding: 6rem 4rem;
+      min-height: 55vh;
+      padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 6vw, 4rem);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -408,27 +392,38 @@
     }
 
     .craft-fact-inner {
-      max-width: 700px;
+      width: 100%;
+      max-width: 680px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
       position: relative;
+      margin: 0 auto;
     }
 
     .craft-number {
       font-family: var(--ff-mono);
-      font-size: 0.6rem;
+      font-size: clamp(0.55rem, 1.5vw, 0.62rem);
       letter-spacing: 0.4em;
       color: var(--text-muted);
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       display: block;
+      text-align: center;
+      text-transform: uppercase;
     }
 
     .craft-text {
       font-family: var(--ff-display);
-      font-size: clamp(1.6rem, 3vw, 2.8rem);
+      font-size: clamp(1.5rem, 4vw, 2.8rem);
       font-weight: 300;
-      line-height: 1.25;
+      line-height: 1.28;
       color: var(--warm-white);
       letter-spacing: -0.01em;
+      text-align: center;
+      width: 100%;
+      padding: 0 1rem;
     }
 
     .craft-text em {
@@ -438,9 +433,10 @@
 
     .craft-divider {
       width: 1px;
-      height: 80px;
+      height: 60px;
       background: linear-gradient(to bottom, transparent, var(--border-glow), transparent);
-      margin: 4rem auto 0;
+      margin: 2.5rem auto 0;
+      display: block;
     }
 
     /* ── SERVICES ── */
@@ -1118,7 +1114,7 @@
       <li><a href="#services" data-i18n="nav.services">Servicios</a></li>
       <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
       <li><a href="#portfolio" data-i18n="nav.work">Trabajo</a></li>
-      <li><a href="#cta" class="nav-cta" data-i18n="nav.cta">Iniciar Proyecto</a></li>
+      <li><a href="#cta" data-i18n="nav.contact">Contacto</a></li>
     </ul>
     <div class="lang-switcher">
       <button class="lang-btn active" data-lang="es">ES</button>
@@ -1138,7 +1134,6 @@
       <p class="hero-sub" data-i18n="hero.sub">Diseñamos y desarrollamos sitios, interfaces y mundos digitales para
         marcas que quieren destacar.</p>
       <div class="hero-ctas">
-        <a href="#cta" class="btn-primary" data-i18n="hero.cta1">Iniciar Proyecto</a>
         <a href="#services" class="btn-ghost" data-i18n="hero.cta2">Explorar Servicios</a>
       </div>
       <div class="hero-scroll-hint">
@@ -1425,29 +1420,18 @@
       <p class="cta-label reveal" data-i18n="cta.label">¿Listo para comenzar?</p>
       <h2 class="cta-title reveal reveal-delay-1" data-i18n="cta.title">Tu próximo sitio no tiene que parecerse
         a<br><em>cualquier otro sitio.</em></h2>
-      <div class="hero-ctas reveal reveal-delay-2" style="margin-bottom: 4rem;">
-        <a href="mailto:hello@studioforma.co" class="btn-primary" data-i18n="cta.btn">Hablemos de Tu Proyecto</a>
-      </div>
+      <p class="manifesto-body reveal reveal-delay-2" style="margin-bottom:3.5rem;" data-i18n="cta.sub">Hablemos sobre
+        tu proyecto. Cuéntanos qué quieres construir.</p>
       <div class="contact-row reveal reveal-delay-3">
-        <a href="mailto:hello@studioforma.co" class="contact-item">
+        <a href="mailto:hello@aminoacid.studio" class="contact-item">
           <span class="contact-icon">@</span>
-          hello@studioforma.co
+          hello@aminoacid.studio
         </a>
         <span class="contact-divider">·</span>
-        <a href="https://wa.me/1234567890" class="contact-item">
-          <span class="contact-icon">W</span>
-          WhatsApp
-        </a>
-        <span class="contact-divider">·</span>
-        <a href="https://instagram.com/studioforma" class="contact-item">
+        <a href="https://instagram.com/aminoacid" class="contact-item">
           <span class="contact-icon">I</span>
-          @studioforma
+          @aminoacid
         </a>
-      </div>
-      <div class="contact-form-row reveal reveal-delay-4">
-        <input type="email" class="contact-input" data-i18n-placeholder="cta.placeholder">
-        <button class="btn-primary" style="white-space:nowrap;cursor:none;" data-i18n="cta.send">Enviar mensaje
-          →</button>
       </div>
     </section>
 
@@ -1465,7 +1449,7 @@
     // ═══════════════════════════════════════════════════════════════
     const T = {
       es: {
-        "nav.services": "Servicios", "nav.process": "Proceso", "nav.work": "Trabajo", "nav.cta": "Iniciar Proyecto",
+        "nav.services": "Servicios", "nav.process": "Proceso", "nav.work": "Trabajo", "nav.contact": "Contacto",
         "hero.eyebrow": "Aminoacid Studio — Artesanía Digital",
         "hero.title": "Creamos experiencias web que <em>se sienten vivas.</em>",
         "hero.sub": "Diseñamos y desarrollamos sitios, interfaces y mundos digitales para marcas que quieren destacar.",
@@ -1500,11 +1484,11 @@
         "portfolio.p3.tag": "Campaña 3D", "portfolio.p3.title": "Entorno 3D para lanzamiento automotriz", "portfolio.p3.sub": "WebGL · Sistemas de partículas · Renderizado en tiempo real",
         "portfolio.p4.tag": "Sistema de automatización", "portfolio.p4.title": "Inteligencia operacional para empresa logística", "portfolio.p4.sub": "Dashboard personalizado · Integraciones API · Datos en tiempo real",
         "cta.label": "¿Listo para comenzar?", "cta.title": "Tu próximo sitio no tiene que parecerse a<br><em>cualquier otro sitio.</em>",
-        "cta.btn": "Hablemos de Tu Proyecto", "cta.placeholder": "tu@email.com", "cta.send": "Enviar mensaje →",
+        "cta.sub": "Hablemos sobre tu proyecto. Cuéntanos qué quieres construir.",
         "footer.copy": "© 2026 — Construido con precisión"
       },
       en: {
-        "nav.services": "Services", "nav.process": "Process", "nav.work": "Work", "nav.cta": "Start a Project",
+        "nav.services": "Services", "nav.process": "Process", "nav.work": "Work", "nav.contact": "Contact",
         "hero.eyebrow": "Aminoacid Studio — Digital Craftsmanship",
         "hero.title": "We create web experiences that <em>feel alive.</em>",
         "hero.sub": "We design and develop websites, interfaces, and digital worlds for brands that want to stand out.",
@@ -1539,11 +1523,11 @@
         "portfolio.p3.tag": "3D campaign", "portfolio.p3.title": "3D environment for an automotive launch", "portfolio.p3.sub": "WebGL · Particle systems · Real-time rendering",
         "portfolio.p4.tag": "Automation system", "portfolio.p4.title": "Operations intelligence for a logistics company", "portfolio.p4.sub": "Custom dashboard · API integrations · Real-time data",
         "cta.label": "Ready to begin?", "cta.title": "Your next website doesn't have to look like<br><em>just another website.</em>",
-        "cta.btn": "Let's Talk About Your Project", "cta.placeholder": "your@email.com", "cta.send": "Send a message →",
+        "cta.sub": "Let's talk about your project. Tell us what you want to build.",
         "footer.copy": "© 2026 — Built with precision"
       },
       fr: {
-        "nav.services": "Services", "nav.process": "Processus", "nav.work": "Travaux", "nav.cta": "Démarrer un projet",
+        "nav.services": "Services", "nav.process": "Processus", "nav.work": "Travaux", "nav.contact": "Contact",
         "hero.eyebrow": "Aminoacid Studio — Artisanat numérique",
         "hero.title": "Nous créons des expériences web qui <em>semblent vivantes.</em>",
         "hero.sub": "Nous concevons et développons des sites, interfaces et mondes numériques pour les marques qui veulent se démarquer.",
@@ -1578,7 +1562,7 @@
         "portfolio.p3.tag": "Campagne 3D", "portfolio.p3.title": "Environnement 3D pour un lancement automobile", "portfolio.p3.sub": "WebGL · Systèmes de particules · Rendu en temps réel",
         "portfolio.p4.tag": "Système d'automatisation", "portfolio.p4.title": "Intelligence opérationnelle pour une entreprise logistique", "portfolio.p4.sub": "Dashboard personnalisé · Intégrations API · Données en temps réel",
         "cta.label": "Prêt à commencer ?", "cta.title": "Votre prochain site n'a pas à ressembler<br><em>à un site quelconque.</em>",
-        "cta.btn": "Parlons de votre projet", "cta.placeholder": "votre@email.com", "cta.send": "Envoyer un message →",
+        "cta.sub": "Parlons de votre projet. Dites-nous ce que vous voulez construire.",
         "footer.copy": "© 2026 — Construit avec précision"
       }
     };
@@ -1788,57 +1772,138 @@
         return g;
       }
 
+      // ── HYPERREALISTIC STARS ─────────────────────────────────────
+      // Two layers: tiny distant stars + larger solar/corona stars
+      function buildStarField() {
+        // Layer 1: distant stars — tiny white/blue-white points
+        const N1 = isMobile ? 600 : 1800;
+        const g1 = new THREE.BufferGeometry();
+        const p1 = new Float32Array(N1 * 3);
+        const c1 = new Float32Array(N1 * 3);
+        const s1 = new Float32Array(N1); // individual sizes
+        for (let i = 0; i < N1; i++) {
+          // Distribute on a large sphere shell so no flat plane clusters
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 40 + Math.random() * 60;
+          p1[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          p1[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          p1[i * 3 + 2] = r * Math.cos(phi);
+          // Star colors: blue-white, white, warm-white
+          const col = Math.random();
+          if (col < 0.3) { c1[i * 3] = 0.7; c1[i * 3 + 1] = 0.85; c1[i * 3 + 2] = 1.0; }       // blue-white
+          else if (col < 0.7) { c1[i * 3] = 1.0; c1[i * 3 + 1] = 1.0; c1[i * 3 + 2] = 1.0; }    // pure white
+          else { c1[i * 3] = 1.0; c1[i * 3 + 1] = 0.92; c1[i * 3 + 2] = 0.78; }                  // warm/yellow
+          s1[i] = 0.04 + Math.random() * 0.12;
+        }
+        g1.setAttribute('position', new THREE.BufferAttribute(p1, 3));
+        g1.setAttribute('color', new THREE.BufferAttribute(c1, 3));
+        const m1 = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.88, sizeAttenuation: true });
+        scene.add(new THREE.Points(g1, m1));
+
+        // Layer 2: solar/corona stars — larger, glowing, fewer
+        const N2 = isMobile ? 30 : 80;
+        const g2 = new THREE.BufferGeometry();
+        const p2 = new Float32Array(N2 * 3);
+        const c2 = new Float32Array(N2 * 3);
+        // Solar colors: deep orange, yellow, white-yellow, red giant
+        const solarPalette = [
+          [1.0, 0.55, 0.05], [1.0, 0.85, 0.2], [1.0, 1.0, 0.85],
+          [1.0, 0.25, 0.1], [0.6, 0.8, 1.0], [1.0, 0.95, 0.6],
+        ];
+        for (let i = 0; i < N2; i++) {
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 35 + Math.random() * 45;
+          p2[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          p2[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          p2[i * 3 + 2] = r * Math.cos(phi);
+          const sc = solarPalette[Math.floor(Math.random() * solarPalette.length)];
+          c2[i * 3] = sc[0]; c2[i * 3 + 1] = sc[1]; c2[i * 3 + 2] = sc[2];
+        }
+        g2.setAttribute('position', new THREE.BufferAttribute(p2, 3));
+        g2.setAttribute('color', new THREE.BufferAttribute(c2, 3));
+        const m2 = new THREE.PointsMaterial({ size: 0.45, vertexColors: true, transparent: true, opacity: 0.9, sizeAttenuation: true });
+        const solarStars = new THREE.Points(g2, m2);
+        scene.add(solarStars);
+
+        // Layer 3: ultra-bright corona giants — rendered as small bright meshes
+        // so they get specular bloom from the lighting
+        const N3 = isMobile ? 8 : 20;
+        const giantGeo = new THREE.SphereGeometry(0.22, 8, 6);
+        const giantColors = [0xff8800, 0xffdd44, 0xff3311, 0xaaccff, 0xffff88];
+        for (let i = 0; i < N3; i++) {
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 28 + Math.random() * 30;
+          const mat = new THREE.MeshStandardMaterial({
+            color: giantColors[i % giantColors.length],
+            roughness: 0.0, metalness: 0.0,
+            emissive: giantColors[i % giantColors.length],
+            emissiveIntensity: 2.5 + Math.random() * 2,
+          });
+          const star = new THREE.Mesh(giantGeo, mat);
+          star.position.set(
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.sin(phi) * Math.sin(theta),
+            r * Math.cos(phi)
+          );
+          scene.add(star);
+        }
+
+        return { stars2: solarStars, mat2: m2 };
+      }
+
+      const { stars2, mat2 } = buildStarField();
+
       // ── 8 named molecules, one per page section ───────────────────
-      // Each has a fixed world position that the camera will orbit when
-      // the user scrolls to the corresponding section.
-      // Sections: Hero, Manifesto, Fact1, Services, Fact2, Process, Portfolio, CTA
+      // All Y positions set to 0 or small offset so they're screen-centered.
+      // Rotations are deliberately non-axis-aligned (all three axes twisted).
       const MOLECULES = [
-        // 0 Hero      — large red helix center-stage
-        { type: 'helix', pos: [0.0, 0.0, 0.0], rot: [0.15, 0.0, 0.0], res: 10, r: 1.2, pitch: 0.95, ang: 0.0, mIdx: 0 },
+        // 0 Hero      — red helix, dead center
+        { type: 'helix', pos: [0.0, 0.0, 0.0], rot: [0.55, 0.30, 0.40], res: 10, r: 1.2, pitch: 0.95, ang: 0.0, mIdx: 0 },
         // 1 Manifesto — yellow-green strand, left
-        { type: 'strand', pos: [-5.0, 1.5, -4.0], rot: [0.1, 0.5, -0.1], res: 7, mIdx: 1 },
-        // 2 Fact 1    — purple helix, upper right
-        { type: 'helix', pos: [5.5, 2.0, -3.0], rot: [-0.2, -0.4, 0.2], res: 8, r: 1.0, pitch: 0.9, ang: 1.0, mIdx: 2 },
-        // 3 Services  — blue strand, lower left
-        { type: 'strand', pos: [-4.0, -3.0, -8.0], rot: [0.25, 0.3, 0.1], res: 6, mIdx: 3 },
-        // 4 Fact 2    — orange helix, deep center
-        { type: 'helix', pos: [1.5, 1.0, -12.0], rot: [0.1, -0.2, 0.0], res: 9, r: 1.1, pitch: 1.0, ang: 0.5, mIdx: 4 },
-        // 5 Process   — cyan strand, right mid-depth
-        { type: 'strand', pos: [6.0, 0.0, -16.0], rot: [-0.1, 0.6, 0.2], res: 5, mIdx: 5 },
-        // 6 Portfolio — magenta helix, left deep
-        { type: 'helix', pos: [-5.0, -1.0, -20.0], rot: [0.2, -0.3, -0.1], res: 8, r: 0.9, pitch: 0.85, ang: 2.0, mIdx: 6 },
-        // 7 CTA       — gold strand, final
-        { type: 'strand', pos: [0.5, 2.0, -26.0], rot: [0.0, 0.1, 0.0], res: 7, mIdx: 7 },
+        { type: 'strand', pos: [-5.0, 0.0, -4.0], rot: [0.65, 0.50, -0.45], res: 7, mIdx: 1 },
+        // 2 Fact 1    — purple helix, right
+        { type: 'helix', pos: [5.5, 0.0, -3.0], rot: [-0.50, -0.55, 0.60], res: 8, r: 1.0, pitch: 0.9, ang: 1.0, mIdx: 2 },
+        // 3 Services  — blue strand, lower-left
+        { type: 'strand', pos: [-4.0, -0.5, -8.0], rot: [0.70, 0.35, 0.55], res: 6, mIdx: 3 },
+        // 4 Fact 2    — orange helix, center-deep
+        { type: 'helix', pos: [1.5, 0.0, -12.0], rot: [0.45, -0.60, 0.35], res: 9, r: 1.1, pitch: 1.0, ang: 0.5, mIdx: 4 },
+        // 5 Process   — cyan strand, right
+        { type: 'strand', pos: [6.0, 0.0, -16.0], rot: [-0.55, 0.65, 0.40], res: 5, mIdx: 5 },
+        // 6 Portfolio — magenta helix, left
+        { type: 'helix', pos: [-5.0, 0.0, -20.0], rot: [0.60, -0.40, -0.50], res: 8, r: 0.9, pitch: 0.85, ang: 2.0, mIdx: 6 },
+        // 7 CTA       — gold strand, final center
+        { type: 'strand', pos: [0.5, 0.0, -26.0], rot: [0.50, 0.45, 0.30], res: 7, mIdx: 7 },
       ];
+
+      // Track all individual atom meshes per molecule for raycasting
+      const moleculeAtoms = []; // array of {molIdx, meshes:[]}
 
       const molecules = [];
       MOLECULES.forEach((s, idx) => {
         const mats = matSet(s.mIdx);
-        const mesh = s.type === 'helix'
+        let mesh;
+        const atomMeshes = [];
+
+        // Intercept mesh creation to collect atom meshes
+        const origAdd = THREE.Group.prototype.add;
+        // We'll collect atoms after build instead
+        mesh = s.type === 'helix'
           ? buildHelix(new THREE.Vector3(...s.pos), s.res, s.r, s.pitch, s.ang, mats)
           : buildStrand(new THREE.Vector3(...s.pos), s.res, mats);
         mesh.rotation.set(...s.rot);
         scene.add(mesh);
+
+        // Collect all Mesh children recursively for raycasting
+        mesh.traverse(child => {
+          if (child.isMesh) atomMeshes.push(child);
+        });
+        moleculeAtoms.push({ molIdx: idx, meshes: atomMeshes, baseMats: atomMeshes.map(m => m.material) });
+
         molecules.push({ mesh, baseRot: [...s.rot], speed: 0.018 + idx * 0.004, phase: idx * 0.8 });
       });
-
-      // ── Ambient particles (vivid, matching color palette) ─────────
-      const partCount = isMobile ? 150 : 400;
-      const partGeo = new THREE.BufferGeometry();
-      const partPos = new Float32Array(partCount * 3);
-      const partCol = new Float32Array(partCount * 3);
-      const partColors = ATOM_COLORS.map(h => new THREE.Color(h));
-      for (let i = 0; i < partCount; i++) {
-        partPos[i * 3] = (Math.random() - 0.5) * 40;
-        partPos[i * 3 + 1] = (Math.random() - 0.5) * 25;
-        partPos[i * 3 + 2] = (Math.random() - 0.5) * 60;
-        const c = partColors[Math.floor(Math.random() * partColors.length)];
-        partCol[i * 3] = c.r * 0.6; partCol[i * 3 + 1] = c.g * 0.6; partCol[i * 3 + 2] = c.b * 0.6;
-      }
-      partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
-      partGeo.setAttribute('color', new THREE.BufferAttribute(partCol, 3));
-      const partMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.6, sizeAttenuation: true });
-      scene.add(new THREE.Points(partGeo, partMat));
 
       // ── Cell membrane toroids ────────────────────────────────────
       const torusMat = new THREE.MeshBasicMaterial({ color: 0x1a0a3a, transparent: true, opacity: 0.2 });
@@ -1850,38 +1915,47 @@
 
       // ── Lights ───────────────────────────────────────────────────
       scene.add(new THREE.AmbientLight(0x050208, 5));
-
-      // Key light — white-ish to let vivid colors show true
       const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
       keyLight.position.set(5, 10, 8); scene.add(keyLight);
 
-      // Accent lights matching the color palette — drift for drama
       const redLight = new THREE.PointLight(0xff2244, 2.5, 30); redLight.position.set(-5, 3, 6); scene.add(redLight);
       const blueLight = new THREE.PointLight(0x1188ff, 2.0, 28); blueLight.position.set(6, -2, 4); scene.add(blueLight);
       const purpLight = new THREE.PointLight(0xaa22ff, 1.8, 25); purpLight.position.set(0, 6, -5); scene.add(purpLight);
       const goldLight = new THREE.PointLight(0xffcc00, 1.5, 22); goldLight.position.set(-4, -4, -8); scene.add(goldLight);
 
-      // ── Camera waypoints — one per molecule/section ──────────────
-      // Each waypoint positions camera to orbit that specific molecule
-      // with a slight offset so it's not dead-center (more cinematic)
+      // ── Camera waypoints (Y=0 centered) ─────────────────────────
       const camPath = [
-        // 0 Hero: pull-back wide view of mol#0 (red helix center)
-        { pos: new THREE.Vector3(0.0, 1.5, 10.0), target: new THREE.Vector3(0.0, 0.3, 0.0) },
-        // 1 Manifesto: swoop left to yellow-green strand
-        { pos: new THREE.Vector3(-3.5, 3.0, 0.5), target: new THREE.Vector3(-5.0, 1.5, -4.0) },
-        // 2 Fact 1: arc to purple helix upper right
-        { pos: new THREE.Vector3(7.5, 3.5, 1.0), target: new THREE.Vector3(5.5, 2.0, -3.0) },
-        // 3 Services: descend to blue strand lower left
-        { pos: new THREE.Vector3(-2.5, -1.5, -3.5), target: new THREE.Vector3(-4.0, -3.0, -8.0) },
-        // 4 Fact 2: push deep to orange helix
-        { pos: new THREE.Vector3(3.5, 2.5, -7.0), target: new THREE.Vector3(1.5, 1.0, -12.0) },
-        // 5 Process: slide right to cyan strand
-        { pos: new THREE.Vector3(8.5, 1.0, -12.5), target: new THREE.Vector3(6.0, 0.0, -16.0) },
-        // 6 Portfolio: sweep left to magenta helix
-        { pos: new THREE.Vector3(-3.0, 0.5, -16.5), target: new THREE.Vector3(-5.0, -1.0, -20.0) },
-        // 7 CTA: final approach to gold strand, slight top-down
-        { pos: new THREE.Vector3(2.0, 5.0, -21.5), target: new THREE.Vector3(0.5, 2.0, -26.0) },
+        { pos: new THREE.Vector3(0.0, 0.0, 10.0), target: new THREE.Vector3(0.0, 0.0, 0.0) },
+        { pos: new THREE.Vector3(-3.5, 0.5, 0.5), target: new THREE.Vector3(-5.0, 0.0, -4.0) },
+        { pos: new THREE.Vector3(7.5, 0.5, 1.0), target: new THREE.Vector3(5.5, 0.0, -3.0) },
+        { pos: new THREE.Vector3(-2.5, -0.5, -3.5), target: new THREE.Vector3(-4.0, -0.5, -8.0) },
+        { pos: new THREE.Vector3(3.5, 0.5, -7.0), target: new THREE.Vector3(1.5, 0.0, -12.0) },
+        { pos: new THREE.Vector3(8.5, 0.0, -12.5), target: new THREE.Vector3(6.0, 0.0, -16.0) },
+        { pos: new THREE.Vector3(-3.0, 0.5, -16.5), target: new THREE.Vector3(-5.0, 0.0, -20.0) },
+        { pos: new THREE.Vector3(2.0, 1.5, -21.5), target: new THREE.Vector3(0.5, 0.0, -26.0) },
       ];
+
+      // ── Raycaster hover system ───────────────────────────────────
+      const raycaster = new THREE.Raycaster();
+      const mouseNDC = new THREE.Vector2();
+      // Hover emissive material — bright white pulse
+      const hoverMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.0, metalness: 1.0, emissive: 0xffffff, emissiveIntensity: 0.0 });
+
+      let hoveredMesh = null;
+      let hoverPulse = 0;   // 0→1 animation progress
+      let hoverActive = false;
+
+      // Flat list of all atom meshes across all molecules
+      const allAtoms = moleculeAtoms.flatMap(m => m.meshes);
+
+      document.addEventListener('mousemove', e => {
+        mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      });
+
+      // Glow point light that follows hovered atom
+      const hoverLight = new THREE.PointLight(0xffffff, 0, 6);
+      scene.add(hoverLight);
 
       // Smooth scroll value
       let rawScroll = 0;
@@ -1890,7 +1964,7 @@
         rawScroll = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
       });
 
-      // Mouse parallax
+      // Mouse parallax (separate from NDC)
       let mx = 0, my = 0, cmx = 0, cmy = 0;
       document.addEventListener('mousemove', e => {
         mx = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -1919,7 +1993,6 @@
         const raw = Math.min(s * n, n - 0.001);
         const idx = Math.floor(raw);
         const frac = raw - idx;
-        // Smooth step — ease in/out between waypoints
         const st = frac * frac * (3 - 2 * frac);
         return {
           pos: lerpVec3(camPath[idx].pos, camPath[Math.min(idx + 1, n)].pos, st),
@@ -1927,17 +2000,13 @@
         };
       }
 
-      // Light colors that animate per section (matched to molecule palette)
       const sectionLightColors = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
 
       function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
 
-        // Smooth scroll — lerp factor 0.055 = snappy but damped
         smoothScroll += (rawScroll - smoothScroll) * 0.055;
-
-        // Mouse smooth
         cmx += (mx - cmx) * 0.04;
         cmy += (my - cmy) * 0.04;
 
@@ -1948,32 +2017,79 @@
         camera.position.y += cmy * -1.0;
         camera.lookAt(state.target);
 
-        // Molecules — individual slow rotation + float, no full spin (keeps detail visible)
+        // Molecules — all axes twisted, oscillating around base rotation
         molecules.forEach((m, i) => {
-          m.mesh.rotation.y = m.baseRot[1] + Math.sin(t * m.speed + m.phase) * 0.22;
-          m.mesh.rotation.x = m.baseRot[0] + Math.cos(t * m.speed * 0.7 + m.phase) * 0.12;
-          m.mesh.rotation.z = m.baseRot[2] + Math.sin(t * m.speed * 0.5 + m.phase + 1) * 0.08;
-          m.mesh.position.y = MOLECULES[i].pos[1] + Math.sin(t * 0.2 + m.phase) * 0.3;
+          const sp = m.speed, ph = m.phase;
+          m.mesh.rotation.y = m.baseRot[1] + Math.sin(t * sp + ph) * 0.28;
+          m.mesh.rotation.x = m.baseRot[0] + Math.cos(t * sp * 0.7 + ph) * 0.20;
+          m.mesh.rotation.z = m.baseRot[2] + Math.sin(t * sp * 0.5 + ph + 1.2) * 0.15;
+          m.mesh.position.y = MOLECULES[i].pos[1] + Math.sin(t * 0.2 + ph) * 0.25;
         });
 
-        // Torus pulsing
+        // Torus membrane pulsing
         torus1.rotation.z = t * 0.03;
         torus2.rotation.y = t * 0.025;
         torusMat.opacity = 0.14 + Math.sin(t * 0.4) * 0.06;
 
-        // Color-matched accent lights drift and breathe
+        // Section light color shift
         const secIdx = Math.min(Math.floor(smoothScroll * (camPath.length - 1)), camPath.length - 2);
         const col = new THREE.Color(sectionLightColors[secIdx]);
-        redLight.color.lerp(col, 0.02);
+        redLight.color.lerp(col, 0.025);
         redLight.intensity = 2.5 + Math.sin(t * 0.55) * 0.7;
         blueLight.intensity = 2.0 + Math.cos(t * 0.42 + 1.2) * 0.5;
         purpLight.intensity = 1.8 + Math.sin(t * 0.38 + 2.1) * 0.4;
         goldLight.intensity = 1.5 + Math.cos(t * 0.30 + 0.5) * 0.35;
-
-        // Drift accent lights slowly for ambient movement
         redLight.position.x = -5 + Math.sin(t * 0.18) * 2.5;
         blueLight.position.z = 4 + Math.cos(t * 0.15) * 2;
         purpLight.position.y = 6 + Math.sin(t * 0.12) * 1.5;
+
+        // Solar star twinkle
+        mat2.opacity = 0.8 + Math.sin(t * 1.4) * 0.1;
+
+        // ── Raycaster hover ──────────────────────────────────────
+        raycaster.setFromCamera(mouseNDC, camera);
+        const hits = raycaster.intersectObjects(allAtoms, false);
+
+        if (hits.length > 0) {
+          const hit = hits[0].object;
+          if (hit !== hoveredMesh) {
+            // Restore previous
+            if (hoveredMesh) {
+              hoveredMesh.material = hoveredMesh._origMat;
+              hoveredMesh._origMat = undefined;
+            }
+            hoveredMesh = hit;
+            // Store original and clone for hover
+            hit._origMat = hit.material;
+            const glow = hit.material.clone();
+            glow.emissive = new THREE.Color(hit.material.color);
+            glow.emissiveIntensity = 1.8;
+            glow.roughness = 0.0;
+            hit.material = glow;
+            hoverActive = true;
+            hoverPulse = 0;
+          }
+          // Position hover light at hit point
+          hoverLight.position.copy(hits[0].point);
+          hoverLight.color.set(hoveredMesh.material.color);
+          hoverLight.intensity = 4.0 + Math.sin(t * 6) * 1.5; // rapid pulse
+          hoverLight.distance = 5;
+          // Pulse emissive
+          if (hoveredMesh.material.emissiveIntensity !== undefined) {
+            hoveredMesh.material.emissiveIntensity = 1.8 + Math.sin(t * 8) * 0.8;
+          }
+          // Scale atom up slightly
+          hoveredMesh.scale.setScalar(1.18 + Math.sin(t * 8) * 0.06);
+        } else {
+          if (hoveredMesh) {
+            hoveredMesh.material = hoveredMesh._origMat;
+            hoveredMesh._origMat = undefined;
+            hoveredMesh.scale.setScalar(1.0);
+            hoveredMesh = null;
+          }
+          hoverLight.intensity = 0;
+          hoverActive = false;
+        }
 
         renderer.render(scene, camera);
       }
