@@ -175,6 +175,10 @@
       flex-direction: column;
       gap: 2rem;
       padding-top: 0;
+      min-height: 220vh;
+      /* tall enough that cluster is well below initial view */
+      justify-content: flex-start;
+      padding-top: 22vh;
     }
 
     .hero-eyebrow {
@@ -199,19 +203,34 @@
       animation: fadeUp 1s 0.8s ease forwards;
     }
 
-    .hero-title em {
-      font-style: italic;
-      color: var(--sand);
+    #hero-distort-zone {
+      filter: url(#hero-distort);
+      will-change: filter;
+      transition: filter 0s;
+      /* instant — JS drives it */
+      cursor: none;
+    }
+
+    /* Subtle glow on the title during distortion */
+    #hero-distort-zone .hero-title {
+      transition: text-shadow 0.4s ease;
+    }
+
+    #hero-distort-zone.distorting .hero-title {
+      text-shadow: 0 0 40px rgba(122, 184, 201, 0.35), 0 0 80px rgba(122, 184, 201, 0.12);
     }
 
     .hero-sub {
-      font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
       color: var(--text-secondary);
-      max-width: 500px;
-      line-height: 1.7;
+      max-width: 620px;
+      line-height: 1.75;
       font-weight: 300;
       opacity: 0;
       animation: fadeUp 1s 1.1s ease forwards;
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .hero-ctas {
@@ -267,17 +286,42 @@
       transform: translateX(4px);
     }
 
+    .hero-explore-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--ff-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      text-decoration: none;
+      opacity: 0;
+      animation: fadeIn 1s 2s ease forwards;
+      transition: color 0.3s;
+      margin-top: 1rem;
+    }
+
+    .hero-explore-link:hover {
+      color: var(--sand);
+    }
+
+    .hero-explore-arrow {
+      display: block;
+      font-size: 1rem;
+      animation: scrollPulse 2.2s ease-in-out infinite;
+      margin-top: 0.2rem;
+    }
+
     .hero-scroll-hint {
-      position: absolute;
-      bottom: 3rem;
-      left: 50%;
-      transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.8rem;
       opacity: 0;
       animation: fadeIn 1s 2s ease forwards;
+      margin-top: 1.5rem;
     }
 
     .scroll-line {
@@ -1108,6 +1152,18 @@
   <canvas id="hero-canvas"></canvas>
   <div id="webgl-fallback"></div>
 
+  <!-- SVG filter for hero text distortion -->
+  <svg id="svg-filters" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="hero-distort" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="linearRGB">
+        <feTurbulence id="ft-turb" type="turbulence" baseFrequency="0.015 0.008" numOctaves="3" seed="2"
+          stitchTiles="stitch" result="noise" />
+        <feDisplacementMap id="ft-disp" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R"
+          yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
   <nav>
     <a href="#" class="nav-logo">Aminoacid Studio</a>
     <ul class="nav-links">
@@ -1130,11 +1186,10 @@
     <!-- HERO -->
     <section id="hero">
       <p class="hero-eyebrow" data-i18n="hero.eyebrow">Aminoacid Studio — Artesanía Digital</p>
-      <h1 class="hero-title" data-i18n="hero.title">Creamos experiencias web que <em>se sienten vivas.</em></h1>
-      <p class="hero-sub" data-i18n="hero.sub">Diseñamos y desarrollamos sitios, interfaces y mundos digitales para
-        marcas que quieren destacar.</p>
-      <div class="hero-ctas">
-        <a href="#services" class="btn-ghost" data-i18n="hero.cta2">Explorar Servicios</a>
+      <div id="hero-distort-zone">
+        <h1 class="hero-title" data-i18n="hero.title">Creamos experiencias web que <em>se sienten vivas.</em></h1>
+        <p class="hero-sub" data-i18n="hero.sub">Diseñamos y desarrollamos sitios, interfaces y mundos digitales para
+          marcas que quieren destacar.</p>
       </div>
       <div class="hero-scroll-hint">
         <div class="scroll-line"></div>
@@ -1660,7 +1715,7 @@
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 1500);
-      camera.position.set(0, 0, 18);
+      camera.position.set(0, 2, 14); // starts above cluster, looking at text zone
 
       // ── Scroll + mouse ────────────────────────────────────────────
       let rawScroll = 0, smoothScroll = 0;
@@ -1763,7 +1818,9 @@
       // ═══════════════════════════════════════════════════════════════
 
       // All clusters live in one group, always in scene
-      const grpAmino = new THREE.Group(); scene.add(grpAmino);
+      const grpAmino = new THREE.Group();
+      grpAmino.position.y = -28; // far below initial camera — revealed on scroll
+      scene.add(grpAmino);
 
       // Center cluster (the hero one — visible from frame 0)
       const aDefs = [
@@ -2145,7 +2202,7 @@
       // Distant background amino clusters — rendered as tiny SPHERE meshes (not points)
       // so they look like genuine amino structures, never squares
       const CPK = [0xff2244, 0x1188ff, 0xdddddd, 0xaaee00, 0xff6600, 0x00ddcc, 0xffcc00, 0xaa22ff];
-      const DIST_N = isMobile ? 28 : 55;
+      const DIST_N = isMobile ? 55 : 140;
       const _bgAtomGeo = new THREE.SphereGeometry(0.12, 6, 5); // tiny sphere per dot
       const _bgBondGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.55, 5, 1);
       for (let ci = 0; ci < DIST_N; ci++) {
@@ -2220,20 +2277,20 @@
       // CAMERA KEYFRAMES
       // ═══════════════════════════════════════════════════════════════
       const CAMS = [
-        { s: 0.00, p: [0, 0, 10], t: [0, 0, 0] },      // S0 hero — tight on center cluster
-        { s: 0.06, p: [1, 0.5, 12], t: [0, 0, 0] },    // S0 breathe slightly
-        { s: 0.13, p: [2, 1.5, 22], t: [0, 0, -2] },   // S1 start pull back — first cluster appears
-        { s: 0.20, p: [-3, 3, 35], t: [0, 0, -5] },    // S1 wider — two more clusters visible
-        { s: 0.27, p: [4, 4, 48], t: [0, 0, -8] },     // S1 full reveal — all 4 clusters + attraction
-        { s: 0.33, p: [4, 20, 44], t: [0, 0, 0] },     // S2 isometric neuron approach
-        { s: 0.44, p: [3, 17, 35], t: [0, -4, 0] },    // S2 neuron settled
-        { s: 0.48, p: [1, 11, 58], t: [0, 0, -7] },    // S3 pull out for network
-        { s: 0.58, p: [0, 9, 70], t: [0, 2, -8] },     // S3 wide network
+        { s: 0.00, p: [0, 2, 14], t: [0, 1, 0] },    // hero: above cluster, particles visible
+        { s: 0.06, p: [0, -5, 14], t: [0, -12, 0] },    // scroll begins — camera tilts down toward cluster
+        { s: 0.13, p: [2, -16, 22], t: [0, -28, -2] },   // cluster comes into view as we zoom out
+        { s: 0.20, p: [-3, -22, 35], t: [0, -28, -5] },  // wider — satellite clusters appear
+        { s: 0.27, p: [4, -24, 48], t: [0, -28, -8] },   // full cluster field visible + attraction
+        { s: 0.33, p: [4, 20, 44], t: [0, 0, 0] },    // S2 isometric neuron approach
+        { s: 0.44, p: [3, 17, 35], t: [0, -4, 0] },    // S2 neuron
+        { s: 0.48, p: [1, 11, 58], t: [0, 0, -7] },    // S3 network
+        { s: 0.58, p: [0, 9, 70], t: [0, 2, -8] },    // S3 wide
         { s: 0.66, p: [7, 16, 84], t: [0, 0, -5] },    // S4 space blue
-        { s: 0.71, p: [1, 3, 44], t: [0, 0, 0] },      // S5 head approach
-        { s: 0.80, p: [-2, 1, 30], t: [0, -0.5, 0] },  // S5 head close
-        { s: 0.88, p: [3, 5, 42], t: [0, 0, 0] },      // S6 process wider
-        { s: 1.00, p: [0, 7, 60], t: [0, 0, 0] },      // S7 cosmic fade
+        { s: 0.71, p: [1, 3, 44], t: [0, 0, 0] },    // S5 head
+        { s: 0.80, p: [-2, 1, 30], t: [0, -0.5, 0] },   // S5 close
+        { s: 0.88, p: [3, 5, 42], t: [0, 0, 0] },    // S6 wider
+        { s: 1.00, p: [0, 7, 60], t: [0, 0, 0] },    // S7 fade
       ];
       function getCam(s) {
         let lo = 0, hi = 1;
@@ -2503,6 +2560,276 @@
       }
 
       animate();
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // AUDIO SYSTEM
+    // ═══════════════════════════════════════════════════════════════
+    (function () {
+      let audioCtx = null;
+      let soundtrackSource = null;
+      let masterGain = null;
+      let padActive = false;
+      let padTimeout = null;
+
+      // ── Init Web Audio (requires user gesture) ───────────────────
+      function initAudio() {
+        if (audioCtx) {
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          return;
+        }
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.32, audioCtx.currentTime + 3);
+        masterGain.connect(audioCtx.destination);
+
+        // ── Load soundtrack.mp3 ──────────────────────────────────────
+        fetch('soundtrack.mp3')
+          .then(r => r.arrayBuffer())
+          .then(buf => audioCtx.decodeAudioData(buf))
+          .then(decoded => {
+            soundtrackSource = audioCtx.createBufferSource();
+            soundtrackSource.buffer = decoded;
+            soundtrackSource.loop = true;
+            soundtrackSource.playbackRate.value = 1.0;
+            soundtrackSource.connect(masterGain);
+            soundtrackSource.start(0);
+          })
+          .catch(() => {
+            // soundtrack.mp3 not found — silent fail, pad still works
+          });
+      }
+
+      // ── Convolver reverb (impulse response generated programmatically) ──
+      function makeReverb(ctx, duration, decay) {
+        const sr = ctx.sampleRate;
+        const len = sr * duration;
+        const buf = ctx.createBuffer(2, len, sr);
+        for (let c = 0; c < 2; c++) {
+          const d = buf.getChannelData(c);
+          for (let i = 0; i < len; i++) {
+            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+          }
+        }
+        const conv = ctx.createConvolver();
+        conv.buffer = buf;
+        return conv;
+      }
+
+      // ── Church organ note — triggered on letter distortion ──────
+      // Single note (A3 = 220hz) with organ harmonic series + long reverb
+      function playPad(ctx, destination) {
+        if (padActive) return;
+        padActive = true;
+
+        // Master gain for this note — much louder than before
+        const noteGain = ctx.createGain();
+        noteGain.gain.setValueAtTime(0, ctx.currentTime);
+        noteGain.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 0.08); // fast attack like organ
+        noteGain.gain.setValueAtTime(0.55, ctx.currentTime + 0.5);
+        noteGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.8);     // slow release
+
+        // Church organ reverb — long, cathedral-like
+        const reverb = makeReverb(ctx, 4.5, 1.8);
+        const dryGain = ctx.createGain(); dryGain.gain.value = 0.45;
+        const wetGain = ctx.createGain(); wetGain.gain.value = 0.55;
+        noteGain.connect(dryGain); dryGain.connect(destination);
+        noteGain.connect(reverb); reverb.connect(wetGain); wetGain.connect(destination);
+
+        // Organ harmonic series on A3 = 220hz
+        // Real pipe organ = fundamental + strong 2nd, 3rd, 4th harmonics
+        const BASE = 220;
+        const harmonics = [
+          { mult: 1, amp: 1.00, type: 'sawtooth' },   // fundamental — full
+          { mult: 2, amp: 0.70, type: 'sawtooth' },   // 2nd harmonic
+          { mult: 3, amp: 0.50, type: 'sawtooth' },   // 3rd harmonic (quint)
+          { mult: 4, amp: 0.30, type: 'sawtooth' },   // 4th harmonic
+          { mult: 0.5, amp: 0.20, type: 'sine' },   // sub octave — warmth
+        ];
+        harmonics.forEach(h => {
+          const osc = ctx.createOscillator();
+          osc.type = h.type;
+          osc.frequency.value = BASE * h.mult;
+          osc.detune.value = (Math.random() - 0.5) * 3; // tiny humanization
+          const hGain = ctx.createGain();
+          hGain.gain.value = h.amp / harmonics.length;
+          osc.connect(hGain);
+          hGain.connect(noteGain);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 3.5);
+        });
+
+        // Reset after note finishes
+        padTimeout = setTimeout(() => { padActive = false; }, 1500);
+      }
+
+      // ── Per-letter distortion system ────────────────────────────
+      // Each word/letter gets its own SVG filter instance so distortion
+      // is local — only letters near the cursor are affected.
+      // We split the hero title into <span> per word, each with its own filter.
+
+      const heroTitle = document.querySelector('.hero-title');
+      if (!heroTitle) return;
+
+      // Create N filter instances (one per word span)
+      // Each has its own feTurbulence + feDisplacementMap
+      function makeLetterFilter(id) {
+        const svgFilters = document.getElementById('svg-filters').querySelector('defs');
+        const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        filter.id = id;
+        filter.setAttribute('x', '-30%'); filter.setAttribute('y', '-30%');
+        filter.setAttribute('width', '160%'); filter.setAttribute('height', '160%');
+        filter.setAttribute('color-interpolation-filters', 'linearRGB');
+        const turb = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+        turb.setAttribute('type', 'turbulence');
+        turb.setAttribute('baseFrequency', '0.018 0.010');
+        turb.setAttribute('numOctaves', '3');
+        turb.setAttribute('seed', String(Math.floor(Math.random() * 99)));
+        turb.setAttribute('result', 'noise');
+        const disp = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
+        disp.setAttribute('in', 'SourceGraphic'); disp.setAttribute('in2', 'noise');
+        disp.setAttribute('scale', '0');
+        disp.setAttribute('xChannelSelector', 'R'); disp.setAttribute('yChannelSelector', 'G');
+        filter.appendChild(turb); filter.appendChild(disp);
+        svgFilters.appendChild(filter);
+        return { filter, turb, disp };
+      }
+
+      // Split title into word spans
+      // Preserve the <em> tag by working at the DOM level
+      const words = [];
+      heroTitle.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          node.textContent.split(/(\s+)/).forEach(part => {
+            if (part.trim()) {
+              const span = document.createElement('span');
+              span.className = 'hero-word';
+              span.textContent = part;
+              words.push(span);
+            } else if (part) {
+              // whitespace — insert as text node
+              words.push(document.createTextNode(part));
+            }
+          });
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          // em tag — wrap its text in a word span too
+          const span = document.createElement('span');
+          span.className = 'hero-word';
+          span.innerHTML = node.outerHTML;
+          words.push(span);
+        }
+      });
+      heroTitle.innerHTML = '';
+      const wordSpans = [];
+      words.forEach(w => {
+        heroTitle.appendChild(w);
+        if (w.classList && w.classList.contains('hero-word')) wordSpans.push(w);
+      });
+
+      // Assign a unique filter to each word span
+      const wordFilters = wordSpans.map((span, i) => {
+        const id = `wf-${i}`;
+        const { turb, disp } = makeLetterFilter(id);
+        span.style.display = 'inline-block';
+        span.style.filter = `url(#${id})`;
+        span.style.willChange = 'filter';
+        return { span, turb, disp, current: 0, target: 0, phase: Math.random() * Math.PI * 2 };
+      });
+
+      let turbPhase = 0;
+      let animId = null;
+      let lastMx = -1, lastMy = -1;
+      let padTriggeredAt = -999;
+
+      function animateLetterFilters() {
+        turbPhase += 0.014;
+        let anyActive = false;
+        wordFilters.forEach(wf => {
+          wf.current += (wf.target - wf.current) * 0.10;
+          if (wf.current > 0.4) {
+            const bf1 = (0.018 + Math.sin(turbPhase + wf.phase) * 0.006).toFixed(4);
+            const bf2 = (0.010 + Math.cos(turbPhase * 0.7 + wf.phase) * 0.004).toFixed(4);
+            wf.turb.setAttribute('baseFrequency', `${bf1} ${bf2}`);
+            wf.disp.setAttribute('scale', wf.current.toFixed(2));
+            anyActive = true;
+          } else {
+            wf.disp.setAttribute('scale', '0');
+            if (wf.current > 0.05) anyActive = true;
+          }
+        });
+        if (anyActive) animId = requestAnimationFrame(animateLetterFilters);
+        else animId = null;
+      }
+
+      function startAnim() {
+        if (!animId) animId = requestAnimationFrame(animateLetterFilters);
+      }
+
+      function handlePointer(px, py, speed) {
+        if (!audioCtx) initAudio();
+        let anyHit = false;
+        wordFilters.forEach(wf => {
+          const r = wf.span.getBoundingClientRect();
+          if (r.width === 0) return;
+          // Distance from pointer to letter center
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          const dx = px - cx, dy = py - cy;
+          // Influence radius = 120px, falls off with distance
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const influence = clamp(1 - dist / 120, 0, 1);
+          if (influence > 0) {
+            const intensity = influence * (18 + speed * 0.3);
+            wf.target = clamp(intensity, 0, 26);
+            anyHit = true;
+            // Play pad when a letter is meaningfully distorted
+            if (intensity > 6 && audioCtx && (performance.now() - padTriggeredAt) > 1500) {
+              // Resume context if suspended (browser autoplay policy)
+              if (audioCtx.state === 'suspended') audioCtx.resume();
+              padTriggeredAt = performance.now();
+              playPad(audioCtx, masterGain);
+            }
+          } else {
+            wf.target = 0;
+          }
+        });
+        startAnim();
+      }
+
+      function releaseAll() {
+        wordFilters.forEach(wf => { wf.target = 0; });
+        startAnim();
+      }
+
+      // ── Mouse ─────────────────────────────────────────────────────
+      document.addEventListener('mousemove', e => {
+        const speed = Math.abs(e.clientX - lastMx) + Math.abs(e.clientY - lastMy);
+        lastMx = e.clientX; lastMy = e.clientY;
+        handlePointer(e.clientX, e.clientY, speed);
+      }, { passive: true });
+
+      // ── Touch ─────────────────────────────────────────────────────
+      document.addEventListener('touchstart', () => { if (!audioCtx) initAudio(); }, { passive: true });
+      document.addEventListener('touchmove', e => {
+        const t = e.touches[0];
+        handlePointer(t.clientX, t.clientY, 0);
+      }, { passive: true });
+      document.addEventListener('touchend', releaseAll, { passive: true });
+
+      // clamp helper (local, doesn't conflict with Three.js scope)
+      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+      // ── First user gesture → init audio ─────────────────────────
+      // Listen on first scroll too (common on mobile)
+      function onFirstGesture() {
+        initAudio();
+        document.removeEventListener('click', onFirstGesture);
+        document.removeEventListener('keydown', onFirstGesture);
+        window.removeEventListener('scroll', onFirstGesture, { passive: true });
+      }
+      document.addEventListener('click', onFirstGesture);
+      document.addEventListener('keydown', onFirstGesture);
+      window.addEventListener('scroll', onFirstGesture, { passive: true });
     })();
   </script>
 </body>
