@@ -31,7 +31,7 @@
       font-weight: 300;
       overflow-x: hidden;
       cursor: none;
-      transition: background 1.2s ease
+      transition: background 0.35s ease
     }
 
     #root {
@@ -1722,9 +1722,12 @@
       }
 
       // ── Init distortion after DOM ─────────────────────────────────
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupDistortion);
-      } else { setupDistortion(); }
+      // Distortion: desktop only — touchmove on mobile causes unwanted auto-distortion
+      if (!IS_MOB) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setupDistortion);
+        } else { setupDistortion(); }
+      }
 
     })();
   </script>
