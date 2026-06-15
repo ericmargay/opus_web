@@ -1315,15 +1315,21 @@
 
       // ── Load and loop soundtrack ─────────────────────────────────
       async function loadAndPlay(ctx2, entry) {
-        // Try multiple paths for the soundtrack
-        let ab = null;
-        for (const path of ['soundtrack.mp3', '../agency-site/soundtrack.mp3']) {
-          try {
-            const res = await fetch(path);
-            if (res.ok) { ab = await res.arrayBuffer(); break; }
-          } catch (_) { }
-        }
-        if (!ab) throw new Error('soundtrack not found');
+        // Load via XHR — works on file:// and http:// alike
+        const ab = await new Promise((resolve, reject) => {
+          const paths = ['soundtrack.mp3', '../agency-site/soundtrack.mp3', './soundtrack.mp3'];
+          let idx = 0;
+          function tryNext() {
+            if (idx >= paths.length) { reject(new Error('soundtrack not found')); return; }
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', paths[idx++], true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onload = () => xhr.status < 400 ? resolve(xhr.response) : tryNext();
+            xhr.onerror = tryNext;
+            xhr.send();
+          }
+          tryNext();
+        });
         audioBuffer = await ctx2.decodeAudioData(ab);
         function startLoop(offset) {
           srcNode = ctx2.createBufferSource();
@@ -1369,18 +1375,17 @@
         tremoloOsc.connect(tremoloGain.gain);
       }
 
-      // Per-section presets — DRASTIC changes so they're unmistakably audible
+      // Per-section presets — perceptible but musical, not jarring
       // [lpFreq, hpFreq, wetGain, dryGain, masterVol, playbackRate]
-      // playbackRate shifts pitch: 1.0=normal, 0.75=lower, 1.25=higher
       const PRESETS = [
-        [18000, 20, 0.10, 0.90, 0.72, 1.00], // S0: full bright, normal pitch
-        [2000, 20, 0.75, 0.25, 0.65, 0.85], // S1: dark+cavernous+pitch down
-        [400, 20, 0.90, 0.10, 0.55, 0.70], // S2: extreme darkness, deep pitch
-        [16000, 200, 0.05, 0.95, 0.80, 1.15], // S3: ultra bright, stripped, pitch up
-        [18000, 20, 0.65, 0.35, 0.68, 1.25], // S4: bright + swimming reverb + high
-        [300, 300, 0.85, 0.15, 0.60, 0.75], // S5: almost inaudible + subterranean
-        [14000, 20, 0.92, 0.08, 0.55, 1.00], // S6: all reverb, washed out
-        [1200, 100, 0.40, 0.60, 0.82, 0.90], // S7: dark+loud+punchy return
+        [16000, 20, 0.15, 0.85, 0.72, 1.00], // S0: bright, clean, normal
+        [3500, 30, 0.55, 0.45, 0.68, 0.93], // S1: warm+dark, slight pitch down
+        [900, 20, 0.72, 0.28, 0.62, 0.88], // S2: deep+cavernous, lower
+        [14000, 120, 0.12, 0.88, 0.76, 1.06], // S3: bright+dry, slightly up
+        [18000, 20, 0.52, 0.48, 0.68, 1.08], // S4: full+spacious, highest
+        [600, 100, 0.65, 0.35, 0.65, 0.90], // S5: muffled+reverby, lower
+        [12000, 20, 0.80, 0.20, 0.60, 0.96], // S6: washed reverb, near normal
+        [2500, 80, 0.38, 0.62, 0.78, 0.94], // S7: dark return, punchy
       ];
       const RAMP = 1.2; // faster transitions
       function applyPreset(i) {
@@ -1636,58 +1641,58 @@
           'st3': 'Prototype', 'sd3': 'Validate before building.',
           'st4': 'Development', 'sd4': 'Clean, measurable code.',
           'st5': 'Launch', 'sd5': 'Deploy and continuous refinement.',
-          'p6.eyebrow': '03 — Digital craft', 'p6.title': '3D doesn't decorate;< br > it must<em>tell<br>a story.</em> ',
-      'p7.eyebrow': 'Ready to start?', 'p7.title': 'Your next site<br>doesn't have to look < br > like < em > another site.</em > ',
-      'p7.body': 'Let's talk about your project.','p7.cta':'hello @aminoacid.studio →',
-    },
-      fr: {
-      'nav.services': 'Services', 'nav.process': 'Processus', 'nav.work': 'Travaux', 'nav.contact': 'Contact',
-        'hero.eyebrow': 'Exp\u00e9riences num\u00e9riques', 'hero.sub': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
+          'p6.eyebrow': '03 — Digital craft', 'p6.title': '3D doesn\u2019t decorate;<br>it must <em>tell<br>a story.</em>',
+          'p7.eyebrow': 'Ready to start?', 'p7.title': 'Your next site<br>doesn\u2019t have to look<br>like <em>another site.</em>',
+          'p7.body': 'Let\u2019s talk about your project.', 'p7.cta': 'hello@aminoacid.studio →',
+        },
+        fr: {
+          'nav.services': 'Services', 'nav.process': 'Processus', 'nav.work': 'Travaux', 'nav.contact': 'Contact',
+          'hero.eyebrow': 'Exp\u00e9riences num\u00e9riques', 'hero.sub': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
           'scroll': 'D\u00e9filer',
-            'p0.body': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
-              'p1.tag': '\u00c0 propos du studio', 'p1.title': 'O\u00f9 le <em>design</em><br>rencontre<br>l\u2019ing\u00e9nierie.',
-                'p1.body': 'Nous sommes un studio boutique \u00e0 l\u2019intersection de la technologie et du storytelling. Nous combinons pens\u00e9e strat\u00e9gique, ing\u00e9nierie de pr\u00e9cision et attention obsessionnelle au craft.',
-                  'p2.eyebrow': '01 \u2014 Artisanat num\u00e9rique', 'p2.title': 'Un site rapide <em>vend</em><br>avant que l\u2019utilisateur<br>pense \u00e0 partir.',
-                    'p3.eyebrow': 'Ce que nous construisons', 'p3.title': 'Notre <em>craft</em>',
-                      's1.name': 'D\u00e9veloppement Web Moderne', 's1.desc': 'React, Next.js et architectures personnalis\u00e9es.',
-                        's2.name': 'Pages d\u2019atterrissage', 's2.desc': 'Conversion, r\u00e9cit de marque et r\u00e9sultats.',
-                          's3.name': 'Exp\u00e9riences 3D', 's3.desc': 'Sc\u00e8nes WebGL immersives en temps r\u00e9el.',
-                            's4.name': 'Interfaces UX/UI', 's4.desc': 'Du wireframe au syst\u00e8me haute fid\u00e9lit\u00e9.',
-                              's5.name': 'Automatisations', 's5.desc': 'Pipelines API qui \u00e9liminent la friction.',
-                                's6.name': 'Performance', 's6.desc': 'Sites lents \u2192 exp\u00e9riences ultra-rapides.',
-                                  'p4.eyebrow': '02 \u2014 Artisanat num\u00e9rique', 'p4.title': '<em>L\u2019interaction</em><br>transforme une page<br>en exp\u00e9rience.',
-                                    'p5.tag': 'Comment nous travaillons', 'p5.title': 'Le <em>processus</em>',
-                                      'st1': 'D\u00e9couverte', 'sd1': 'Objectifs, utilisateurs et contexte.',
-                                        'st2': 'Design', 'sd2': 'Syst\u00e9mique et visuel.',
-                                          'st3': 'Prototype', 'sd3': 'Valider avant de construire.',
-                                            'st4': 'D\u00e9veloppement', 'sd4': 'Code propre et mesurable.',
-                                              'st5': 'Lancement', 'sd5': 'D\u00e9ploiement et raffinement continu.',
-                                                'p6.eyebrow': '03 \u2014 Artisanat num\u00e9rique', 'p6.title': 'La 3D ne d\u00e9core pas;<br>elle doit <em>raconter<br>une histoire.</em>',
-                                                  'p7.eyebrow': 'Pr\u00eat \u00e0 commencer?', 'p7.title': 'Votre prochain site<br>n\u2019a pas \u00e0 ressembler<br>\u00e0 <em>un autre site.</em>',
-                                                    'p7.body': 'Parlons de votre projet.', 'p7.cta': 'hello@aminoacid.studio \u2192',
-    }
-  };
+          'p0.body': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
+          'p1.tag': '\u00c0 propos du studio', 'p1.title': 'O\u00f9 le <em>design</em><br>rencontre<br>l\u2019ing\u00e9nierie.',
+          'p1.body': 'Nous sommes un studio boutique \u00e0 l\u2019intersection de la technologie et du storytelling. Nous combinons pens\u00e9e strat\u00e9gique, ing\u00e9nierie de pr\u00e9cision et attention obsessionnelle au craft.',
+          'p2.eyebrow': '01 \u2014 Artisanat num\u00e9rique', 'p2.title': 'Un site rapide <em>vend</em><br>avant que l\u2019utilisateur<br>pense \u00e0 partir.',
+          'p3.eyebrow': 'Ce que nous construisons', 'p3.title': 'Notre <em>craft</em>',
+          's1.name': 'D\u00e9veloppement Web Moderne', 's1.desc': 'React, Next.js et architectures personnalis\u00e9es.',
+          's2.name': 'Pages d\u2019atterrissage', 's2.desc': 'Conversion, r\u00e9cit de marque et r\u00e9sultats.',
+          's3.name': 'Exp\u00e9riences 3D', 's3.desc': 'Sc\u00e8nes WebGL immersives en temps r\u00e9el.',
+          's4.name': 'Interfaces UX/UI', 's4.desc': 'Du wireframe au syst\u00e8me haute fid\u00e9lit\u00e9.',
+          's5.name': 'Automatisations', 's5.desc': 'Pipelines API qui \u00e9liminent la friction.',
+          's6.name': 'Performance', 's6.desc': 'Sites lents \u2192 exp\u00e9riences ultra-rapides.',
+          'p4.eyebrow': '02 \u2014 Artisanat num\u00e9rique', 'p4.title': '<em>L\u2019interaction</em><br>transforme une page<br>en exp\u00e9rience.',
+          'p5.tag': 'Comment nous travaillons', 'p5.title': 'Le <em>processus</em>',
+          'st1': 'D\u00e9couverte', 'sd1': 'Objectifs, utilisateurs et contexte.',
+          'st2': 'Design', 'sd2': 'Syst\u00e9mique et visuel.',
+          'st3': 'Prototype', 'sd3': 'Valider avant de construire.',
+          'st4': 'D\u00e9veloppement', 'sd4': 'Code propre et mesurable.',
+          'st5': 'Lancement', 'sd5': 'D\u00e9ploiement et raffinement continu.',
+          'p6.eyebrow': '03 \u2014 Artisanat num\u00e9rique', 'p6.title': 'La 3D ne d\u00e9core pas;<br>elle doit <em>raconter<br>une histoire.</em>',
+          'p7.eyebrow': 'Pr\u00eat \u00e0 commencer?', 'p7.title': 'Votre prochain site<br>n\u2019a pas \u00e0 ressembler<br>\u00e0 <em>un autre site.</em>',
+          'p7.body': 'Parlons de votre projet.', 'p7.cta': 'hello@aminoacid.studio \u2192',
+        }
+      };
 
-    // Map keys to DOM elements via data-i18n attribute
-    function applyLang(lang) {
-      const dict = T[lang] || T.es;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key] !== undefined) el.innerHTML = dict[key];
+      // Map keys to DOM elements via data-i18n attribute
+      function applyLang(lang) {
+        const dict = T[lang] || T.es;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (dict[key] !== undefined) el.innerHTML = dict[key];
+        });
+        document.querySelectorAll('.lang-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.lang === lang);
+        });
+        localStorage.setItem('amino-lang', lang);
+      }
+
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => applyLang(btn.dataset.lang));
       });
-      document.querySelectorAll('.lang-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.lang === lang);
-      });
-      localStorage.setItem('amino-lang', lang);
-    }
 
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => applyLang(btn.dataset.lang));
-    });
-
-    // Apply saved or default lang
-    applyLang(localStorage.getItem('amino-lang') || 'es');
-}) ();
+      // Apply saved or default lang
+      applyLang(localStorage.getItem('amino-lang') || 'es');
+    })();
   </script>
 </body>
 
