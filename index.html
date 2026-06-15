@@ -186,8 +186,9 @@
       z-index: 15;
       text-align: center;
       pointer-events: none;
-      transition: opacity .6s ease;
-      /* Controlled by JS scroll — does NOT follow panel system */
+      transition: opacity .5s ease;
+      opacity: 0;
+      /* starts hidden — JS reveals after loader */
     }
 
     #hero-word-row {
@@ -616,7 +617,7 @@
     </div>
   </div>
 
-  <div class="panel panel-left active" id="p0">
+  <div class="panel panel-left" id="p0">
     <div class="inner" style="margin-top:auto;padding-bottom:10vh">
       <p class="body-text" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan
         huella.</p>
@@ -1174,27 +1175,20 @@
     const pEls = PANELS.map(p => ({ ...p, el: document.getElementById(p.id) }));
     const scrollHint = document.getElementById('scroll-hint');
     function updatePanels(s) {
+      if (IS_MOB) return; // Mobile: panels driven by IntersectionObserver + scroll snap
       pEls.forEach(p => {
         if (!p.el) return;
         const m = .035;
         const active = s >= p.lo - m && s <= p.hi + m;
         p.el.classList.toggle('active', active);
-        if (!IS_MOB && active) {
-          // Desktop: smooth opacity within section
+        if (active) {
           const raw = clamp((s - p.lo) / (p.hi - p.lo), 0, 1);
           p.el.style.opacity = Math.min(clamp(raw / .1, 0, 1), clamp((1 - raw) / .1, 0, 1));
         }
       });
-      if (!IS_MOB) scrollHint.style.opacity = Math.max(0, 1 - s * 10);
+      scrollHint.style.opacity = Math.max(0, 1 - s * 10);
       const heroEl = document.getElementById('hero-brand');
-      if (heroEl) {
-        if (IS_MOB) {
-          // Mobile: just toggle class, let CSS handle transition
-          heroEl.classList.toggle('hidden', s > .12);
-        } else {
-          heroEl.style.opacity = Math.max(0, 1 - clamp((s - .06) / .08, 0, 1));
-        }
-      }
+      if (heroEl) heroEl.style.opacity = Math.max(0, 1 - clamp((s - .06) / .08, 0, 1));
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -1303,7 +1297,6 @@
       if (_sceneReady) return;
       _sceneReady = true;
       if (_loaderStat) _loaderStat.textContent = 'Listo';
-      // Reveal the CTA button
       if (_loaderCta) _loaderCta.classList.add('ready');
     }
 
@@ -1334,28 +1327,79 @@
             if (window._applyPreset) window._applyPreset(idx);
           }
         });
-      }, { threshold: 0.5, rootMargin: '-10% 0px -40% 0px' });
+      }, { threshold: 0, rootMargin: '0px 0px -50% 0px' });
       _snapPts.forEach(el => _sectIO.observe(el));
     }
 
-    // ── Mobile: hide canvas entirely, use pure CSS background ────────
+    // ── Mobile panels: driven by IntersectionObserver, not rAF ───────
     if (IS_MOB) {
-      document.getElementById('c').style.display = 'none';
-      document.body.style.cursor = 'auto';
-      // Also stop the animate loop from rendering
-      window._mobNoRender = true;
+      // Map section index → panel id
+      const MOB_PANELS = [
+        { sect: 0, id: 'p0' }, { sect: 1, id: 'p1' }, { sect: 2, id: 'p2' }, { sect: 3, id: 'p3' },
+        { sect: 4, id: 'p4' }, { sect: 5, id: 'p5' }, { sect: 6, id: 'p6' }, { sect: 7, id: 'p7' },
+      ];
+      // hero-brand and p0 are revealed by the auto-dismiss timer below
+      const _heroB = document.getElementById('hero-brand');
+
+      let _activeMobSection = -1;
+      const _panelIO = new IntersectionObserver((entries) => {
+        // Find the section with maximum intersection ratio
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const idx = parseInt(e.target.dataset.section || '0');
+          if (idx === _activeMobSection) return;
+          // Deactivate previous panel
+          if (_activeMobSection >= 0) {
+            const prev = MOB_PANELS.find(m => m.sect === _activeMobSection);
+            const prevEl = prev ? document.getElementById(prev.id) : null;
+            if (prevEl) prevEl.classList.remove('active');
+          }
+          // Activate new panel
+          _activeMobSection = idx;
+          const mp = MOB_PANELS.find(m => m.sect === idx);
+          const panelEl = mp ? document.getElementById(mp.id) : null;
+          if (panelEl) panelEl.classList.add('active');
+          // Hero brand only on section 0
+          if (_heroB) _heroB.style.opacity = idx === 0 ? '1' : '0';
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -45% 0px' });
+      _snapPts.forEach(el => _panelIO.observe(el));
     }
 
-    animate();
-
-    // Detect first rendered frame → reveal CTA
-    const _origRender = renderer.render.bind(renderer);
-    renderer.render = function (sc, cam) {
-      _origRender(sc, cam);
-      _onSceneReady();
-      // Restore original after first call to avoid overhead
-      renderer.render = _origRender;
-    };
+    // ── Mobile: no canvas, auto-dismiss loader ───────────────────────
+    if (IS_MOB) {
+      const canvasEl = document.getElementById('c');
+      if (canvasEl) canvasEl.style.display = 'none';
+      document.body.style.cursor = 'auto';
+      window._mobNoRender = true;
+      // On mobile: skip CTA entirely, auto-hide loader after brief delay
+      setTimeout(() => {
+        _loaderGone = true;
+        if (_loaderEl) {
+          _loaderEl.style.opacity = '0';
+          setTimeout(() => { _loaderEl.style.display = 'none'; }, 600);
+        }
+        // Show only p0 panel and hero brand
+        const p0 = document.getElementById('p0');
+        if (p0) p0.classList.add('active');
+        const hb = document.getElementById('hero-brand');
+        if (hb) hb.style.opacity = '1';
+        // Ensure all other panels are hidden
+        ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('active');
+        });
+      }, 800);
+    } else {
+      animate();
+      // Detect first rendered frame → reveal CTA button
+      const _origRender = renderer.render.bind(renderer);
+      renderer.render = function (sc, cam) {
+        _origRender(sc, cam);
+        _onSceneReady();
+        renderer.render = _origRender;
+      };
+    }
   </script>
 
   <script>
@@ -1664,13 +1708,17 @@
         }
       }, { passive: true });
 
-      // ── Audio triggered by loader CTA (window._loaderStart calls _audioOnGesture)
-      // No document-level gesture listeners needed — CTA is the single entry point
-      // window._audioOnGesture is exposed below for the loader to call
+      // ── Audio: desktop via CTA button, mobile via first touch/scroll ──
       let _started = false;
       function onGesture() {
         if (_started) return; _started = true;
         initAudio(); // sync — AudioContext created synchronously inside gesture
+      }
+      // Mobile needs gesture listeners (no CTA button on mobile)
+      if (IS_MOB) {
+        ['touchstart', 'click'].forEach(ev => {
+          window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
+        });
       }
 
       // ── Init distortion after DOM ─────────────────────────────────
