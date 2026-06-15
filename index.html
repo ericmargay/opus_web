@@ -916,10 +916,8 @@
       gl_FragColor=vec4(sky,1.);
     }`
     });
-    if (!IS_MOB) {
-      scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, 3), skyMat));
-    }
-    // Mobile sky: just renderer clear color updated each frame (free)
+    // Sky dome: both devices (mobile uses simpler fast-path in shader via uMob)
+    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, IS_MOB ? 2 : 3), skyMat));
 
 
     // ═══════════════════════════════════════════════════════════════
@@ -1226,9 +1224,9 @@
       // Hemisphere light color — both devices
       colorLightA.color.copy(colA).multiplyScalar(IS_MOB ? 3.0 : 2.0);
       colorLightA.groundColor.copy(colC).multiplyScalar(IS_MOB ? 1.5 : 0.5);
+      // ── Sky + extra lights + water — desktop only for heavy items ──
+      skyMat.uniforms.uTime.value = t; // sky shader runs on both devices
       if (!IS_MOB) {
-        // Desktop-only: sky shader, extra lights, water
-        skyMat.uniforms.uTime.value = t;
         colorLightB.color.copy(colB).multiplyScalar(1.8);
         colorLightC.color.copy(colC).multiplyScalar(1.4);
         colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
