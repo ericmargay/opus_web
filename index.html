@@ -453,18 +453,86 @@
 </head>
 
 <body>
-  <!-- Loading screen -->
+  <!-- Loading + Start screen — unified for mobile and desktop -->
+  <style>
+    @keyframes loaderFill {
+      from {
+        width: 0
+      }
+
+      to {
+        width: 100%
+      }
+    }
+
+    @keyframes loaderPulse {
+
+      0%,
+      100% {
+        opacity: .35
+      }
+
+      50% {
+        opacity: .8
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    #loader-cta {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .5s ease
+    }
+
+    #loader-cta.ready {
+      opacity: 1;
+      pointer-events: all;
+      animation: fadeInUp .6s ease forwards
+    }
+
+    #loader-cta:hover .cta-inner,
+    #loader-cta:active .cta-inner {
+      border-color: rgba(200, 180, 255, .55);
+      background: rgba(200, 180, 255, .06)
+    }
+  </style>
   <div id="loader"
-    style="position:fixed;inset:0;z-index:9999;background:#04020a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease;font-family:'DM Mono',monospace;">
+    style="position:fixed;inset:0;z-index:9999;background:#04020a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .7s ease;font-family:'DM Mono',monospace;cursor:default;">
+    <!-- Logo -->
     <div
-      style="color:rgba(200,180,255,.7);font-size:.62rem;letter-spacing:.4em;text-transform:uppercase;margin-bottom:1.5rem">
+      style="color:rgba(200,180,255,.6);font-size:.58rem;letter-spacing:.45em;text-transform:uppercase;margin-bottom:2.5rem;animation:loaderPulse 2.4s ease-in-out infinite">
       Aminoacid Studio</div>
-    <div id="loader-bar-wrap" style="width:160px;height:1px;background:rgba(200,180,255,.15);">
-      <div id="loader-bar" style="height:1px;width:0%;background:rgba(200,180,255,.6);transition:width .1s linear;">
+
+    <!-- Progress bar -->
+    <div style="width:180px;height:1px;background:rgba(200,180,255,.10);overflow:hidden;margin-bottom:.8rem;">
+      <div id="loader-bar" style="height:1px;width:0;background:rgba(200,180,255,.6);transition:width .15s linear;">
       </div>
     </div>
-    <div id="loader-pct" style="color:rgba(200,180,255,.35);font-size:.52rem;letter-spacing:.25em;margin-top:1rem">0%
-    </div>
+    <div id="loader-status"
+      style="color:rgba(200,180,255,.28);font-size:.48rem;letter-spacing:.22em;margin-bottom:3.5rem">Cargando
+      experiencia...</div>
+
+    <!-- CTA button — hidden until scene ready, then becomes the gesture -->
+    <button id="loader-cta" onclick="window._loaderStart()"
+      style="background:none;border:none;cursor:pointer;padding:0;">
+      <div class="cta-inner"
+        style="border:1px solid rgba(200,180,255,.2);padding:1.1rem 2.4rem;transition:border-color .3s,background .3s;text-align:center;">
+        <div
+          style="color:rgba(200,180,255,.85);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;line-height:1.6">
+          Tócame para comenzar<br>la experiencia</div>
+      </div>
+    </button>
   </div>
 
   <canvas id="c"></canvas>
@@ -804,7 +872,7 @@
     // ═══════════════════════════════════════════════════════════════
     const TRES = IS_MOB ? 40 : 64;
     const desertMat = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() } },
+      uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() }, uMobT: { value: IS_MOB ? 1.0 : 0.0 } },
       vertexShader: `
     varying vec3 vWorldPos;
     varying vec3 vNormal;
@@ -829,17 +897,24 @@
       return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),
                  mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);
     }
-    // Mobile: 3 octaves only; desktop: 6
+    uniform float uMobT;
     float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*noise(p);p*=2.07;a*=.48;}return v;}
 
     void main(){
       vec2 xz=vWorldPos.xz;
-
-      // Multi-scale sand texture — simplified for performance
-      float n1=fbm(xz*.06);
-      float n2=noise(xz*.28+vec2(1.7));  // single noise instead of fbm
-      float n3=noise(xz*1.1+vec2(3.1));
-      float n4=noise(xz*3.+vec2(uTime*.02));
+      float n1,n2,n3,n4;
+      if(uMobT>0.5){
+        // Mobile: single noise per sample — 8x cheaper
+        n1=noise(xz*.06);
+        n2=noise(xz*.25+vec2(1.7));
+        n3=noise(xz*1.0+vec2(3.1));
+        n4=noise(xz*2.5+vec2(uTime*.02));
+      } else {
+        n1=fbm(xz*.06);
+        n2=noise(xz*.28+vec2(1.7));
+        n3=noise(xz*1.1+vec2(3.1));
+        n4=noise(xz*3.+vec2(uTime*.02));
+      }
 
       // Sand base color — interpolated between two animated colors
       vec3 sandBase=mix(uColA,uColB,n1);
@@ -1138,42 +1213,57 @@
       renderer.render(scene, camera);
     }
 
-    // ── Loading progress simulation ────────────────────────────────
+    // ── Loader + Start logic ────────────────────────────────────────
     const _loaderEl = document.getElementById('loader');
     const _loaderBar = document.getElementById('loader-bar');
-    const _loaderPct = document.getElementById('loader-pct');
-    let _loadPct = 0, _loaderDone = false;
-    function _tickLoader() {
-      if (_loaderDone) return;
-      // Simulate progress: fast to 80%, then wait for first render
-      _loadPct = Math.min(_loadPct + 2.5, 80);
-      if (_loaderBar) _loaderBar.style.width = _loadPct + '%';
-      if (_loaderPct) _loaderPct.textContent = Math.floor(_loadPct) + '%';
-      if (_loadPct < 80) setTimeout(_tickLoader, 40);
+    const _loaderStat = document.getElementById('loader-status');
+    const _loaderCta = document.getElementById('loader-cta');
+    let _sceneReady = false;
+    let _loaderGone = false;
+    let _loadPct = 0;
+
+    // Animate loading bar in JS for precise control
+    function _tickLoad() {
+      if (_loaderGone) return;
+      // Ease toward 90% while scene builds; jumps to 100 when scene ready
+      const target = _sceneReady ? 100 : 88;
+      _loadPct += (target - _loadPct) * 0.06;
+      if (_loaderBar) _loaderBar.style.width = Math.min(_loadPct, 100).toFixed(1) + '%';
+      if (_loadPct < 99.5) requestAnimationFrame(_tickLoad);
     }
-    _tickLoader();
+    requestAnimationFrame(_tickLoad);
+
+    // Called when Three.js renders its first frame
+    function _onSceneReady() {
+      if (_sceneReady) return;
+      _sceneReady = true;
+      if (_loaderStat) _loaderStat.textContent = 'Listo';
+      // Reveal the CTA button
+      if (_loaderCta) _loaderCta.classList.add('ready');
+    }
+
+    // Called when user clicks/taps the CTA — starts audio AND hides loader
+    window._loaderStart = function () {
+      if (_loaderGone) return;
+      _loaderGone = true;
+      // Trigger audio (synchronous inside click handler = valid gesture)
+      if (window._audioOnGesture) window._audioOnGesture();
+      // Dismiss loader with fade
+      if (_loaderEl) {
+        _loaderEl.style.opacity = '0';
+        setTimeout(() => { _loaderEl.style.display = 'none'; }, 750);
+      }
+    };
 
     animate();
 
-    // Hide loader after first real frame renders
-    let _firstFrame = true;
-    const _origAnimate = animate;
-    function _patchedFrame() {
-      if (_firstFrame) {
-        _firstFrame = false;
-        _loadPct = 100;
-        if (_loaderBar) _loaderBar.style.width = '100%';
-        if (_loaderPct) _loaderPct.textContent = '100%';
-        setTimeout(() => {
-          if (_loaderEl) { _loaderEl.style.opacity = '0'; setTimeout(() => _loaderEl.style.display = 'none', 650); }
-        }, 200);
-      }
-    }
-    // Monkey-patch renderer to detect first frame
+    // Detect first rendered frame → reveal CTA
     const _origRender = renderer.render.bind(renderer);
-    renderer.render = function (s, c2) {
-      _origRender(s, c2);
-      _patchedFrame();
+    renderer.render = function (sc, cam) {
+      _origRender(sc, cam);
+      _onSceneReady();
+      // Restore original after first call to avoid overhead
+      renderer.render = _origRender;
     };
   </script>
 
@@ -1448,8 +1538,9 @@
       btn.onmouseleave = () => btn.style.color = 'rgba(224,216,240,.4)';
       document.body.appendChild(btn);
       function updateBtn() { btn.textContent = audioPlaying ? '⏸' : '▶'; }
-      // Expose for animate loop
+      // Expose for animate loop and loader
       window._applyPreset = applyPreset;
+      window._audioOnGesture = onGesture;
 
       btn.onclick = async () => {
         if (!audioReady) { await initAudio(); return; }
@@ -1482,25 +1573,14 @@
         }
       }, { passive: true });
 
-      // ── Auto-start on first user gesture ─────────────────────────
-      // Auto-start: fires on ANY interaction — capture phase, once
+      // ── Audio triggered by loader CTA (window._loaderStart calls _audioOnGesture)
+      // No document-level gesture listeners needed — CTA is the single entry point
+      // window._audioOnGesture is exposed below for the loader to call
       let _started = false;
       function onGesture() {
-        // Called synchronously from user gesture event
         if (_started) return; _started = true;
-        initAudio(); // sync — no await
+        initAudio(); // sync — AudioContext created synchronously inside gesture
       }
-      // Desktop: try immediate autoplay
-      if (!IS_MOB) {
-        setTimeout(() => {
-          try { if (!_started) { _started = true; initAudio(); } } catch (_) { }
-        }, 200);
-      }
-      // All devices: fire on first touchstart, scroll, click, or keydown
-      // touchstart = valid AudioContext gesture on iOS Safari + Android Chrome
-      ['touchstart', 'scroll', 'click', 'keydown', 'pointerdown'].forEach(ev => {
-        window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
-      });
 
       // ── Init distortion after DOM ─────────────────────────────────
       if (document.readyState === 'loading') {
