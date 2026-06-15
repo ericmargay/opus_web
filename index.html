@@ -1,122 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aminoacid Studio — Web Experiences That Feel Alive</title>
+  <title>Aminoacid Studio — Experiencias digitales</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&family=DM+Mono:wght@300&display=swap"
     rel="stylesheet">
   <style>
-    :root {
-      --midnight: #050b1a;
-      --deep-navy: #0a1628;
-      --navy: #0e1f3a;
-      --sand: #c8b89a;
-      --sand-light: #e8dccb;
-      --warm-white: #f5f0e8;
-      --cyan-soft: #7ab8c9;
-      --gold: #c9a84c;
-      --gold-dim: #8a6d2f;
-      --text-primary: #f2ece4;
-      --text-secondary: rgba(220, 205, 180, 0.88);
-      --text-muted: rgba(210, 195, 168, 0.65);
-      --border: rgba(200, 184, 154, 0.08);
-      --border-glow: rgba(122, 184, 201, 0.15);
-      --ff-display: 'Cormorant', Georgia, serif;
-      --ff-body: 'DM Sans', sans-serif;
-      --ff-mono: 'DM Mono', monospace;
-    }
-
     *,
     *::before,
     *::after {
       box-sizing: border-box;
       margin: 0;
-      padding: 0;
+      padding: 0
     }
 
     html {
-      scroll-behavior: smooth;
       font-size: 16px;
+      scroll-behavior: auto
     }
 
     body {
-      background: var(--midnight);
-      color: var(--text-primary);
-      font-family: var(--ff-body);
+      background: #04020a;
+      color: #e0d8f0;
+      font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
-      cursor: none;
+      cursor: none
     }
 
-    /* ── CUSTOM CURSOR ── */
-    #cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 8px;
-      height: 8px;
-      background: var(--sand);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transition: transform 0.15s ease;
-      mix-blend-mode: exclusion;
-    }
-
-    #cursor-ring {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 36px;
-      height: 36px;
-      border: 1px solid rgba(200, 184, 154, 0.4);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transition: transform 0.4s cubic-bezier(0.2, 1, 0.4, 1), width 0.3s, height 0.3s, opacity 0.3s;
-    }
-
-    .cursor-grow #cursor-ring {
-      width: 60px;
-      height: 60px;
-      opacity: 0.5;
-    }
-
-    /* ── THREE.JS CANVAS ── */
-    #hero-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-
-    /* ── NOISE OVERLAY ── */
-    #noise {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      opacity: 0.04;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-    }
-
-    /* ── SCROLL WRAPPER ── */
-    #scroll-container {
+    #root {
       position: relative;
-      z-index: 2;
+      height: 800vh
     }
 
-    /* ── NAV ── */
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0
+    }
+
+    #cur {
+      position: fixed;
+      width: 5px;
+      height: 5px;
+      background: #e0d8f0;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: exclusion
+    }
+
+    #cur2 {
+      position: fixed;
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(224, 216, 240, .25);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 998;
+      transform: translate(-50%, -50%)
+    }
+
+    #prog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 1px;
+      background: rgba(180, 160, 255, .5);
+      z-index: 200;
+      width: 0;
+      transition: width .08s linear
+    }
+
     nav {
       position: fixed;
       top: 0;
@@ -124,2812 +84,1446 @@
       right: 0;
       z-index: 100;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 2rem 4rem;
-      mix-blend-mode: normal;
+      align-items: center;
+      padding: 2rem 4rem
     }
 
-    .nav-logo {
-      font-family: var(--ff-display);
-      font-size: 1.1rem;
-      font-weight: 400;
-      letter-spacing: 0.15em;
-      color: var(--sand);
-      text-decoration: none;
+    .logo {
+      font-family: 'Cormorant', serif;
+      font-size: 1rem;
+      letter-spacing: .18em;
       text-transform: uppercase;
+      color: #e0d8f0;
+      text-decoration: none;
+      opacity: .9
     }
 
     .nav-links {
       display: flex;
-      gap: 3rem;
-      list-style: none;
+      gap: 2.5rem;
+      list-style: none
     }
 
     .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
+      font-family: 'DM Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: .22em;
       text-transform: uppercase;
-      transition: color 0.3s;
+      color: rgba(224, 216, 240, .5);
+      text-decoration: none;
+      transition: color .3s
     }
 
     .nav-links a:hover {
-      color: var(--sand);
+      color: #e0d8f0
     }
 
-    /* ── SECTIONS ── */
-    section {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8rem 4rem;
-      position: relative;
-    }
-
-    /* ── HERO ── */
-    #hero {
-      text-align: center;
-      flex-direction: column;
-      gap: 2rem;
-      padding-top: 0;
-      min-height: 220vh;
-      /* tall enough that cluster is well below initial view */
-      justify-content: flex-start;
-      padding-top: 22vh;
-    }
-
-    .hero-touch-hint {
-      font-family: var(--ff-mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-align: center;
-      opacity: 0;
-      animation: fadeUp 1s 0.75s ease forwards;
-      margin-top: -0.5rem;
-    }
-
-    /* ── Audio toggle button ── */
-    #audio-toggle {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 200;
-      border: none;
-      background: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 1rem;
-      transition: color 0.3s;
-      padding: 0.25rem;
-      line-height: 1;
-    }
-
-    #audio-toggle:hover {
-      color: var(--sand);
-    }
-
-    .hero-eyebrow {
-      font-family: var(--ff-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--cyan-soft);
-      opacity: 0;
-      animation: fadeUp 1s 0.5s ease forwards;
-    }
-
-    .hero-title {
-      font-family: var(--ff-display);
-      font-size: clamp(3rem, 7vw, 7rem);
-      font-weight: 300;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      color: var(--warm-white);
-      max-width: 900px;
-      opacity: 0;
-      animation: fadeUp 1s 0.8s ease forwards;
-    }
-
-    #hero-distort-zone {
-      filter: url(#hero-distort);
-      will-change: filter;
-      transition: filter 0s;
-      /* instant — JS drives it */
-      cursor: none;
-    }
-
-    /* Subtle glow on the title during distortion */
-    #hero-distort-zone .hero-title {
-      transition: text-shadow 0.4s ease;
-    }
-
-    #hero-distort-zone.distorting .hero-title {
-      text-shadow: 0 0 40px rgba(122, 184, 201, 0.35), 0 0 80px rgba(122, 184, 201, 0.12);
-    }
-
-    .hero-sub {
-      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
-      color: var(--text-secondary);
-      max-width: 620px;
-      line-height: 1.75;
-      font-weight: 300;
-      opacity: 0;
-      animation: fadeUp 1s 1.1s ease forwards;
-      text-align: center;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .hero-ctas {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-      opacity: 0;
-      animation: fadeUp 1s 1.4s ease forwards;
-    }
-
-    .btn-primary {
-      background: var(--sand);
-      color: var(--midnight);
-      padding: 0.85rem 2.2rem;
-      font-size: 0.78rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border-radius: 2px;
-      font-family: var(--ff-body);
-      font-weight: 500;
-      transition: background 0.3s, transform 0.2s;
-      display: inline-block;
-    }
-
-    .btn-primary:hover {
-      background: var(--sand-light);
-      transform: translateY(-2px);
-    }
-
-    .btn-ghost {
-      color: var(--text-secondary);
-      font-size: 0.78rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      transition: color 0.3s;
-    }
-
-    .btn-ghost:hover {
-      color: var(--sand);
-    }
-
-    .btn-ghost::after {
-      content: '→';
-      transition: transform 0.3s;
-    }
-
-    .btn-ghost:hover::after {
-      transform: translateX(4px);
-    }
-
-    .hero-explore-link {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--ff-mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      text-decoration: none;
-      opacity: 0;
-      animation: fadeIn 1s 2s ease forwards;
-      transition: color 0.3s;
-      margin-top: 1rem;
-    }
-
-    .hero-explore-link:hover {
-      color: var(--sand);
-    }
-
-    .hero-explore-arrow {
-      display: block;
-      font-size: 1rem;
-      animation: scrollPulse 2.2s ease-in-out infinite;
-      margin-top: 0.2rem;
-    }
-
-    .hero-scroll-hint {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.8rem;
-      opacity: 0;
-      animation: fadeIn 1s 2s ease forwards;
-      margin-top: 1.5rem;
-    }
-
-    .scroll-line {
-      width: 1px;
-      height: 60px;
-      background: linear-gradient(to bottom, var(--sand), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-
-    .scroll-label {
-      font-family: var(--ff-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    /* ── MANIFESTO ── */
-    #manifesto {
-      max-width: 800px;
-      margin: 0 auto;
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .manifesto-label {
-      font-family: var(--ff-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 3rem;
-    }
-
-    .manifesto-text {
-      font-family: var(--ff-display);
-      font-size: clamp(1.8rem, 3.5vw, 3.2rem);
-      font-weight: 300;
-      line-height: 1.3;
-      color: var(--warm-white);
-      letter-spacing: -0.01em;
-    }
-
-    .manifesto-text em {
-      font-style: italic;
-      color: var(--sand);
-    }
-
-    .manifesto-body {
-      margin-top: 3rem;
-      font-size: 1rem;
-      line-height: 1.8;
-      color: var(--text-secondary);
-      max-width: 560px;
-      text-align: center;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* ── REVEAL ANIMATION ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.9s cubic-bezier(0.2, 1, 0.4, 1), transform 0.9s cubic-bezier(0.2, 1, 0.4, 1);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal-delay-1 {
-      transition-delay: 0.1s;
-    }
-
-    .reveal-delay-2 {
-      transition-delay: 0.22s;
-    }
-
-    .reveal-delay-3 {
-      transition-delay: 0.34s;
-    }
-
-    .reveal-delay-4 {
-      transition-delay: 0.46s;
-    }
-
-    .reveal-delay-5 {
-      transition-delay: 0.58s;
-    }
-
-    .reveal-delay-6 {
-      transition-delay: 0.70s;
-    }
-
-    .reveal-delay-7 {
-      transition-delay: 0.82s;
-    }
-
-    .reveal-delay-8 {
-      transition-delay: 0.94s;
-    }
-
-    /* ── CRAFT FACT ── */
-    .craft-fact-section {
-      min-height: 55vh;
-      padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 6vw, 4rem);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .craft-fact-inner {
-      width: 100%;
-      max-width: 680px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      position: relative;
-      margin: 0 auto;
-    }
-
-    .craft-number {
-      font-family: var(--ff-mono);
-      font-size: clamp(0.55rem, 1.5vw, 0.62rem);
-      letter-spacing: 0.4em;
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      display: block;
-      text-align: center;
-      text-transform: uppercase;
-    }
-
-    .craft-text {
-      font-family: var(--ff-display);
-      font-size: clamp(1.5rem, 4vw, 2.8rem);
-      font-weight: 300;
-      line-height: 1.28;
-      color: var(--warm-white);
-      letter-spacing: -0.01em;
-      text-align: center;
-      width: 100%;
-      padding: 0 1rem;
-    }
-
-    .craft-text em {
-      font-style: italic;
-      color: var(--cyan-soft);
-    }
-
-    .craft-divider {
-      width: 1px;
-      height: 60px;
-      background: linear-gradient(to bottom, transparent, var(--border-glow), transparent);
-      margin: 2.5rem auto 0;
-      display: block;
-    }
-
-    /* ── SERVICES ── */
-    #services {
-      flex-direction: column;
-      padding: 10rem 4rem;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 1200px;
-      margin-bottom: 5rem;
-    }
-
-    .section-label {
-      font-family: var(--ff-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      display: block;
-    }
-
-    .section-title {
-      font-family: var(--ff-display);
-      font-size: clamp(2.2rem, 4vw, 4rem);
-      font-weight: 300;
-      line-height: 1.1;
-      color: var(--warm-white);
-    }
-
-    .section-title em {
-      font-style: italic;
-      color: var(--sand);
-    }
-
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      max-width: 1200px;
-      width: 100%;
-      background: var(--border);
-    }
-
-    .service-card {
-      background: rgba(10, 22, 40, 0.6);
-      padding: 2.5rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      backdrop-filter: blur(10px);
-      transition: background 0.4s;
-      border: 1px solid transparent;
-      cursor: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .service-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--cyan-soft), transparent);
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-
-    .service-card:hover {
-      background: rgba(14, 31, 58, 0.9);
-    }
-
-    .service-card:hover::before {
-      opacity: 1;
-    }
-
-    .service-num {
-      font-family: var(--ff-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.3em;
-      color: var(--text-muted);
-    }
-
-    .service-icon {
-      width: 32px;
-      height: 32px;
-      opacity: 0.6;
-    }
-
-    .service-name {
-      font-family: var(--ff-display);
-      font-size: 1.35rem;
-      font-weight: 400;
-      color: var(--warm-white);
-      line-height: 1.2;
-    }
-
-    .service-desc {
-      font-size: 0.82rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      font-weight: 300;
-    }
-
-    .service-arrow {
-      margin-top: auto;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      letter-spacing: 0.1em;
-      transition: color 0.3s, transform 0.3s;
-      display: inline-block;
-    }
-
-    .service-card:hover .service-arrow {
-      color: var(--cyan-soft);
-      transform: translateX(4px);
-    }
-
-    /* ── PROCESS ── */
-    #process {
-      flex-direction: column;
-      padding: 10rem 4rem;
-    }
-
-    .process-steps {
-      display: flex;
-      gap: 0;
-      max-width: 1200px;
-      width: 100%;
-      position: relative;
-    }
-
-    .process-steps::before {
-      content: '';
-      position: absolute;
-      top: 3rem;
-      left: 3rem;
-      right: 3rem;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--border-glow), transparent);
-    }
-
-    .process-step {
-      flex: 1;
-      padding: 2rem 1.5rem;
-      position: relative;
-    }
-
-    .process-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--navy);
-      border: 1px solid var(--cyan-soft);
-      margin-bottom: 2rem;
-      position: relative;
-      z-index: 1;
-      transition: background 0.3s, transform 0.3s;
-    }
-
-    .process-step:hover .process-dot {
-      background: var(--cyan-soft);
-      transform: scale(1.5);
-    }
-
-    .process-num {
-      font-family: var(--ff-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.3em;
-      color: var(--text-muted);
-      margin-bottom: 0.8rem;
-    }
-
-    .process-name {
-      font-family: var(--ff-display);
-      font-size: 1.3rem;
-      font-weight: 400;
-      color: var(--warm-white);
-      margin-bottom: 0.6rem;
-    }
-
-    .process-desc {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    /* ── PORTFOLIO ── */
-    #portfolio {
-      flex-direction: column;
-      padding: 10rem 4rem;
-    }
-
-    .portfolio-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      max-width: 1200px;
-      width: 100%;
-    }
-
-    .portfolio-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 2px;
-      cursor: none;
-      height: 340px;
-      background: var(--deep-navy);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 2rem;
-      transition: border-color 0.4s;
-    }
-
-    .portfolio-card:hover {
-      border-color: rgba(200, 184, 154, 0.2);
-    }
-
-    .portfolio-card-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0.4;
-      transition: opacity 0.5s, transform 0.7s cubic-bezier(0.2, 1, 0.4, 1);
-    }
-
-    .portfolio-card:hover .portfolio-card-bg {
-      opacity: 0.6;
-      transform: scale(1.04);
-    }
-
-    .portfolio-card-bg.type-a {
-      background: radial-gradient(ellipse at 30% 40%, rgba(122, 184, 201, 0.3) 0%, transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(201, 168, 76, 0.15) 0%, transparent 50%);
-    }
-
-    .portfolio-card-bg.type-b {
-      background: radial-gradient(ellipse at 70% 30%, rgba(200, 184, 154, 0.2) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(122, 184, 201, 0.15) 0%, transparent 50%);
-    }
-
-    .portfolio-card-bg.type-c {
-      background: radial-gradient(ellipse at 50% 20%, rgba(201, 168, 76, 0.2) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(200, 184, 154, 0.1) 0%, transparent 50%);
-    }
-
-    .portfolio-card-bg.type-d {
-      background: radial-gradient(ellipse at 20% 60%, rgba(122, 184, 201, 0.25) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(200, 184, 154, 0.15) 0%, transparent 50%);
-    }
-
-    .portfolio-tag {
-      position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
-      font-family: var(--ff-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      background: rgba(5, 11, 26, 0.6);
-      padding: 0.35rem 0.75rem;
-      backdrop-filter: blur(4px);
-    }
-
-    .portfolio-title {
-      font-family: var(--ff-display);
-      font-size: 1.6rem;
-      font-weight: 300;
-      line-height: 1.2;
-      color: var(--warm-white);
-      margin-bottom: 0.5rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .portfolio-sub {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      position: relative;
-      z-index: 1;
-    }
-
-    .portfolio-link {
-      position: absolute;
-      bottom: 2rem;
-      right: 2rem;
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      transition: border-color 0.3s, color 0.3s, background 0.3s;
-      z-index: 1;
-    }
-
-    .portfolio-card:hover .portfolio-link {
-      border-color: var(--sand);
-      color: var(--sand);
-      background: rgba(200, 184, 154, 0.05);
-    }
-
-    /* ── FINAL CTA ── */
-    #cta {
-      flex-direction: column;
-      text-align: center;
-      min-height: 80vh;
-      padding: 8rem 4rem;
-      position: relative;
-    }
-
-    #cta::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1px;
-      height: 80px;
-      background: linear-gradient(to bottom, transparent, var(--border-glow));
-    }
-
-    .cta-label {
-      font-family: var(--ff-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 3rem;
-    }
-
-    .cta-title {
-      font-family: var(--ff-display);
-      font-size: clamp(2.5rem, 5vw, 5.5rem);
-      font-weight: 300;
-      line-height: 1.05;
-      color: var(--warm-white);
-      max-width: 800px;
-      margin: 0 auto 4rem;
-      letter-spacing: -0.02em;
-    }
-
-    .cta-title em {
-      font-style: italic;
-      color: var(--sand);
-    }
-
-    .contact-row {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 3rem;
-    }
-
-    .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: var(--text-secondary);
-      font-size: 0.82rem;
-      letter-spacing: 0.05em;
-      text-decoration: none;
-      transition: color 0.3s;
-      font-weight: 300;
-    }
-
-    .contact-item:hover {
-      color: var(--sand);
-    }
-
-    .contact-icon {
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      flex-shrink: 0;
-    }
-
-    .contact-divider {
-      color: var(--text-muted);
-      font-size: 0.6rem;
-    }
-
-    .contact-form-row {
-      display: flex;
-      gap: 1rem;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    .contact-input {
-      flex: 1;
-      background: rgba(14, 31, 58, 0.5);
-      border: 1px solid var(--border);
-      color: var(--text-primary);
-      padding: 0.9rem 1.2rem;
-      font-size: 0.82rem;
-      font-family: var(--ff-body);
-      font-weight: 300;
-      outline: none;
-      border-radius: 2px;
-      transition: border-color 0.3s;
-      backdrop-filter: blur(4px);
-    }
-
-    .contact-input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .contact-input:focus {
-      border-color: rgba(122, 184, 201, 0.4);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 3rem 4rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
-
-    .footer-logo {
-      font-family: var(--ff-display);
-      font-size: 1rem;
-      letter-spacing: 0.15em;
-      color: var(--sand);
-      text-transform: uppercase;
-    }
-
-    .footer-copy {
-      font-family: var(--ff-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    /* ── GRADIENT OVERLAYS ── */
-    .gradient-top {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 250px;
-      background: linear-gradient(to bottom, rgba(5, 11, 26, 0.9), transparent);
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    .gradient-bottom {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      background: linear-gradient(to top, rgba(5, 11, 26, 0.7), transparent);
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    /* ── PROGRESS BAR ── */
-    #progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 1px;
-      background: var(--sand);
-      z-index: 200;
-      width: 0%;
-      transition: width 0.1s linear;
-      opacity: 0.6;
-    }
-
-    /* ── WEBGL FALLBACK ── */
-    #webgl-fallback {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      background: radial-gradient(ellipse at 20% 50%, rgba(14, 31, 58, 1) 0%, var(--midnight) 60%);
-      display: none;
-    }
-
-    /* ── KEYFRAMES ── */
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes scrollPulse {
-
-      0%,
-      100% {
-        opacity: 0.3;
-        transform: scaleY(1);
-      }
-
-      50% {
-        opacity: 0.8;
-        transform: scaleY(0.8);
-      }
-    }
-
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-12px);
-      }
-    }
-
-    /* ── LANGUAGE SWITCHER ── */
-    .lang-switcher {
-      display: flex;
-      align-items: center;
-      gap: 0.1rem;
-      margin-left: 2rem;
-    }
-
-    .lang-btn {
-      background: none;
-      border: none;
-      font-family: var(--ff-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      cursor: none;
-      padding: 0.3rem 0.45rem;
-      border-radius: 2px;
-      transition: color 0.25s, background 0.25s;
-      line-height: 1;
-    }
-
-    .lang-btn:hover {
-      color: var(--sand);
-    }
-
-    .lang-btn.active {
-      color: var(--midnight);
-      background: var(--sand);
-    }
-
-    .lang-sep {
-      color: var(--text-muted);
-      font-size: 0.55rem;
-      opacity: 0.4;
-      pointer-events: none;
-    }
-
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
-      nav {
-        padding: 1.5rem 1.5rem;
-      }
-
+    @media(max-width:768px) {
       .nav-links {
-        display: none;
+        display: none
       }
 
-      .lang-switcher {
-        margin-left: 0;
+      nav {
+        padding: 1.5rem
       }
 
-      section {
-        padding: 6rem 1.5rem;
-      }
-
-      .services-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .portfolio-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .process-steps {
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .process-steps::before {
-        display: none;
-      }
-
-      .contact-form-row {
-        flex-direction: column;
-      }
-
-      footer {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
-
-      #cursor,
-      #cursor-ring {
-        display: none;
+      #cur,
+      #cur2 {
+        display: none
       }
 
       body {
-        cursor: auto;
+        cursor: auto
+      }
+    }
+
+    /* HERO BRAND */
+    #hero-brand {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 15;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity .6s ease;
+      /* Controlled by JS scroll — does NOT follow panel system */
+    }
+
+    #hero-word-row {
+      display: flex;
+      gap: .04em;
+      justify-content: center;
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+
+    .hw {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(4rem, 12vw, 11rem);
+      font-weight: 300;
+      letter-spacing: .08em;
+      color: #e8e0f8;
+      text-shadow: 0 0 80px rgba(100, 80, 200, .4), 0 2px 60px rgba(0, 0, 0, .9);
+      display: inline-block;
+      will-change: filter;
+      pointer-events: all;
+      cursor: none;
+    }
+
+    #hero-sub-row {
+      text-align: center;
+      margin-top: .6rem;
+    }
+
+    /* PANELS */
+    .panel {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .4s ease
+    }
+
+    .panel.active {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    .panel-left .inner {
+      margin-left: 8vw;
+      max-width: 500px
+    }
+
+    #p0 {
+      flex-direction: column;
+      justify-content: flex-end
+    }
+
+    .panel-right .inner {
+      margin-left: auto;
+      margin-right: 8vw;
+      max-width: 500px
+    }
+
+    .panel-center .inner {
+      margin: 0 auto;
+      max-width: 640px;
+      text-align: center
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: rgba(200, 180, 255, .65);
+      margin-bottom: 1.4rem;
+      display: block
+    }
+
+    .display {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(2.6rem, 5.2vw, 5.8rem);
+      font-weight: 300;
+      line-height: 1.0;
+      letter-spacing: -.02em;
+      color: #e8e0f8;
+      text-shadow: 0 2px 60px rgba(0, 0, 0, .8)
+    }
+
+    .display em {
+      font-style: italic;
+      color: rgba(200, 160, 255, .85)
+    }
+
+    .body-text {
+      margin-top: 1.8rem;
+      font-size: clamp(.88rem, 1.3vw, 1rem);
+      color: rgba(224, 216, 240, .55);
+      line-height: 1.8
+    }
+
+    .divider {
+      width: 36px;
+      height: 1px;
+      background: rgba(180, 140, 255, .35);
+      margin: 1.6rem 0
+    }
+
+    .tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: .56rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      border: 1px solid rgba(180, 140, 255, .25);
+      color: rgba(180, 140, 255, .55);
+      padding: .3rem .75rem;
+      margin-bottom: 1.2rem
+    }
+
+    .svc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-top: 1.8rem
+    }
+
+    .svc-item {
+      padding: 1.2rem 1.4rem;
+      border: 1px solid rgba(180, 140, 255, .1);
+      background: rgba(4, 2, 10, .55);
+      backdrop-filter: blur(12px)
+    }
+
+    .svc-num {
+      font-family: 'DM Mono', monospace;
+      font-size: .54rem;
+      letter-spacing: .3em;
+      color: rgba(180, 140, 255, .4);
+      display: block;
+      margin-bottom: .5rem
+    }
+
+    .svc-name {
+      font-family: 'Cormorant', serif;
+      font-size: 1.15rem;
+      color: #e8e0f8;
+      margin-bottom: .4rem
+    }
+
+    .svc-desc {
+      font-size: .76rem;
+      color: rgba(224, 216, 240, .45);
+      line-height: 1.55
+    }
+
+    .process-row {
+      display: flex;
+      gap: 1.8rem;
+      margin-top: 1.8rem;
+      flex-wrap: wrap
+    }
+
+    .step {
+      flex: 1;
+      min-width: 110px
+    }
+
+    .step-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      border: 1px solid rgba(180, 140, 255, .4);
+      margin-bottom: .9rem
+    }
+
+    .step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: .54rem;
+      letter-spacing: .3em;
+      color: rgba(180, 140, 255, .4);
+      display: block;
+      margin-bottom: .4rem
+    }
+
+    .step-name {
+      font-family: 'Cormorant', serif;
+      font-size: 1.05rem;
+      color: #e8e0f8;
+      margin-bottom: .3rem
+    }
+
+    .step-desc {
+      font-size: .73rem;
+      color: rgba(224, 216, 240, .4);
+      line-height: 1.5
+    }
+
+    .cta-link {
+      display: inline-block;
+      margin-top: 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(200, 170, 255, .8);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(200, 170, 255, .3);
+      padding-bottom: .3rem;
+      transition: color .3s, border-color .3s
+    }
+
+    .cta-link:hover {
+      color: #e8e0f8;
+      border-color: rgba(224, 216, 240, .5)
+    }
+
+    #scroll-hint {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+      pointer-events: none;
+      transition: opacity .5s
+    }
+
+    #scroll-hint .line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(200, 170, 255, .5), transparent);
+      animation: lp 2s ease-in-out infinite
+    }
+
+    #scroll-hint span {
+      font-family: 'DM Mono', monospace;
+      font-size: .54rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: rgba(200, 170, 255, .35)
+    }
+
+    @keyframes lp {
+
+      0%,
+      100% {
+        opacity: .3;
+        transform: scaleY(1)
       }
 
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
+      50% {
+        opacity: .9;
+        transform: scaleY(.85)
+      }
+    }
+
+    @media(max-width:768px) {
+      .svc-grid {
+        grid-template-columns: 1fr
       }
 
-      .hero-ctas {
-        flex-direction: column;
+      .panel-left .inner,
+      .panel-right .inner {
+        margin: 0 5vw;
+        max-width: 100%
+      }
+
+      .display {
+        font-size: clamp(2rem, 7vw, 3rem)
       }
     }
   </style>
 </head>
 
 <body>
+  <canvas id="c"></canvas>
 
-  <div id="progress"></div>
-  <div id="cursor"></div>
-  <div id="cursor-ring"></div>
-  <div id="noise"></div>
-  <div class="gradient-top"></div>
-  <div class="gradient-bottom"></div>
-
-  <canvas id="hero-canvas"></canvas>
-  <div id="webgl-fallback"></div>
-
-  <!-- SVG filter for hero text distortion -->
-  <svg id="svg-filters" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <filter id="hero-distort" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="linearRGB">
-        <feTurbulence id="ft-turb" type="turbulence" baseFrequency="0.015 0.008" numOctaves="3" seed="2"
-          stitchTiles="stitch" result="noise" />
-        <feDisplacementMap id="ft-disp" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R"
-          yChannelSelector="G" />
-      </filter>
-    </defs>
+  <!-- SVG distortion filters -->
+  <svg id="svg-defs" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs id="svg-filter-defs"></defs>
   </svg>
-
+  <div id="root"></div>
+  <div id="cur"></div>
+  <div id="cur2"></div>
+  <div id="prog"></div>
   <nav>
-    <a href="#" class="nav-logo">Aminoacid Studio</a>
+    <a href="#" class="logo">Aminoacid Studio</a>
     <ul class="nav-links">
-      <li><a href="#services" data-i18n="nav.services">Servicios</a></li>
-      <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
-      <li><a href="#portfolio" data-i18n="nav.work">Trabajo</a></li>
-      <li><a href="#cta" data-i18n="nav.contact">Contacto</a></li>
+      <li><a href="#">Servicios</a></li>
+      <li><a href="#">Proceso</a></li>
+      <li><a href="#">Trabajo</a></li>
+      <li><a href="#">Contacto</a></li>
     </ul>
-    <div class="lang-switcher">
-      <button class="lang-btn active" data-lang="es">ES</button>
-      <span class="lang-sep">/</span>
-      <button class="lang-btn" data-lang="en">EN</button>
-      <span class="lang-sep">/</span>
-      <button class="lang-btn" data-lang="fr">FR</button>
-    </div>
   </nav>
 
-  <button id="audio-toggle" title="Toggle audio" aria-label="Toggle audio">⏸</button>
+  <!-- AMINOACID hero — standalone fixed, independent of panel system -->
+  <div id="hero-brand">
+    <div id="hero-word-row" aria-label="AMINOACID">
+      <span class="hw">A</span><span class="hw">M</span><span class="hw">I</span><span class="hw">N</span><span
+        class="hw">O</span><span class="hw">A</span><span class="hw">C</span><span class="hw">I</span><span
+        class="hw">D</span>
+    </div>
+    <div id="hero-sub-row">
+      <span class="eyebrow" style="margin-bottom:0;opacity:.65">Experiencias digitales</span>
+    </div>
+  </div>
 
-  <div id="scroll-container">
+  <div class="panel panel-left active" id="p0">
+    <div class="inner" style="margin-top:auto;padding-bottom:10vh">
+      <p class="body-text" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan
+        huella.</p>
+    </div>
+  </div>
 
-    <!-- HERO -->
-    <section id="hero">
-      <p class="hero-eyebrow" data-i18n="hero.eyebrow">Aminoacid Studio — Experiencias digitales</p>
-      <p class="hero-touch-hint" data-i18n="hero.touch">Toca aquí abajo las palabras para empezar a sentir</p>
-      <div id="hero-distort-zone">
-        <h1 class="hero-title" data-i18n="hero.title">Creamos experiencias web que <em>se sienten vivas.</em></h1>
-        <p class="hero-sub" data-i18n="hero.sub">Diseñamos y desarrollamos sitios, interfaces y mundos digitales para
-          marcas que quieren destacar.</p>
-      </div>
-      <div class="hero-scroll-hint">
-        <div class="scroll-line"></div>
-        <span class="scroll-label" data-i18n="hero.scroll">Desplazar para explorar</span>
-      </div>
-    </section>
+  <div class="panel panel-right" id="p1">
+    <div class="inner">
+      <span class="tag">Sobre el estudio</span>
+      <h2 class="display">Donde el <em>diseño</em><br>encuentra la<br>ingeniería.</h2>
+      <div class="divider"></div>
+      <p class="body-text">Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos
+        pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales
+        que dejan huella.</p>
+    </div>
+  </div>
 
-    <!-- MANIFESTO -->
-    <section id="manifesto">
-      <p class="manifesto-label reveal" data-i18n="manifesto.label">Sobre el estudio</p>
-      <h2 class="manifesto-text reveal reveal-delay-1" data-i18n="manifesto.title">Donde el <em>diseño</em> encuentra la
-        ingeniería,<br>y las ideas se convierten<br>en realidad digital.</h2>
-      <p class="manifesto-body reveal reveal-delay-2" data-i18n="manifesto.body">Somos un estudio boutique en la
-        intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y
-        atención obsesiva al craft para construir productos digitales que dejan huella.</p>
-    </section>
+  <div class="panel panel-center" id="p2">
+    <div class="inner">
+      <span class="eyebrow">01 — Artesanía digital</span>
+      <h2 class="display">Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.</h2>
+    </div>
+  </div>
 
-    <!-- CRAFT FACT 1 -->
-    <div class="craft-fact-section">
-      <div class="craft-fact-inner">
-        <span class="craft-number reveal" data-i18n="facts.label1">01 — Artesanía digital</span>
-        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f1">Un sitio rápido <em>vende</em><br>antes de que
-          el usuario<br>piense en irse.</p>
-        <div class="craft-divider reveal reveal-delay-2"></div>
+  <div class="panel panel-left" id="p3">
+    <div class="inner" style="max-width:680px">
+      <span class="eyebrow">Lo que construimos</span>
+      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">Nuestro <em>craft</em></h2>
+      <div class="svc-grid">
+        <div class="svc-item"><span class="svc-num">01</span>
+          <div class="svc-name">Desarrollo Web Moderno</div>
+          <p class="svc-desc">React, Next.js y arquitecturas personalizadas.</p>
+        </div>
+        <div class="svc-item"><span class="svc-num">02</span>
+          <div class="svc-name">Landing Pages</div>
+          <p class="svc-desc">Conversión, narrativa de marca y resultados.</p>
+        </div>
+        <div class="svc-item"><span class="svc-num">03</span>
+          <div class="svc-name">Experiencias 3D</div>
+          <p class="svc-desc">Escenas WebGL inmersivas en tiempo real.</p>
+        </div>
+        <div class="svc-item"><span class="svc-num">04</span>
+          <div class="svc-name">UX/UI Interfaces</div>
+          <p class="svc-desc">Del wireframe al sistema de alta fidelidad.</p>
+        </div>
+        <div class="svc-item"><span class="svc-num">05</span>
+          <div class="svc-name">Automatizaciones</div>
+          <p class="svc-desc">Pipelines de API que eliminan la fricción.</p>
+        </div>
+        <div class="svc-item"><span class="svc-num">06</span>
+          <div class="svc-name">Performance</div>
+          <p class="svc-desc">Sitios lentos → experiencias ultrarrápidas.</p>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- SERVICES -->
-    <section id="services">
-      <div class="section-header">
-        <div>
-          <span class="section-label reveal" data-i18n="services.label">Lo que construimos</span>
-          <h2 class="section-title reveal reveal-delay-1" data-i18n="services.title">Nuestro <em>craft</em></h2>
-        </div>
-      </div>
-      <div class="services-grid">
-        <div class="service-card reveal reveal-delay-1">
-          <span class="service-num">01</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <rect x="4" y="6" width="24" height="16" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-            <path d="M10 26h12M16 22v4" stroke="currentColor" stroke-width="0.8" opacity="0.4" />
-            <path d="M8 10l3 3-3 3M13 16h6" stroke="var(--cyan-soft)" stroke-width="0.8" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s1.name">Desarrollo Web Moderno</h3>
-          <p class="service-desc" data-i18n="services.s1.desc">Sitios de alto rendimiento construidos con frameworks
-            modernos. React, Next.js y arquitecturas personalizadas para productos digitales complejos.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-2">
-          <span class="service-num">02</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <rect x="3" y="4" width="26" height="18" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-            <path d="M10 28h12" stroke="currentColor" stroke-width="0.8" opacity="0.4" />
-            <circle cx="16" cy="13" r="4" stroke="var(--gold)" stroke-width="0.8" />
-            <path d="M16 9v-3M16 21v2M23 13h2M7 13h2" stroke="var(--gold)" stroke-width="0.6" opacity="0.6" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s2.name">Landing Pages de Alto Impacto</h3>
-          <p class="service-desc" data-i18n="services.s2.desc">Páginas de destino diseñadas para convertir, que combinan
-            narrativa de marca con resultados medibles.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-3">
-          <span class="service-num">03</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <path d="M16 4L4 10v12l12 6 12-6V10L16 4z" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-            <path d="M16 4v18M4 10l12 6 12-6" stroke="var(--cyan-soft)" stroke-width="0.6" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s3.name">Experiencias 3D Three.js</h3>
-          <p class="service-desc" data-i18n="services.s3.desc">Escenas 3D inmersivas, experiencias interactivas y
-            visualizaciones de producto renderizadas en tiempo real.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-4">
-          <span class="service-num">04</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <rect x="4" y="4" width="11" height="11" rx="1" stroke="var(--gold)" stroke-width="0.8" />
-            <rect x="17" y="4" width="11" height="5" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
-            <rect x="17" y="11" width="11" height="4" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
-            <rect x="4" y="17" width="24" height="11" rx="1" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s4.name">Interfaces UX/UI</h3>
-          <p class="service-desc" data-i18n="services.s4.desc">Diseño de interfaces donde cada píxel tiene propósito.
-            Del wireframe al sistema de alta fidelidad que se siente intuitivo.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-5">
-          <span class="service-num">05</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <circle cx="8" cy="8" r="3" stroke="var(--cyan-soft)" stroke-width="0.8" />
-            <circle cx="24" cy="8" r="3" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-            <circle cx="8" cy="24" r="3" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-            <circle cx="24" cy="24" r="3" stroke="var(--gold)" stroke-width="0.8" />
-            <path d="M11 8h10M8 11v10M24 11v10M11 24h10M11 11l10 10" stroke="currentColor" stroke-width="0.6"
-              opacity="0.3" stroke-dasharray="2 2" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s5.name">Automatizaciones e Integraciones</h3>
-          <p class="service-desc" data-i18n="services.s5.desc">Pipelines de automatización, integraciones de API y
-            sistemas de flujo que eliminan la fricción a escala.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-6">
-          <span class="service-num">06</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <path d="M6 24L26 8" stroke="var(--cyan-soft)" stroke-width="0.8" />
-            <circle cx="10" cy="20" r="2" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
-            <circle cx="16" cy="15" r="2" stroke="var(--gold)" stroke-width="0.8" />
-            <circle cx="22" cy="11" r="2" stroke="currentColor" stroke-width="0.8" opacity="0.5" />
-            <path d="M4 28h24" stroke="currentColor" stroke-width="0.6" opacity="0.3" />
-            <path d="M4 4v24" stroke="currentColor" stroke-width="0.6" opacity="0.3" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s6.name">Optimización de Rendimiento</h3>
-          <p class="service-desc" data-i18n="services.s6.desc">Auditorías técnicas y ciclos de optimización que
-            convierten productos lentos en experiencias ultrarrápidas.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-7">
-          <span class="service-num">07</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <rect x="5" y="8" width="22" height="16" rx="2" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-            <path d="M12 16h8M16 12v8" stroke="var(--gold)" stroke-width="0.8" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s7.name">Prototipos Interactivos</h3>
-          <p class="service-desc" data-i18n="services.s7.desc">Prototipos de alta fidelidad y pruebas de concepto que
-            validan ideas antes de la inversión completa.</p>
-          <span class="service-arrow">→</span>
-        </div>
-        <div class="service-card reveal reveal-delay-8">
-          <span class="service-num">08</span>
-          <svg class="service-icon" viewBox="0 0 32 32" fill="none">
-            <path d="M16 4c6.627 0 12 5.373 12 12s-5.373 12-12 12S4 22.627 4 16 9.373 4 16 4z" stroke="currentColor"
-              stroke-width="0.8" opacity="0.6" />
-            <path d="M16 4c-3 4-5 8-5 12s2 8 5 12M16 4c3 4 5 8 5 12s-2 8-5 12" stroke="var(--cyan-soft)"
-              stroke-width="0.6" />
-            <path d="M4 16h24" stroke="currentColor" stroke-width="0.6" opacity="0.4" />
-          </svg>
-          <h3 class="service-name" data-i18n="services.s8.name">Presencia Digital de Marca</h3>
-          <p class="service-desc" data-i18n="services.s8.desc">Presencia digital completa para marcas, productos,
-            eventos y negocios — de la estrategia al lanzamiento.</p>
-          <span class="service-arrow">→</span>
-        </div>
-      </div>
-    </section>
+  <div class="panel panel-center" id="p4">
+    <div class="inner">
+      <span class="eyebrow">02 — Artesanía digital</span>
+      <h2 class="display"><em>La interacción</em><br>convierte una página<br>en una experiencia.</h2>
+    </div>
+  </div>
 
-    <!-- CRAFT FACT 2 -->
-    <div class="craft-fact-section">
-      <div class="craft-fact-inner">
-        <span class="craft-number reveal" data-i18n="facts.label2">02 — Artesanía digital</span>
-        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f2"><em>La interacción</em> convierte una
-          página<br>en una experiencia.</p>
-        <div class="craft-divider reveal reveal-delay-2"></div>
+  <div class="panel panel-right" id="p5">
+    <div class="inner" style="max-width:540px">
+      <span class="tag">Cómo trabajamos</span>
+      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">El <em>proceso</em></h2>
+      <div class="process-row">
+        <div class="step">
+          <div class="step-dot"></div><span class="step-num">01</span>
+          <div class="step-name">Descubrimiento</div>
+          <p class="step-desc">Objetivos, usuarios y contexto.</p>
+        </div>
+        <div class="step">
+          <div class="step-dot"></div><span class="step-num">02</span>
+          <div class="step-name">Diseño</div>
+          <p class="step-desc">Sistémico y visual.</p>
+        </div>
+        <div class="step">
+          <div class="step-dot"></div><span class="step-num">03</span>
+          <div class="step-name">Prototipo</div>
+          <p class="step-desc">Validar antes de construir.</p>
+        </div>
+        <div class="step">
+          <div class="step-dot"></div><span class="step-num">04</span>
+          <div class="step-name">Desarrollo</div>
+          <p class="step-desc">Código limpio y medible.</p>
+        </div>
+        <div class="step">
+          <div class="step-dot"></div><span class="step-num">05</span>
+          <div class="step-name">Lanzamiento</div>
+          <p class="step-desc">Deploy y refinamiento continuo.</p>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- CRAFT FACT 3 -->
-    <div class="craft-fact-section">
-      <div class="craft-fact-inner">
-        <span class="craft-number reveal" data-i18n="facts.label3">03 — Artesanía digital</span>
-        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f3">El diseño no decora;<br><em>guía,
-            persuade</em><br>y organiza.</p>
-        <div class="craft-divider reveal reveal-delay-2"></div>
-      </div>
+  <div class="panel panel-center" id="p6">
+    <div class="inner">
+      <span class="eyebrow">03 — Artesanía digital</span>
+      <h2 class="display">El 3D no decora;<br>debe <em>contar<br>una historia.</em></h2>
     </div>
+  </div>
 
-    <!-- PROCESS -->
-    <section id="process">
-      <div class="section-header">
-        <div>
-          <span class="section-label reveal" data-i18n="process.label">Cómo trabajamos</span>
-          <h2 class="section-title reveal reveal-delay-1" data-i18n="process.title">El <em>proceso</em></h2>
-        </div>
-      </div>
-      <div class="process-steps">
-        <div class="process-step reveal reveal-delay-1">
-          <div class="process-dot"></div>
-          <p class="process-num">01</p>
-          <h3 class="process-name" data-i18n="process.p1.name">Descubrimiento</h3>
-          <p class="process-desc" data-i18n="process.p1.desc">Inmersión en objetivos, usuarios, competencia y contexto.
-          </p>
-        </div>
-        <div class="process-step reveal reveal-delay-2">
-          <div class="process-dot"></div>
-          <p class="process-num">02</p>
-          <h3 class="process-name" data-i18n="process.p2.name">Diseño</h3>
-          <p class="process-desc" data-i18n="process.p2.desc">Pensamiento sistémico y craft visual. De conceptos a specs
-            de UI.</p>
-        </div>
-        <div class="process-step reveal reveal-delay-3">
-          <div class="process-dot"></div>
-          <p class="process-num">03</p>
-          <h3 class="process-name" data-i18n="process.p3.name">Prototipo</h3>
-          <p class="process-desc" data-i18n="process.p3.desc">Validar antes de construir. Alta fidelidad interactiva a
-            velocidad.</p>
-        </div>
-        <div class="process-step reveal reveal-delay-4">
-          <div class="process-dot"></div>
-          <p class="process-num">04</p>
-          <h3 class="process-name" data-i18n="process.p4.name">Desarrollo</h3>
-          <p class="process-desc" data-i18n="process.p4.desc">Código limpio, stacks modernos, rendimiento medible.</p>
-        </div>
-        <div class="process-step reveal reveal-delay-5">
-          <div class="process-dot"></div>
-          <p class="process-num">05</p>
-          <h3 class="process-name" data-i18n="process.p5.name">Optimización</h3>
-          <p class="process-desc" data-i18n="process.p5.desc">Refinamiento técnico hasta que cada métrica sea correcta.
-          </p>
-        </div>
-        <div class="process-step reveal reveal-delay-6">
-          <div class="process-dot"></div>
-          <p class="process-num">06</p>
-          <h3 class="process-name" data-i18n="process.p6.name">Lanzamiento e Iteración</h3>
-          <p class="process-desc" data-i18n="process.p6.desc">Deploy con confianza. Refinamiento con datos.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CRAFT FACT 4 -->
-    <div class="craft-fact-section">
-      <div class="craft-fact-inner">
-        <span class="craft-number reveal" data-i18n="facts.label4">04 — Artesanía digital</span>
-        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f4">El 3D no debe ser decoración;<br>debe
-          <em>contar una historia.</em></p>
-        <div class="craft-divider reveal reveal-delay-2"></div>
-      </div>
+  <div class="panel panel-left" id="p7">
+    <div class="inner">
+      <span class="eyebrow">¿Listo para comenzar?</span>
+      <h2 class="display">Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em></h2>
+      <div class="divider"></div>
+      <p class="body-text">Hablemos sobre tu proyecto.</p>
+      <a href="mailto:hello@aminoacid.studio" class="cta-link">hello@aminoacid.studio →</a>
     </div>
+  </div>
 
-    <!-- PORTFOLIO -->
-    <section id="portfolio">
-      <div class="section-header">
-        <div>
-          <span class="section-label reveal" data-i18n="portfolio.label">Trabajo seleccionado</span>
-          <h2 class="section-title reveal reveal-delay-1" data-i18n="portfolio.title">El <em>trabajo</em></h2>
-        </div>
-      </div>
-      <div class="portfolio-grid">
-        <div class="portfolio-card reveal reveal-delay-1">
-          <div class="portfolio-card-bg type-a"></div>
-          <span class="portfolio-tag" data-i18n="portfolio.p1.tag">Experiencia interactiva</span>
-          <h3 class="portfolio-title" data-i18n="portfolio.p1.title">Mundo digital para una marca de moda premium</h3>
-          <p class="portfolio-sub" data-i18n="portfolio.p1.sub">Entorno Three.js · Scroll storytelling · Inmersión de
-            marca</p>
-          <span class="portfolio-link">↗</span>
-        </div>
-        <div class="portfolio-card reveal reveal-delay-2">
-          <div class="portfolio-card-bg type-b"></div>
-          <span class="portfolio-tag" data-i18n="portfolio.p2.tag">Landing page</span>
-          <h3 class="portfolio-title" data-i18n="portfolio.p2.title">Campaña de lanzamiento para un producto SaaS</h3>
-          <p class="portfolio-sub" data-i18n="portfolio.p2.sub">Diseño de conversión · Animaciones GSAP · A/B testing
-          </p>
-          <span class="portfolio-link">↗</span>
-        </div>
-        <div class="portfolio-card reveal reveal-delay-3">
-          <div class="portfolio-card-bg type-c"></div>
-          <span class="portfolio-tag" data-i18n="portfolio.p3.tag">Campaña 3D</span>
-          <h3 class="portfolio-title" data-i18n="portfolio.p3.title">Entorno 3D para lanzamiento automotriz</h3>
-          <p class="portfolio-sub" data-i18n="portfolio.p3.sub">WebGL · Sistemas de partículas · Renderizado en tiempo
-            real</p>
-          <span class="portfolio-link">↗</span>
-        </div>
-        <div class="portfolio-card reveal reveal-delay-4">
-          <div class="portfolio-card-bg type-d"></div>
-          <span class="portfolio-tag" data-i18n="portfolio.p4.tag">Sistema de automatización</span>
-          <h3 class="portfolio-title" data-i18n="portfolio.p4.title">Inteligencia operacional para empresa logística
-          </h3>
-          <p class="portfolio-sub" data-i18n="portfolio.p4.sub">Dashboard personalizado · Integraciones API · Datos en
-            tiempo real</p>
-          <span class="portfolio-link">↗</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- CRAFT FACT 5 -->
-    <div class="craft-fact-section">
-      <div class="craft-fact-inner">
-        <span class="craft-number reveal" data-i18n="facts.label5">05 — Artesanía digital</span>
-        <p class="craft-text reveal reveal-delay-1" data-i18n="facts.f5">Una buena interfaz hace que<br><em>la
-            tecnología desaparezca.</em></p>
-        <div class="craft-divider reveal reveal-delay-2"></div>
-      </div>
-    </div>
-
-    <!-- CTA -->
-    <section id="cta">
-      <p class="cta-label reveal" data-i18n="cta.label">¿Listo para comenzar?</p>
-      <h2 class="cta-title reveal reveal-delay-1" data-i18n="cta.title">Tu próximo sitio no tiene que parecerse
-        a<br><em>cualquier otro sitio.</em></h2>
-      <p class="manifesto-body reveal reveal-delay-2" style="margin-bottom:3.5rem;" data-i18n="cta.sub">Hablemos sobre
-        tu proyecto. Cuéntanos qué quieres construir.</p>
-      <div class="contact-row reveal reveal-delay-3">
-        <a href="mailto:hello@aminoacid.studio" class="contact-item">
-          <span class="contact-icon">@</span>
-          hello@aminoacid.studio
-        </a>
-        <span class="contact-divider">·</span>
-        <a href="https://instagram.com/aminoacid" class="contact-item">
-          <span class="contact-icon">I</span>
-          @aminoacid
-        </a>
-      </div>
-    </section>
-
-    <footer>
-      <span class="footer-logo">Aminoacid Studio</span>
-      <span class="footer-copy" data-i18n="footer.copy">© 2026 — Construido con precisión</span>
-    </footer>
-
+  <div id="scroll-hint">
+    <div class="line"></div><span>Desplazar</span>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // ═══════════════════════════════════════════════════════════════
-    // i18n SYSTEM
-    // ═══════════════════════════════════════════════════════════════
-    const T = {
-      es: {
-        "nav.services": "Servicios", "nav.process": "Proceso", "nav.work": "Trabajo", "nav.contact": "Contacto",
-        "hero.eyebrow": "Aminoacid Studio — Experiencias digitales",
-        "hero.title": "Creamos experiencias web que <em>se sienten vivas.</em>",
-        "hero.sub": "Diseñamos y desarrollamos sitios, interfaces y mundos digitales para marcas que quieren destacar.",
-        "hero.cta1": "Iniciar Proyecto", "hero.cta2": "Explorar Servicios", "hero.scroll": "Desplazar para explorar", "hero.touch": "Toca aquí abajo las palabras para empezar a sentir",
-        "manifesto.label": "Sobre el estudio",
-        "manifesto.title": "Donde el <em>diseño</em> encuentra la ingeniería,<br>y las ideas se convierten<br>en realidad digital.",
-        "manifesto.body": "Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales que dejan huella.",
-        "facts.label1": "01 — Artesanía digital", "facts.f1": "Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.",
-        "facts.label2": "02 — Artesanía digital", "facts.f2": "<em>La interacción</em> convierte una página<br>en una experiencia.",
-        "facts.label3": "03 — Artesanía digital", "facts.f3": "El diseño no decora;<br><em>guía, persuade</em><br>y organiza.",
-        "facts.label4": "04 — Artesanía digital", "facts.f4": "El 3D no debe ser decoración;<br>debe <em>contar una historia.</em>",
-        "facts.label5": "05 — Artesanía digital", "facts.f5": "Una buena interfaz hace que<br><em>la tecnología desaparezca.</em>",
-        "services.label": "Lo que construimos", "services.title": "Nuestro <em>craft</em>",
-        "services.s1.name": "Desarrollo Web Moderno", "services.s1.desc": "Sitios de alto rendimiento con frameworks modernos. React, Next.js y arquitecturas personalizadas.",
-        "services.s2.name": "Landing Pages de Alto Impacto", "services.s2.desc": "Páginas diseñadas para convertir que combinan narrativa de marca con resultados medibles.",
-        "services.s3.name": "Experiencias 3D Three.js", "services.s3.desc": "Escenas 3D inmersivas, experiencias interactivas y visualizaciones en tiempo real.",
-        "services.s4.name": "Interfaces UX/UI", "services.s4.desc": "Diseño donde cada píxel tiene propósito. Del wireframe al sistema de alta fidelidad.",
-        "services.s5.name": "Automatizaciones e Integraciones", "services.s5.desc": "Pipelines de automatización, integraciones de API y sistemas de flujo a escala.",
-        "services.s6.name": "Optimización de Rendimiento", "services.s6.desc": "Auditorías técnicas que convierten productos lentos en experiencias ultrarrápidas.",
-        "services.s7.name": "Prototipos Interactivos", "services.s7.desc": "Prototipos de alta fidelidad que validan ideas antes de la inversión completa.",
-        "services.s8.name": "Presencia Digital de Marca", "services.s8.desc": "Presencia digital completa para marcas, productos y eventos — de la estrategia al lanzamiento.",
-        "process.label": "Cómo trabajamos", "process.title": "El <em>proceso</em>",
-        "process.p1.name": "Descubrimiento", "process.p1.desc": "Inmersión en objetivos, usuarios, competencia y contexto.",
-        "process.p2.name": "Diseño", "process.p2.desc": "Pensamiento sistémico y craft visual. De conceptos a specs de UI.",
-        "process.p3.name": "Prototipo", "process.p3.desc": "Validar antes de construir. Alta fidelidad interactiva a velocidad.",
-        "process.p4.name": "Desarrollo", "process.p4.desc": "Código limpio, stacks modernos, rendimiento medible.",
-        "process.p5.name": "Optimización", "process.p5.desc": "Refinamiento técnico hasta que cada métrica sea correcta.",
-        "process.p6.name": "Lanzamiento e Iteración", "process.p6.desc": "Deploy con confianza. Refinamiento con datos.",
-        "portfolio.label": "Trabajo seleccionado", "portfolio.title": "El <em>trabajo</em>",
-        "portfolio.p1.tag": "Experiencia interactiva", "portfolio.p1.title": "Mundo digital para una marca de moda premium", "portfolio.p1.sub": "Entorno Three.js · Scroll storytelling · Inmersión de marca",
-        "portfolio.p2.tag": "Landing page", "portfolio.p2.title": "Campaña de lanzamiento para un producto SaaS", "portfolio.p2.sub": "Diseño de conversión · Animaciones GSAP · A/B testing",
-        "portfolio.p3.tag": "Campaña 3D", "portfolio.p3.title": "Entorno 3D para lanzamiento automotriz", "portfolio.p3.sub": "WebGL · Sistemas de partículas · Renderizado en tiempo real",
-        "portfolio.p4.tag": "Sistema de automatización", "portfolio.p4.title": "Inteligencia operacional para empresa logística", "portfolio.p4.sub": "Dashboard personalizado · Integraciones API · Datos en tiempo real",
-        "cta.label": "¿Listo para comenzar?", "cta.title": "Tu próximo sitio no tiene que parecerse a<br><em>cualquier otro sitio.</em>",
-        "cta.sub": "Hablemos sobre tu proyecto. Cuéntanos qué quieres construir.",
-        "footer.copy": "© 2026 — Construido con precisión"
-      },
-      en: {
-        "nav.services": "Services", "nav.process": "Process", "nav.work": "Work", "nav.contact": "Contact",
-        "hero.eyebrow": "Aminoacid Studio — Digital Experiences",
-        "hero.title": "We create web experiences that <em>feel alive.</em>",
-        "hero.sub": "We design and develop websites, interfaces, and digital worlds for brands that want to stand out.",
-        "hero.cta1": "Start a Project", "hero.cta2": "Explore Services", "hero.scroll": "Scroll to explore", "hero.touch": "Touch the words below to start feeling",
-        "manifesto.label": "About the studio",
-        "manifesto.title": "Where <em>design</em> meets engineering,<br>and ideas become<br>digital reality.",
-        "manifesto.body": "We are a boutique studio at the intersection of technology and storytelling. We combine strategic thinking, precision engineering, and obsessive attention to craft to build digital products that leave a mark.",
-        "facts.label1": "01 — Digital craft", "facts.f1": "A fast website <em>sells</em><br>before the user thinks<br>about leaving.",
-        "facts.label2": "02 — Digital craft", "facts.f2": "<em>Interaction</em> turns a page<br>into an experience.",
-        "facts.label3": "03 — Digital craft", "facts.f3": "Design does not decorate;<br>it <em>guides, persuades,</em><br>and organizes.",
-        "facts.label4": "04 — Digital craft", "facts.f4": "3D should not be decoration;<br>it should <em>tell a story.</em>",
-        "facts.label5": "05 — Digital craft", "facts.f5": "A good interface makes<br><em>technology disappear.</em>",
-        "services.label": "What we build", "services.title": "Our <em>craft</em>",
-        "services.s1.name": "Modern Web Development", "services.s1.desc": "Performance-first sites with modern frameworks. React, Next.js, and custom architectures.",
-        "services.s2.name": "High-Impact Landing Pages", "services.s2.desc": "Conversion-engineered pages that blend brand storytelling with measurable results.",
-        "services.s3.name": "Three.js 3D Experiences", "services.s3.desc": "Immersive 3D scenes, interactive experiences, and real-time product visualizations.",
-        "services.s4.name": "UX/UI Interfaces", "services.s4.desc": "Interface design where every pixel has purpose. From wireframe to high-fidelity systems.",
-        "services.s5.name": "Automations & Integrations", "services.s5.desc": "Custom pipelines, API integrations, and workflow systems that eliminate friction at scale.",
-        "services.s6.name": "Performance Optimization", "services.s6.desc": "Technical audits and optimization cycles that turn slow products into lightning-fast experiences.",
-        "services.s7.name": "Interactive Prototypes", "services.s7.desc": "High-fidelity prototypes and proof-of-concepts that validate ideas before full investment.",
-        "services.s8.name": "Brand Digital Presence", "services.s8.desc": "Full digital presence for brands, products, events, and businesses — from strategy to launch.",
-        "process.label": "How we work", "process.title": "The <em>process</em>",
-        "process.p1.name": "Discovery", "process.p1.desc": "Deep dive into goals, users, competitors, and context.",
-        "process.p2.name": "Design", "process.p2.desc": "Systems thinking meets visual craft. From concepts to UI specs.",
-        "process.p3.name": "Prototype", "process.p3.desc": "Validate before building. Interactive fidelity at speed.",
-        "process.p4.name": "Development", "process.p4.desc": "Clean code, modern stacks, measurable performance.",
-        "process.p5.name": "Optimization", "process.p5.desc": "Technical refinement until every metric is right.",
-        "process.p6.name": "Launch & Iterate", "process.p6.desc": "Deploy with confidence. Refine with data.",
-        "portfolio.label": "Selected work", "portfolio.title": "The <em>work</em>",
-        "portfolio.p1.tag": "Interactive experience", "portfolio.p1.title": "Digital world for a premium fashion brand", "portfolio.p1.sub": "Three.js environment · Scroll storytelling · Brand immersion",
-        "portfolio.p2.tag": "Landing page", "portfolio.p2.title": "Launch campaign for a SaaS product", "portfolio.p2.sub": "Conversion design · GSAP animations · A/B tested",
-        "portfolio.p3.tag": "3D campaign", "portfolio.p3.title": "3D environment for an automotive launch", "portfolio.p3.sub": "WebGL · Particle systems · Real-time rendering",
-        "portfolio.p4.tag": "Automation system", "portfolio.p4.title": "Operations intelligence for a logistics company", "portfolio.p4.sub": "Custom dashboard · API integrations · Real-time data",
-        "cta.label": "Ready to begin?", "cta.title": "Your next website doesn't have to look like<br><em>just another website.</em>",
-        "cta.sub": "Let's talk about your project. Tell us what you want to build.",
-        "footer.copy": "© 2026 — Built with precision"
-      },
-      fr: {
-        "nav.services": "Services", "nav.process": "Processus", "nav.work": "Travaux", "nav.contact": "Contact",
-        "hero.eyebrow": "Aminoacid Studio — Expériences numériques",
-        "hero.title": "Nous créons des expériences web qui <em>semblent vivantes.</em>",
-        "hero.sub": "Nous concevons et développons des sites, interfaces et mondes numériques pour les marques qui veulent se démarquer.",
-        "hero.cta1": "Démarrer un projet", "hero.cta2": "Explorer les services", "hero.scroll": "Défiler pour explorer", "hero.touch": "Touchez les mots ci-dessous pour commencer à ressentir",
-        "manifesto.label": "À propos du studio",
-        "manifesto.title": "Là où le <em>design</em> rencontre l'ingénierie,<br>et les idées deviennent<br>réalité numérique.",
-        "manifesto.body": "Nous sommes un studio boutique à l'intersection de la technologie et du storytelling. Nous combinons pensée stratégique, ingénierie de précision et attention obsessionnelle au craft pour construire des produits numériques qui marquent les esprits.",
-        "facts.label1": "01 — Artisanat numérique", "facts.f1": "Un site rapide <em>vend</em><br>avant que l'utilisateur<br>ne pense à partir.",
-        "facts.label2": "02 — Artisanat numérique", "facts.f2": "<em>L'interaction</em> transforme une page<br>en une expérience.",
-        "facts.label3": "03 — Artisanat numérique", "facts.f3": "Le design ne décore pas ;<br>il <em>guide, persuade</em><br>et organise.",
-        "facts.label4": "04 — Artisanat numérique", "facts.f4": "La 3D ne doit pas être décoration ;<br>elle doit <em>raconter une histoire.</em>",
-        "facts.label5": "05 — Artisanat numérique", "facts.f5": "Une bonne interface fait<br><em>disparaître la technologie.</em>",
-        "services.label": "Ce que nous construisons", "services.title": "Notre <em>craft</em>",
-        "services.s1.name": "Développement web moderne", "services.s1.desc": "Sites haute performance avec des frameworks modernes. React, Next.js et architectures personnalisées.",
-        "services.s2.name": "Landing pages à fort impact", "services.s2.desc": "Pages conçues pour convertir, mêlant storytelling de marque et résultats mesurables.",
-        "services.s3.name": "Expériences 3D Three.js", "services.s3.desc": "Scènes 3D immersives, expériences interactives et visualisations produit en temps réel.",
-        "services.s4.name": "Interfaces UX/UI", "services.s4.desc": "Design où chaque pixel a un but. Du wireframe au système haute fidélité intuitif.",
-        "services.s5.name": "Automatisations et intégrations", "services.s5.desc": "Pipelines d'automatisation, intégrations API et systèmes de flux qui éliminent les frictions.",
-        "services.s6.name": "Optimisation des performances", "services.s6.desc": "Audits techniques et cycles d'optimisation qui transforment les produits lents en expériences rapides.",
-        "services.s7.name": "Prototypes interactifs", "services.s7.desc": "Prototypes haute fidélité qui valident les idées avant l'investissement complet.",
-        "services.s8.name": "Présence numérique de marque", "services.s8.desc": "Présence numérique complète pour marques, produits et événements — de la stratégie au lancement.",
-        "process.label": "Comment nous travaillons", "process.title": "Le <em>processus</em>",
-        "process.p1.name": "Découverte", "process.p1.desc": "Plongée dans les objectifs, utilisateurs, concurrents et contexte.",
-        "process.p2.name": "Design", "process.p2.desc": "Pensée systémique et craft visuel. Des concepts aux specs UI.",
-        "process.p3.name": "Prototype", "process.p3.desc": "Valider avant de construire. Haute fidélité interactive à vitesse.",
-        "process.p4.name": "Développement", "process.p4.desc": "Code propre, stacks modernes, performances mesurables.",
-        "process.p5.name": "Optimisation", "process.p5.desc": "Raffinement technique jusqu'à ce que chaque métrique soit correcte.",
-        "process.p6.name": "Lancement et itération", "process.p6.desc": "Déployer avec confiance. Affiner avec les données.",
-        "portfolio.label": "Travaux sélectionnés", "portfolio.title": "Le <em>travail</em>",
-        "portfolio.p1.tag": "Expérience interactive", "portfolio.p1.title": "Monde numérique pour une marque de mode premium", "portfolio.p1.sub": "Environnement Three.js · Scroll storytelling · Immersion de marque",
-        "portfolio.p2.tag": "Landing page", "portfolio.p2.title": "Campagne de lancement pour un produit SaaS", "portfolio.p2.sub": "Design de conversion · Animations GSAP · Tests A/B",
-        "portfolio.p3.tag": "Campagne 3D", "portfolio.p3.title": "Environnement 3D pour un lancement automobile", "portfolio.p3.sub": "WebGL · Systèmes de particules · Rendu en temps réel",
-        "portfolio.p4.tag": "Système d'automatisation", "portfolio.p4.title": "Intelligence opérationnelle pour une entreprise logistique", "portfolio.p4.sub": "Dashboard personnalisé · Intégrations API · Données en temps réel",
-        "cta.label": "Prêt à commencer ?", "cta.title": "Votre prochain site n'a pas à ressembler<br><em>à un site quelconque.</em>",
-        "cta.sub": "Parlons de votre projet. Dites-nous ce que vous voulez construire.",
-        "footer.copy": "© 2026 — Construit avec précision"
-      }
-    };
+    'use strict';
+    const IS_MOB = innerWidth < 768;
 
-    let currentLang = localStorage.getItem('sf-lang') || 'es';
+    // ── Cursor ────────────────────────────────────────────────────
+    const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; }, { passive: true });
+    (function ac() { rx += (mx - rx) * .1; ry += (my - ry) * .1; cur2.style.left = rx + 'px'; cur2.style.top = ry + 'px'; requestAnimationFrame(ac); })();
 
-    function applyLang(lang) {
-      currentLang = lang;
-      localStorage.setItem('sf-lang', lang);
-      document.documentElement.lang = lang;
-      const dict = T[lang];
-
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.dataset.i18n;
-        if (dict[key] !== undefined) el.innerHTML = dict[key];
-      });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.dataset.i18nPlaceholder;
-        if (dict[key] !== undefined) el.placeholder = dict[key];
-      });
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-      });
-    }
-
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => applyLang(btn.dataset.lang));
-    });
-
-    applyLang(currentLang);
-
-    // ═══════════════════════════════════════════════════════════════
-    // CURSOR
-    // ═══════════════════════════════════════════════════════════════
-    const cursor = document.getElementById('cursor');
-    const cursorRing = document.getElementById('cursor-ring');
-    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-
-    document.addEventListener('mousemove', e => {
-      mouseX = e.clientX; mouseY = e.clientY;
-      cursor.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
-    });
-    function animateRing() {
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
-      cursorRing.style.transform = `translate(${ringX - 18}px, ${ringY - 18}px)`;
-      requestAnimationFrame(animateRing);
-    }
-    animateRing();
-    document.querySelectorAll('a, button, .service-card, .portfolio-card').forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-grow'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-grow'));
-    });
-
-    // ═══════════════════════════════════════════════════════════════
-    // SCROLL PROGRESS BAR
-    // ═══════════════════════════════════════════════════════════════
-    const progressBar = document.getElementById('progress');
+    // ── Scroll ────────────────────────────────────────────────────
+    let scrollRaw = 0, scrollSmooth = 0;
+    const prog = document.getElementById('prog');
     window.addEventListener('scroll', () => {
-      const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      progressBar.style.width = pct + '%';
+      scrollRaw = window.scrollY;
+      prog.style.width = (scrollRaw / Math.max(1, document.body.scrollHeight - innerHeight) * 100) + '%';
+    }, { passive: true });
+
+    // ── Renderer ──────────────────────────────────────────────────
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOB, alpha: false, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOB ? 1.5 : 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setClearColor(0x04020a, 1);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x100820, 0.010);
+
+    const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, .05, 600);
+    camera.position.set(0, 4, 28);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // SCROLL REVEAL
-    // ═══════════════════════════════════════════════════════════════
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    function eio(t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t }
 
     // ═══════════════════════════════════════════════════════════════
-    // AMINOACID STUDIO — 3D EXPERIENCE v4
-    // S0  0–15%   aminoácidos en célula
-    // S1  15–30%  clusters dispersos + rayos eléctricos
-    // S2  30–44%  neurona isométrica + pulso axón→dendritas  
-    // S3  44–58%  red neuronal + rayos eléctricos entre neuronas
-    // S4  58–68%  fondo espacial azul profundo
-    // S5  68–80%  cabeza 3D malla tornasol + cerebro partículas
-    // S6  80–92%  cabeza alejada + degradado espiritual
-    // S7  92–100% fade cósmico
+    // LIGHTS
     // ═══════════════════════════════════════════════════════════════
+    scene.add(new THREE.AmbientLight(0x0a0520, 5));
+
+    // Blue-electric "star" light — main key
+    const starLight = new THREE.DirectionalLight(0x2255ff, 2.8);
+    starLight.position.set(20, 12, -15);
+    scene.add(starLight);
+
+    // Animated color lights — driven by time (color cycle)
+    const colorLightA = new THREE.PointLight(0xff00aa, 3.0, 120); colorLightA.position.set(-30, 15, 0); scene.add(colorLightA);
+    const colorLightB = new THREE.PointLight(0x00ffcc, 2.5, 100); colorLightB.position.set(30, 10, -20); scene.add(colorLightB);
+    const colorLightC = new THREE.PointLight(0xaa00ff, 2.0, 80); colorLightC.position.set(0, 20, 10); scene.add(colorLightC);
+
+    // ═══════════════════════════════════════════════════════════════
+    // SKY — full animated color cycle matching video
+    // HSL hue rotates over time: magenta→yellow→green→cyan→blue→purple→magenta
+    // Multiple "nebula" layers pulse at different rates
+    // ═══════════════════════════════════════════════════════════════
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      uniforms: { uTime: { value: 0 } },
+      vertexShader: `varying vec3 vDir;void main(){vDir=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader: `
+    precision highp float;
+    uniform float uTime;
+    varying vec3 vDir;
+
+    vec3 hsl2rgb(float h,float s,float l){
+      h=mod(h,1.);
+      float c=(1.-abs(2.*l-1.))*s;
+      float x=c*(1.-abs(mod(h*6.,2.)-1.));
+      float m=l-c*.5;
+      vec3 rgb;
+      if     (h<1./6.) rgb=vec3(c,x,0.);
+      else if(h<2./6.) rgb=vec3(x,c,0.);
+      else if(h<3./6.) rgb=vec3(0.,c,x);
+      else if(h<4./6.) rgb=vec3(0.,x,c);
+      else if(h<5./6.) rgb=vec3(x,0.,c);
+      else             rgb=vec3(c,0.,x);
+      return rgb+m;
+    }
+
+    float hash21(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float hash31(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+
+    // Smooth noise
+    float noise(vec2 p){
+      vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+      return mix(mix(hash21(i),hash21(i+vec2(1,0)),u.x),
+                 mix(hash21(i+vec2(0,1)),hash21(i+vec2(1,1)),u.x),u.y);
+    }
+
+    void main(){
+      float h=vDir.y; // -1 to 1, 0=horizon
+      vec3 d=normalize(vDir);
+      float t=uTime;
+
+      // === COLOR CYCLE — 5 hue bands rotating at different speeds ===
+      // Base hue cycles at different speeds per sky zone
+      // This creates the multi-color effect seen in the video
+      float hCycle  = mod(t*.022,1.);            // main slow cycle ~45s period
+      float hCycle2 = mod(t*.038+.33,1.);        // second layer, offset
+      float hCycle3 = mod(t*.015+.66,1.);        // third layer, slower
+
+      // Zenith color — deep saturated, slowly cycling
+      float hZenith=mod(hCycle+.05,1.);
+      vec3 zenith=hsl2rgb(hZenith,.85,.08);
+
+      // Mid sky — different hue, brighter
+      float hMid=mod(hCycle2+.15,1.);
+      vec3 mid=hsl2rgb(hMid,.80,.12);
+
+      // Horizon — brightest, third hue family
+      float hHoriz=mod(hCycle3+.42,1.);
+      vec3 horiz=hsl2rgb(hHoriz,.90,.18);
+
+      // Low horizon glow
+      float hLow=mod(hCycle+.55,1.);
+      vec3 low=hsl2rgb(hLow,.95,.15);
+
+      // Build sky gradient
+      vec3 sky=mix(low, horiz, smoothstep(-.15,.05,h));
+      sky=mix(sky, mid,    smoothstep(.0,.4,h));
+      sky=mix(sky, zenith, smoothstep(.3,.85,h));
+
+      // === NEBULA LAYERS — seamless 3D noise (no atan seam) ===
+      // Use 3D position directly — avoids atan() discontinuity at ±π
+      // Project onto 3 independent planes for variety
+      vec2 p1=d.xz*3.0+vec2(t*.008,t*.006);
+      vec2 p2=d.yx*5.0+vec2(-t*.012,t*.009);
+      vec2 p3=d.zy*8.0+vec2(t*.005,-t*.007);
+      float n1=noise(p1); float n2=noise(p2); float n3=noise(p3);
+
+      // Nebula color 1 — complementary to current sky
+      float hNeb1=mod(hCycle+.5,1.);
+      vec3 neb1=hsl2rgb(hNeb1,.9,.18)*n1*n1;
+
+      // Nebula color 2
+      float hNeb2=mod(hCycle2+.25,1.);
+      vec3 neb2=hsl2rgb(hNeb2,.85,.14)*n2*n2;
+
+      // Add nebulae — stronger above horizon
+      float nebMask=smoothstep(-.1,.5,h);
+      sky+=neb1*nebMask*.6;
+      sky+=neb2*nebMask*.4;
+
+      // Fine noise texture variation
+      sky*=.9+n3*.2;
+
+      // === STAR FLOCKS — 6 groups moving like murmuration ===
+      // Flock colors declared outside loops (GLSL array-in-loop bug fix)
+      vec3 fc0col=vec3(.72,.88,1.0), fc1col=vec3(1.,1.,1.),
+           fc2col=vec3(1.,.91,.70),  fc3col=vec3(.84,.95,1.),
+           fc4col=vec3(1.,.96,.82),  fc5col=vec3(.92,.82,1.);
+
+      // Global slow rotation of entire star field
+      float br=uTime*.0018;
+      float cbr=cos(br),sbr=sin(br);
+      vec3 dR=vec3(d.x*cbr+d.z*sbr,d.y,-d.x*sbr+d.z*cbr);
+
+      // Flock 0
+      {float ff=0.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
+       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
+       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
+       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
+       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
+       for(int pi=0;pi<30;pi++){float pf=float(pi);
+        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
+        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
+        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
+        vec3 sd=normalize(fc+fright*sx+fup2*sy);
+        float dv=dot(dR,sd);if(dv<0.99996)continue;
+        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
+        if(ang>sr)continue;
+        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
+        sky+=fc0col*br2*2.2;}
+      }
+      // Flock 1
+      {float ff=1.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
+       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
+       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
+       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
+       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
+       for(int pi=0;pi<30;pi++){float pf=float(pi);
+        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
+        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
+        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
+        vec3 sd=normalize(fc+fright*sx+fup2*sy);
+        float dv=dot(dR,sd);if(dv<0.99996)continue;
+        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
+        if(ang>sr)continue;
+        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
+        sky+=fc1col*br2*2.2;}
+      }
+      // Flock 2
+      {float ff=2.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
+       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
+       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
+       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
+       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
+       for(int pi=0;pi<30;pi++){float pf=float(pi);
+        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
+        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
+        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
+        vec3 sd=normalize(fc+fright*sx+fup2*sy);
+        float dv=dot(dR,sd);if(dv<0.99996)continue;
+        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
+        if(ang>sr)continue;
+        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
+        sky+=fc2col*br2*2.2;}
+      }
+      // Flock 3
+      {float ff=3.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
+       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
+       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
+       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
+       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
+       for(int pi=0;pi<30;pi++){float pf=float(pi);
+        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
+        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
+        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
+        vec3 sd=normalize(fc+fright*sx+fup2*sy);
+        float dv=dot(dR,sd);if(dv<0.99996)continue;
+        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
+        if(ang>sr)continue;
+        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
+        sky+=fc3col*br2*2.2;}
+      }
+      // Flock 4
+      {float ff=4.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
+       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
+       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
+       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
+       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
+       for(int pi=0;pi<30;pi++){float pf=float(pi);
+        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
+        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
+        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
+        vec3 sd=normalize(fc+fright*sx+fup2*sy);
+        float dv=dot(dR,sd);if(dv<0.99996)continue;
+        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
+        if(ang>sr)continue;
+        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
+        sky+=fc4col*br2*2.2;}
+      }
+      // Flock 5
+      {float ff=5.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
+       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
+       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
+       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
+       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
+       for(int pi=0;pi<30;pi++){float pf=float(pi);
+        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
+        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
+        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
+        vec3 sd=normalize(fc+fright*sx+fup2*sy);
+        float dv=dot(dR,sd);if(dv<0.99996)continue;
+        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
+        if(ang>sr)continue;
+        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
+        sky+=fc5col*br2*2.2;}
+      }
+
+      // === ELECTRIC BLUE SUN DISC ===
+      vec3 sunDir=normalize(vec3(.6,.12,-.8));
+      float sd2=max(0.,dot(d,sunDir));
+      float disc   =smoothstep(.9990,.9998,sd2);
+      float corona1=pow(sd2,14.)*.6;
+      float corona2=pow(sd2,30.)*.4;
+      float corona3=pow(sd2,80.)*.3;
+      sky=mix(sky,vec3(.92,.97,1.),disc);
+      sky+=vec3(.05,.35,1.)*corona1;
+      sky+=vec3(.3,.6,1.) *corona2;
+      sky+=vec3(.7,.85,1.)*corona3;
+
+      // Tone and clamp
+      sky=pow(max(sky,vec3(0.)),vec3(.88)); // slight gamma lift
+      gl_FragColor=vec4(sky,1.);
+    }`
+    });
+    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, 4), skyMat));
+
+    // ═══════════════════════════════════════════════════════════════
+    // DESERT TERRAIN — procedural dunes with sand shader
+    // ═══════════════════════════════════════════════════════════════
+    const TRES = IS_MOB ? 56 : 88;
+    const desertMat = new THREE.ShaderMaterial({
+      uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() } },
+      vertexShader: `
+    varying vec3 vWorldPos;
+    varying vec3 vNormal;
+    varying float vH;
+    void main(){
+      vec4 wp=modelMatrix*vec4(position,1.);
+      vWorldPos=wp.xyz;
+      vNormal=normalize(normalMatrix*normal);
+      vH=position.y;
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
+    }`,
+      fragmentShader: `
+    precision highp float;
+    uniform float uTime;
+    uniform vec3 uColA,uColB;
+    varying vec3 vWorldPos,vNormal;
+    varying float vH;
+
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
+    float noise(vec2 p){
+      vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+      return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),
+                 mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);
+    }
+    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<6;i++){v+=a*noise(p);p*=2.07;a*=.48;}return v;}
+
+    void main(){
+      vec2 xz=vWorldPos.xz;
+
+      // Multi-scale sand texture
+      float n1=fbm(xz*.06);           // large dune shapes
+      float n2=fbm(xz*.25+vec2(1.7)); // medium ripples
+      float n3=fbm(xz*1.2 +vec2(3.1)); // fine sand grain
+      float n4=noise(xz*4.+vec2(uTime*.02)); // very fine shimmer
+
+      // Sand base color — interpolated between two animated colors
+      vec3 sandBase=mix(uColA,uColB,n1);
+      // Warm golden base tint
+      vec3 sandWarm=vec3(.72,.52,.28);
+      sandBase=mix(sandBase,sandWarm,.45);
+
+      // Ripple shading — darker in troughs, lighter on crests
+      float ripple=n2*.5+n3*.25+n4*.1;
+      sandBase=mix(sandBase*.65,sandBase*1.2,ripple);
+
+      // Normal-based lighting (dune face shadowing)
+      vec3 lightDir=normalize(vec3(.6,.5,-.4));
+      float diff=max(0.,dot(normalize(vNormal),lightDir));
+
+      // Key light (animated color from uColA)
+      vec3 keyCol=uColA*3.+vec3(.2,.15,.05);
+      // Fill — complementary color from uColB
+      vec3 fillCol=uColB*1.5+vec3(.05,.03,.08);
+      // Ambient — very dark
+      vec3 amb=vec3(.04,.02,.06);
+
+      vec3 lit=sandBase*(amb+keyCol*diff*.6+fillCol*(1.-diff)*.25);
+
+      // Specular glint on sand crests — tiny bright points
+      float spec=pow(max(0.,dot(reflect(-lightDir,normalize(vNormal)),normalize(cameraPosition-vWorldPos))),80.);
+      lit+=vec3(.8,.9,1.)*spec*.3*n4;
+
+      // Subsurface glow in sand — fantasy world, sand glows faintly
+      lit+=uColB*.06*n1;
+
+      // Water zone — darken sand near water
+      float wDist=length(vWorldPos.xz)/18.;
+      lit*=mix(.55,1.,clamp(wDist,0.,1.));
+
+      gl_FragColor=vec4(lit,1.);
+    }`
+    });
+
+    // Build dune terrain geometry
+    const tGeo = new THREE.PlaneGeometry(160, 160, TRES, TRES);
+    tGeo.rotateX(-Math.PI / 2);
+    const tPos = tGeo.attributes.position;
+    for (let i = 0; i < tPos.count; i++) {
+      const x = tPos.getX(i), z = tPos.getZ(i);
+      // Layered dune profiles — different frequencies/amplitudes
+      let h = Math.sin(x * .028 + .4) * 6.5     // mega dunes
+        + Math.cos(z * .038 - .3) * 5.2
+        + Math.sin(x * .075 + z * .055) * 2.8  // medium dunes
+        + Math.cos(x * .12 - z * .09) * 1.8
+        + Math.sin((x + z) * .095) * .9      // small ripples
+        + Math.cos(x * .22 + z * .15) * .45;
+      // Flatten oasis zone
+      const d = Math.sqrt(x * x + z * z);
+      const flat = clamp(1 - d / 20, 0, 1);
+      tPos.setY(i, h * (1 - flat * flat * flat) - 3.0);
+    }
+    tPos.needsUpdate = true;
+    tGeo.computeVertexNormals();
+    const terrain = new THREE.Mesh(tGeo, desertMat);
+    terrain.receiveShadow = false;
+    scene.add(terrain);
+
+    // ═══════════════════════════════════════════════════════════════
+    // WATER — improved Gerstner + fantasy color animation
+    // ═══════════════════════════════════════════════════════════════
+    const waterMat = new THREE.ShaderMaterial({
+      transparent: true,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uTime: { value: 0 },
+        uColA: { value: new THREE.Color() },
+        uColB: { value: new THREE.Color() },
+      },
+      vertexShader: `
+    uniform float uTime;
+    varying vec3 vPos,vN;varying float vElev;
+
+    vec3 gerstner(vec2 dir,float steep,float wl,vec3 p,inout vec3 tan,inout vec3 bn){
+      float k=6.2832/wl,c=sqrt(9.8/k),a=steep/k;
+      float f=k*(dot(dir,p.xz)-c*uTime);
+      tan+=vec3(-dir.x*dir.x*(steep*sin(f)), dir.x*(steep*cos(f)),-dir.x*dir.y*(steep*sin(f)));
+      bn +=vec3(-dir.x*dir.y*(steep*sin(f)), dir.y*(steep*cos(f)),-dir.y*dir.y*(steep*sin(f)));
+      return vec3(dir.x*a*cos(f),a*sin(f),dir.y*a*cos(f));
+    }
+
+    void main(){
+      vec3 p=position;
+      vec3 tan=vec3(1,0,0),bn=vec3(0,0,1);
+      p+=gerstner(vec2(.8,.6),.042,4.8,p,tan,bn);
+      p+=gerstner(vec2(-.5,.85),.035,3.2,p,tan,bn);
+      p+=gerstner(vec2(.3,-.9),.025,6.1,p,tan,bn);
+      p+=gerstner(vec2(.95,.3),.018,2.5,p,tan,bn);
+      vN=normalize(cross(bn,tan));
+      vPos=p;vElev=p.y;
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
+    }`,
+      fragmentShader: `
+    precision highp float;
+    uniform float uTime;
+    uniform vec3 uColA,uColB;
+    varying vec3 vPos,vN;varying float vElev;
+
+    void main(){
+      // Water base color from animated sky palette
+      vec3 deep=uColA*.3+vec3(.02,.01,.04);
+      vec3 surf=uColB*.5+vec3(.04,.02,.08);
+      vec3 col=mix(deep,surf,clamp((vElev+.2)*4.,0.,1.));
+
+      // View-dependent fresnel
+      vec3 V=normalize(cameraPosition-vPos);
+      vec3 N=normalize(vN);
+      float fr=pow(1.-max(0.,dot(N,V)),3.5);
+
+      // Specular from two light sources
+      vec3 L1=normalize(vec3(.6,.5,-.4));
+      vec3 L2=normalize(vec3(-.5,.4,.3));
+      float s1=pow(max(0.,dot(reflect(-L1,N),V)),90.);
+      float s2=pow(max(0.,dot(reflect(-L2,N),V)),60.);
+      col+=uColA*s1*1.2;
+      col+=uColB*s2*.8;
+
+      // Fresnel reflection of sky color
+      col=mix(col,uColB*.6+uColA*.4,fr*.55);
+
+      // Foam on crests
+      float foam=smoothstep(.06,.16,vElev)*(.5+.5*sin(vPos.x*7.+vPos.z*5.+uTime))*.25;
+      col=mix(col,uColA*.8+vec3(.4,.4,.5),foam);
+
+      // Subsurface glow
+      col+=uColB*.04*clamp(1.-abs(vElev)/.3,0.,1.);
+
+      gl_FragColor=vec4(col,clamp(.78+fr*.15,0.,1.));
+    }`
+    });
+    const wGeo = new THREE.PlaneGeometry(38, 38, IS_MOB ? 48 : 92, IS_MOB ? 48 : 92);
+    wGeo.rotateX(-Math.PI / 2);
+    const water = new THREE.Mesh(wGeo, waterMat);
+    water.position.y = -3.0;
+    scene.add(water);
+
+    // ═══════════════════════════════════════════════════════════════
+    // RAIN — instanced line segments falling with wind
+    // ═══════════════════════════════════════════════════════════════
+    const RAIN_N = IS_MOB ? 1200 : 3500;
     (function () {
-      const canvas = document.getElementById('hero-canvas');
-      try { const _t = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); if (!_t) throw 0; }
-      catch (_) { document.getElementById('webgl-fallback').style.display = 'block'; canvas.style.display = 'none'; return; }
+      // Each raindrop = short vertical line (2 verts)
+      const rGeo = new THREE.BufferGeometry();
+      const pos = new Float32Array(RAIN_N * 6); // 2 points × 3 coords per drop
+      const rData = new Float32Array(RAIN_N * 4); // x,z,phase,speed per drop
 
-      const isMobile = window.innerWidth < 768;
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor(0x020508, 1);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.3;
+      for (let i = 0; i < RAIN_N; i++) {
+        // Random XZ across the desert, Y will be computed in shader from phase
+        rData[i * 4] = (Math.random() - 0.5) * 90;   // x
+        rData[i * 4 + 1] = (Math.random() - 0.5) * 90;   // z
+        rData[i * 4 + 2] = Math.random();             // phase (0-1)
+        rData[i * 4 + 3] = 0.4 + Math.random() * 0.6;    // speed variation
+        // Initial positions — will be overwritten in animate
+        pos[i * 6] = pos[i * 6 + 3] = rData[i * 4];
+        pos[i * 6 + 1] = pos[i * 6 + 4] = 0;
+        pos[i * 6 + 2] = pos[i * 6 + 5] = rData[i * 4 + 1];
+      }
+      rGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      rGeo.setAttribute('rData', new THREE.InstancedBufferAttribute(rData, 4)); // won't use instanced, just store
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 1500);
-      camera.position.set(0, 2, 14); // starts above cluster, looking at text zone
-
-      // ── Scroll + mouse ────────────────────────────────────────────
-      let rawScroll = 0, smoothScroll = 0;
-      window.addEventListener('scroll', () => {
-        rawScroll = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
+      const rMat = new THREE.LineBasicMaterial({
+        color: 0x88aacc,
+        transparent: true,
+        opacity: 0.18,
       });
-      let mx = 0, my = 0, cmx = 0, cmy = 0;
-      document.addEventListener('mousemove', e => {
-        mx = (e.clientX / window.innerWidth - 0.5) * 2; my = (e.clientY / window.innerHeight - 0.5) * 2;
-      });
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-
-      // ── Utils ─────────────────────────────────────────────────────
-      function rand(a, b) { return a + Math.random() * (b - a); }
-      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-      function eio(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
-      // Smooth fade-in/fade-out band
-      function band(s, lo, hi) {
-        const w = (hi - lo) * 0.15;
-        return clamp((s - lo) / w, 0, 1) * clamp((hi - s) / w, 0, 1);
-      }
-      function fadeIn(s, lo, dur) { return clamp((s - lo) / dur, 0, 1); }
-      function fadeOut(s, hi, dur) { return clamp((hi - s) / dur, 0, 1); }
-
-      // ── Atom colors — vivid metallic (original palette) ──────────
-      const AC = [0xff2244, 0xaaee00, 0xaa22ff, 0x1188ff, 0xff6600, 0x00ddcc, 0xff00aa, 0xffcc00];
-
-      function atomMat(hex) {
-        return new THREE.MeshStandardMaterial({
-          color: hex, roughness: 0.07, metalness: 0.90,
-          transparent: true, opacity: 1.0
-        });
-      }
-      function bondMat(hex) {
-        return new THREE.MeshStandardMaterial({
-          color: hex, roughness: 0.22, metalness: 0.72,
-          transparent: true, opacity: 0.88
-        });
-      }
-
-      const gLg = new THREE.SphereGeometry(0.30, 16, 12);
-      const gMd = new THREE.SphereGeometry(0.20, 14, 10);
-      const gSm = new THREE.SphereGeometry(0.12, 12, 8);
-
-      function mkBond(a, b, color, r) {
-        r = r || 0.065;
-        const dir = new THREE.Vector3().subVectors(b, a), len = dir.length();
-        if (len < 0.001) return new THREE.Object3D();
-        const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 8, 1), bondMat(color));
-        m.position.copy(a).lerp(b, 0.5);
-        m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-        return m;
-      }
-
-      function buildResidue(origin, ci) {
-        const g = new THREE.Group(); g.position.copy(origin);
-        const cA = AC[ci % 8], cB = AC[(ci + 2) % 8], cC = AC[(ci + 4) % 8];
-        const pN = new THREE.Vector3(-0.70, 0, 0), pCa = new THREE.Vector3(0, 0, 0),
-          pC = new THREE.Vector3(0.66, 0.32, 0), pO = new THREE.Vector3(1.02, 0.90, 0.20);
-        const n = new THREE.Mesh(gMd, atomMat(cA)); n.position.copy(pN); g.add(n);
-        const ca = new THREE.Mesh(gLg, atomMat(cB)); ca.position.copy(pCa); g.add(ca);
-        const c = new THREE.Mesh(gMd, atomMat(cB)); c.position.copy(pC); g.add(c);
-        const o = new THREE.Mesh(gSm, atomMat(cC)); o.position.copy(pO); g.add(o);
-        g.add(mkBond(pN, pCa, cA, 0.075)); g.add(mkBond(pCa, pC, cB, 0.075)); g.add(mkBond(pC, pO, cC, 0.05));
-        const scP = new THREE.Vector3(Math.cos(ci * 1.1) * 0.60, -0.50, Math.sin(ci * 1.1) * 0.44);
-        const sc = new THREE.Mesh(gMd, atomMat(AC[(ci + 1) % 8])); sc.position.copy(scP); g.add(sc);
-        g.add(mkBond(pCa, scP, AC[(ci + 1) % 8], 0.04));
-        return g;
-      }
-
-      function buildHelix(origin, n, hr, pitch, ang0, ci) {
-        const g = new THREE.Group(); g.position.copy(origin); const pts = [];
-        for (let i = 0; i < n; i++) {
-          const a = ang0 + i * (Math.PI * 2 / 3.6), y = i * pitch;
-          const pos = new THREE.Vector3(Math.cos(a) * hr, y, Math.sin(a) * hr);
-          const res = buildResidue(pos, ci + i); res.rotation.y = a + Math.PI * 0.5; g.add(res); pts.push(pos);
-        }
-        for (let i = 0; i < pts.length - 1; i++) g.add(mkBond(pts[i], pts[i + 1], AC[ci % 8], 0.14));
-        return g;
-      }
-
-      function buildStrand(origin, n, ci) {
-        const g = new THREE.Group(); g.position.copy(origin); const pts = [];
-        for (let i = 0; i < n; i++) {
-          const pos = new THREE.Vector3(i * 1.25, Math.sin(i * Math.PI) * 0.18, 0);
-          const res = buildResidue(pos, ci + i); res.rotation.y = i % 2 ? Math.PI : 0; g.add(res); pts.push(pos);
-        }
-        for (let i = 0; i < pts.length - 1; i++) g.add(mkBond(pts[i], pts[i + 1], AC[ci % 8], 0.11));
-        return g;
-      }
-
-      // ═══════════════════════════════════════════════════════════════
-      // S0+S1 — ALL AMINO CLUSTERS in one unified group
-      // S0: camera close, only center cluster visible
-      // S1: camera zooms out revealing all clusters drifting toward each other
-      // ═══════════════════════════════════════════════════════════════
-
-      // All clusters live in one group, always in scene
-      const grpAmino = new THREE.Group();
-      grpAmino.position.y = -28; // far below initial camera — revealed on scroll
-      scene.add(grpAmino);
-
-      // Center cluster (the hero one — visible from frame 0)
-      const aDefs = [
-        { fn: 'helix', pos: [-3.0, -0.8, 1.0], rot: [0.55, 0.30, 0.40], n: 7, hr: 0.90, pitch: 0.85, ang: 0.0, ci: 0 },
-        { fn: 'strand', pos: [2.1, -0.4, -1.4], rot: [0.65, 0.50, -0.40], n: 5, ci: 1 },
-        { fn: 'helix', pos: [0.2, -1.6, 1.9], rot: [-0.5, -0.5, 0.60], n: 6, hr: 0.80, pitch: 0.85, ang: 1.0, ci: 2 },
-        { fn: 'strand', pos: [-1.1, 0.7, -1.7], rot: [0.70, 0.35, 0.55], n: 5, ci: 3 },
-        { fn: 'helix', pos: [3.0, -1.4, 0.5], rot: [0.45, -0.6, 0.35], n: 5, hr: 0.75, pitch: 0.80, ang: 0.5, ci: 4 },
-        { fn: 'strand', pos: [-2.7, 0.3, -0.5], rot: [-0.5, 0.65, 0.40], n: 4, ci: 5 },
-      ];
-      const aMs = aDefs.map(d => {
-        const m = d.fn === 'helix'
-          ? buildHelix(new THREE.Vector3(...d.pos), d.n, d.hr, d.pitch, d.ang, d.ci)
-          : buildStrand(new THREE.Vector3(...d.pos), d.n, d.ci);
-        m.rotation.set(...d.rot);
-        // Stamp base opacities at build time — never read live opacity as base
-        m.traverse(ch => {
-          if (ch.isMesh && ch.material && ch.material.opacity !== undefined)
-            ch.material._base = ch.material.opacity;
-        });
-        grpAmino.add(m);
-        return { mesh: m, br: [...d.rot], ph: Math.random() * Math.PI * 2, sp: 0.013 + Math.random() * 0.009 };
-      });
-
-      // Organelle dots (center cluster)
-      const orgG = new THREE.BufferGeometry(); const NP = 180;
-      const oP = new Float32Array(NP * 3), oC = new Float32Array(NP * 3);
-      for (let i = 0; i < NP; i++) {
-        const r = rand(0.5, 6), th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
-        oP[i * 3] = r * Math.sin(ph) * Math.cos(th); oP[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th); oP[i * 3 + 2] = r * Math.cos(ph);
-        const c = new THREE.Color(AC[i % 8]); oC[i * 3] = c.r * 0.4; oC[i * 3 + 1] = c.g * 0.4; oC[i * 3 + 2] = c.b * 0.4;
-      }
-      orgG.setAttribute('position', new THREE.BufferAttribute(oP, 3));
-      orgG.setAttribute('color', new THREE.BufferAttribute(oC, 3));
-      const orgM = new THREE.PointsMaterial({ size: 0.07, vertexColors: true, transparent: true, opacity: 0.55, sizeAttenuation: true });
-      grpAmino.add(new THREE.Points(orgG, orgM));
-
-      // ── 8 satellite clusters — positioned around center, revealed by zoom-out ──
-      // Starts NEAR center (within camera view at z=48) so they appear as camera pulls back
-      // NOT popping in from nowhere — they were always there, just outside initial tight frame
-      const CLUSTER_BASE = [
-        new THREE.Vector3(-8, 2, -3),   // left
-        new THREE.Vector3(7, 1, -4),   // right
-        new THREE.Vector3(-4, -6, -2),   // bottom-left
-        new THREE.Vector3(5, -4, -5),   // bottom-right
-        new THREE.Vector3(-6, 5, -6),   // top-left-back
-        new THREE.Vector3(6, 4, -2),   // top-right
-        new THREE.Vector3(1, -2, -8),   // back-center
-        new THREE.Vector3(-2, 3, -7),   // back-left
-      ];
-      // Varied speeds — very spread out so union is staggered over time
-      const CLUSTER_SPEED = [0.45, 0.70, 0.35, 0.85, 0.55, 0.60, 0.40, 0.75];
-
-      // Final protein positions — tightly packed around center
-      const PROTEIN_TARGET = [
-        new THREE.Vector3(-1.6, 0.5, -0.6),
-        new THREE.Vector3(1.5, 0.3, -0.8),
-        new THREE.Vector3(-0.7, -1.2, -0.4),
-        new THREE.Vector3(0.9, -0.7, 0.3),
-        new THREE.Vector3(-1.0, 1.2, -1.0),
-        new THREE.Vector3(1.2, 0.8, 0.5),
-        new THREE.Vector3(0.2, -0.5, -1.4),
-        new THREE.Vector3(-0.8, 0.6, -1.2),
-      ];
-
-      // Persistent merge state (survives across frames)
-      let globalMergeRatio = 0;
-
-      const clusterGroups = CLUSTER_BASE.map((base, ci) => {
-        const g = new THREE.Group();
-        g.position.copy(base);
-        for (let k = 0; k < 3; k++) {
-          const d = aDefs[(k + ci * 2) % aDefs.length];
-          const off = new THREE.Vector3(rand(-1.3, 1.3), rand(-1.3, 1.3), rand(-1.3, 1.3));
-          const m = d.fn === 'helix'
-            ? buildHelix(off, Math.max(3, d.n - 1), d.hr, d.pitch, d.ang + ci + k, d.ci + ci * 3 + k)
-            : buildStrand(off, d.n, d.ci + ci * 3 + k);
-          m.rotation.set(rand(-1.2, 1.2), rand(-1.2, 1.2), rand(-1.2, 1.2));
-          g.add(m);
-        }
-        // Stamp base opacities at build time
-        g.traverse(ch => {
-          if (ch.isMesh && ch.material && ch.material.opacity !== undefined)
-            ch.material._base = ch.material.opacity;
-        });
-        g.visible = false;
-        grpAmino.add(g);
-        return {
-          g, base: base.clone(), ph: Math.random() * Math.PI * 2,
-          rotSp: rand(0.002, 0.004), // SLOW base rotation speed
-          rotX: 0, rotY: 0          // accumulated rotation (stops when merged)
-        };
-      });
-
-      // ── Protein particle cloud (space-filling CPK model) ────────────
-      // Built from dense overlapping spheres — no visible bonds, just atoms
-      // Revealed when clusters are fully merged
-      // Legacy compat
-      const grpS0 = grpAmino;
-      const grpS1 = grpAmino;
-
-      // ═══════════════════════════════════════════════════════════════
-      // S2 — SINGLE NEURON (isometric view)
-      // ═══════════════════════════════════════════════════════════════
-      const grpS2 = new THREE.Group(); grpS2.visible = false; scene.add(grpS2);
-      grpS2.rotation.x = 0.52; grpS2.rotation.y = 0.79;
-
-      const somaM = new THREE.MeshPhongMaterial({ color: 0xdd8844, specular: 0xffddaa, shininess: 150, emissive: 0xff6600, emissiveIntensity: 0, transparent: true, opacity: 0.95 });
-      const axonM = new THREE.MeshPhongMaterial({ color: 0xeeaa55, specular: 0xffddaa, shininess: 80, transparent: true, opacity: 0.90 });
-      const myM = new THREE.MeshPhongMaterial({ color: 0xfffaf0, specular: 0xffffff, shininess: 200, transparent: true, opacity: 0.65 });
-
-      const somaR = 1.2;
-      const soma = new THREE.Mesh(new THREE.SphereGeometry(somaR, 32, 24), somaM); grpS2.add(soma);
-      // Nucleus
-      const nucleusMesh = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 10),
-        new THREE.MeshPhongMaterial({ color: 0x331100, specular: 0x440000, shininess: 30, transparent: true, opacity: 0.75 }));
-      nucleusMesh.position.set(0.15, 0.1, 0); grpS2.add(nucleusMesh);
-
-      // Nucleolus
-      const nucleolusMesh = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8),
-        new THREE.MeshPhongMaterial({ color: 0x662200, specular: 0x880000, shininess: 50, transparent: true, opacity: 0.9 }));
-      nucleolusMesh.position.set(0.22, 0.15, 0.05); grpS2.add(nucleolusMesh);
-
-      const ASEGS = 14; const axPts = [new THREE.Vector3(0, -somaR, 0)];
-      for (let i = 0; i < ASEGS; i++) {
-        const pr = axPts[axPts.length - 1];
-        const nr = new THREE.Vector3(pr.x + Math.sin(i * 0.42) * 0.24, pr.y - 1.55, pr.z + Math.cos(i * 0.55) * 0.18);
-        const r = Math.max(0.025, (0.22 - i * 0.013));
-        const seg = mkBond(pr, nr, 0xeeaa55, r);
-        grpS2.add(seg); axPts.push(nr);
-      }
-      for (let i = 1; i < ASEGS - 1; i += 2) {
-        const sh = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.07, 8, 20), myM);
-        sh.position.copy(axPts[i]); sh.rotation.x = Math.PI / 2; grpS2.add(sh);
-      }
-      // Axon terminals
-      for (let b = 0; b < 6; b++) {
-        const a2 = (b / 6) * Math.PI * 2;
-        const btn = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8),
-          new THREE.MeshPhongMaterial({ color: 0xff8833, specular: 0xffaa44, shininess: 180, emissive: 0xff5500, emissiveIntensity: 0.5, transparent: true, opacity: 0.92 }));
-        btn.position.set(axPts[ASEGS].x + Math.cos(a2) * 0.55, axPts[ASEGS].y, axPts[ASEGS].z + Math.sin(a2) * 0.55);
-        grpS2.add(btn);
-      }
-      // Dendrites
-      const dTips = [];
-      for (let d = 0; d < 8; d++) {
-        const ba = (d / 8) * Math.PI * 2; let prv2 = new THREE.Vector3(0, 0, 0);
-        for (let seg = 0; seg < 5; seg++) {
-          const r2 = Math.max(0.020, (0.18 - seg * 0.030));
-          const len = rand(0.80, 1.30);
-          const nxt2 = new THREE.Vector3(
-            prv2.x + Math.cos(ba + rand(-0.4, 0.4)) * len + rand(-0.15, 0.15),
-            prv2.y + rand(0.1, 0.6) * len, prv2.z + Math.sin(ba + rand(-0.4, 0.4)) * len + rand(-0.15, 0.15)
-          );
-          grpS2.add(mkBond(prv2, nxt2, 0xcc8844, r2)); prv2 = nxt2;
-          if (seg === 4) {
-            // Each tip gets its OWN material instance to avoid shared-material crash
-            const tipMat = new THREE.MeshPhongMaterial({ color: 0xffdd44, specular: 0xffffff, shininess: 200, emissive: 0xffaa00, emissiveIntensity: 0, transparent: true, opacity: 0.92 });
-            const tip = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), tipMat);
-            tip.position.copy(nxt2); grpS2.add(tip); dTips.push({ mesh: tip, mat: tipMat });
-          }
-        }
-      }
-      // Pulse sphere + halo
-      const pulseCoreMat = new THREE.MeshPhongMaterial({ color: 0x88ffee, specular: 0xffffff, shininess: 300, emissive: 0x44ffcc, emissiveIntensity: 5, transparent: true, opacity: 0.95 });
-      const pulseCore = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), pulseCoreMat); grpS2.add(pulseCore);
-      const pulseHaloMat = new THREE.MeshBasicMaterial({ color: 0x44ffcc, transparent: true, opacity: 0.08, side: THREE.DoubleSide });
-      const pulseHalo = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 10), pulseHaloMat); grpS2.add(pulseHalo);
-      // Point light that travels with pulse
-      const pulseLight = new THREE.PointLight(0x44ffcc, 0, 8); grpS2.add(pulseLight);
-
-      // ═══════════════════════════════════════════════════════════════
-      // S3 — NEURAL NETWORK with ELECTRIC BOLT SYNAPSES
-      // ═══════════════════════════════════════════════════════════════
-      const grpS3 = new THREE.Group(); grpS3.visible = false; scene.add(grpS3);
-      const NDEF = [
-        { p: [0, 0, 0], r: [0.0, 0.0, 0.0], sc: 0.58 },
-        { p: [-10, 5, -4], r: [0.8, 0.3, -0.4], sc: 0.52 },
-        { p: [9, 3, -6], r: [-0.5, 0.6, 0.3], sc: 0.48 },
-        { p: [-5, -6, -3], r: [0.6, -0.4, 0.7], sc: 0.50 },
-        { p: [4, -5, -8], r: [0.3, 0.8, -0.5], sc: 0.46 },
-        { p: [0, 8, -10], r: [-0.4, -0.3, 0.6], sc: 0.48 },
-        { p: [-9, 1, -9], r: [0.7, 0.5, -0.3], sc: 0.44 },
-        { p: [8, -2, -13], r: [-0.6, 0.4, 0.5], sc: 0.44 },
-      ];
-
-      function buildMini(g, sc) {
-        // soma
-        g.add(new THREE.Mesh(new THREE.SphereGeometry(1.1 * sc, 16, 12),
-          new THREE.MeshPhongMaterial({ color: 0xdd8844, specular: 0xffddaa, shininess: 130, emissive: 0xff6600, emissiveIntensity: 0.1, transparent: true, opacity: 0.92 })));
-        // axon
-        let pr = new THREE.Vector3(0, -1.1 * sc, 0);
-        for (let i = 0; i < 8; i++) {
-          const r = Math.max(0.020, (0.16 - i * 0.015)) * sc;
-          const nx = new THREE.Vector3(pr.x + Math.sin(i * 0.4) * 0.20 * sc, pr.y - 1.4 * sc, pr.z + Math.cos(i * 0.55) * 0.16 * sc);
-          g.add(mkBond(pr, nx, 0xeeaa55, r)); pr = nx;
-          if (i % 2 === 1) {
-            const sh = new THREE.Mesh(new THREE.TorusGeometry(0.20 * sc, 0.055 * sc, 6, 14),
-              new THREE.MeshPhongMaterial({ color: 0xfffaf0, specular: 0xffffff, shininess: 200, transparent: true, opacity: 0.55 }));
-            sh.position.copy(pr); sh.rotation.x = Math.PI / 2; g.add(sh);
-          }
-        }
-        // dendrites
-        for (let d = 0; d < 6; d++) {
-          const ba = (d / 6) * Math.PI * 2; let p2 = new THREE.Vector3(0, 0, 0);
-          for (let seg = 0; seg < 4; seg++) {
-            const r2 = Math.max(0.014, (0.11 - seg * 0.020)) * sc;
-            const len = rand(0.60, 0.95) * sc;
-            const n2 = new THREE.Vector3(p2.x + Math.cos(ba + rand(-0.4, 0.4)) * len, p2.y + rand(0.1, 0.5) * len, p2.z + Math.sin(ba + rand(-0.4, 0.4)) * len);
-            g.add(mkBond(p2, n2, 0xcc8844, r2)); p2 = n2;
-          }
-        }
-      }
-
-      const nGrps = NDEF.map(def => {
-        const g = new THREE.Group(); g.position.set(...def.p); g.rotation.set(...def.r);
-        buildMini(g, def.sc); grpS3.add(g);
-        return { g, ph: Math.random() * Math.PI * 2 };
-      });
-
-      // ELECTRIC BOLT synapses — stochastic random flashes like real lightning
-      const synPairs = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [0, 3], [1, 4], [2, 6]];
-      const synBolts = synPairs.map(([ia, ib]) => {
-        const a3 = new THREE.Vector3(...NDEF[ia].p), b3 = new THREE.Vector3(...NDEF[ib].p);
-        const dist = a3.distanceTo(b3);
-        if (dist > 26) return null;
-        const NSEG = 22;
-        const pts = Array.from({ length: NSEG }, () => new THREE.Vector3());
-        const geo = new THREE.BufferGeometry().setFromPoints(pts);
-        const mat = new THREE.LineBasicMaterial({ color: 0x66ffdd, transparent: true, opacity: 0, linewidth: 1 });
-        const line = new THREE.Line(geo, mat); grpS3.add(line);
-        return {
-          line, geo, pts, a: a3, b: b3, mat, dist,
-          active: false, nextFire: rand(0.1, 3.0), holdTime: 0,
-          cooldown: rand(0.5, 2.5)
-        };
-      }).filter(Boolean);
-
-      // Spark particles along bolts
-      const NS2 = 60, spkG2 = new THREE.BufferGeometry(), spkP2 = new Float32Array(NS2 * 3);
-      const spkSt2 = Array.from({ length: NS2 }, () => ({ t: Math.random(), sp: rand(0.007, 0.022), bi: Math.floor(Math.random() * synBolts.length) }));
-      spkG2.setAttribute('position', new THREE.BufferAttribute(spkP2, 3));
-      const spkM2 = new THREE.PointsMaterial({ size: 0.22, color: 0x99ffee, transparent: true, opacity: 0, sizeAttenuation: true });
-      grpS3.add(new THREE.Points(spkG2, spkM2));
-
-      // ═══════════════════════════════════════════════════════════════
-      // S5+S6 — HUMAN HEAD (iridescent mesh + brain particles)
-      // ═══════════════════════════════════════════════════════════════
-      const grpHead = new THREE.Group(); grpHead.visible = false; scene.add(grpHead);
-
-      // ── Iridescent skin using onBeforeCompile ────────────────────
-      // Simulates thin-film interference: colour shifts with viewing angle
-      const skinBase = new THREE.MeshStandardMaterial({
-        color: 0x99bbcc, roughness: 0.08, metalness: 0.88,
-        transparent: true, opacity: 0.38, side: THREE.DoubleSide, depthWrite: false,
-      });
-      skinBase.onBeforeCompile = function (shader) {
-        shader.fragmentShader = shader.fragmentShader.replace(
-          'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
-          `// Iridescent thin-film shift based on view angle
-      vec3 viewN = normalize(vNormal);
-      float vd = abs(dot(viewN, normalize(cameraPosition - vViewPosition)));
-      float shift = vd * 3.14159;
-      vec3 irid = vec3(
-        0.5+0.5*sin(shift+0.0),
-        0.5+0.5*sin(shift+2.094),
-        0.5+0.5*sin(shift+4.189)
-      ) * 0.35;
-      gl_FragColor = vec4( outgoingLight + irid, diffuseColor.a );`
-        );
-      };
-      skinBase.needsUpdate = true;
-
-      const wireSkinM = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.09, wireframe: true });
-
-      // Cranium (head shape)
-      const cranGeo = new THREE.SphereGeometry(5.0, 64, 44);
-      const cranium = new THREE.Mesh(cranGeo, skinBase);
-      cranium.scale.set(0.92, 1.02, 0.86); grpHead.add(cranium);
-      const cranWire = new THREE.Mesh(cranGeo, wireSkinM);
-      cranWire.scale.copy(cranium.scale).multiplyScalar(1.003); grpHead.add(cranWire);
-
-      // Forehead bump
-      const fbump = new THREE.Mesh(new THREE.SphereGeometry(4.2, 40, 30), skinBase);
-      fbump.scale.set(0.80, 0.55, 0.52); fbump.position.set(0, 2.2, 3.2); grpHead.add(fbump);
-      const fbWire = new THREE.Mesh(new THREE.SphereGeometry(4.2, 24, 18), wireSkinM);
-      fbWire.scale.copy(fbump.scale).multiplyScalar(1.003); fbWire.position.copy(fbump.position); grpHead.add(fbWire);
-
-      // Jaw/lower face
-      const jawGeo = new THREE.SphereGeometry(3.6, 44, 30);
-      const jaw = new THREE.Mesh(jawGeo, skinBase);
-      jaw.scale.set(0.78, 1.05, 0.68); jaw.position.set(0, -3.8, 0.3); grpHead.add(jaw);
-      const jawWire = new THREE.Mesh(jawGeo, wireSkinM);
-      jawWire.scale.copy(jaw.scale).multiplyScalar(1.003); jawWire.position.copy(jaw.position); grpHead.add(jawWire);
-
-      // Neck
-      const neck = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.8, 3.0, 24), skinBase);
-      neck.position.set(0, -6.4, 0); grpHead.add(neck);
-
-      // Eye socket depressions (dark ellipsoids)
-      [-1.8, 1.8].forEach(ex => {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 12),
-          new THREE.MeshBasicMaterial({ color: 0x000811, transparent: true, opacity: 0.85 }));
-        eye.scale.set(1, 0.65, 0.5); eye.position.set(ex, 0.6, 4.2); grpHead.add(eye);
-        // Subtle rim highlight
-        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.65, 0.06, 8, 24),
-          new THREE.MeshBasicMaterial({ color: 0x88bbdd, transparent: true, opacity: 0.35 }));
-        rim.scale.set(1, 0.65, 1); rim.position.copy(eye.position); rim.position.z += 0.12;
-        rim.rotation.x = Math.PI * 0.15; grpHead.add(rim);
-      });
-
-      // Nose ridge
-      const nose = new THREE.Mesh(new THREE.SphereGeometry(0.55, 12, 10), skinBase);
-      nose.scale.set(0.65, 1.1, 0.85); nose.position.set(0, -0.5, 4.5); grpHead.add(nose);
-
-      // Lips hint
-      const lips = new THREE.Mesh(new THREE.SphereGeometry(0.9, 14, 10), skinBase);
-      lips.scale.set(1.3, 0.4, 0.65); lips.position.set(0, -1.9, 4.1); grpHead.add(lips);
-
-      // Extra iridescent shimmer layers
-      const shimA = new THREE.Mesh(cranGeo, new THREE.MeshBasicMaterial({ color: 0xcc44ff, transparent: true, opacity: 0.035, side: THREE.DoubleSide, depthWrite: false }));
-      shimA.scale.copy(cranium.scale).multiplyScalar(1.007); grpHead.add(shimA);
-      const shimB = new THREE.Mesh(cranGeo, new THREE.MeshBasicMaterial({ color: 0x44ffaa, transparent: true, opacity: 0.028, side: THREE.DoubleSide, depthWrite: false }));
-      shimB.scale.copy(cranium.scale).multiplyScalar(1.014); grpHead.add(shimB);
-      const shimC = new THREE.Mesh(cranGeo, new THREE.MeshBasicMaterial({ color: 0xff6633, transparent: true, opacity: 0.018, side: THREE.DoubleSide, depthWrite: false }));
-      shimC.scale.copy(cranium.scale).multiplyScalar(1.021); grpHead.add(shimC);
-
-      // ── Brain particles inside head ───────────────────────────────
-      const BN = isMobile ? 12000 : 36000;
-      const bGeo = new THREE.BufferGeometry();
-      const bP = new Float32Array(BN * 3), bC = new Float32Array(BN * 3);
-      function fN(x, y, z) { return (Math.sin(x * 2.1 + y * 1.7) * 0.5 + Math.cos(y * 2.3 + z * 1.9) * 0.5 + Math.sin(z * 1.5 + x * 2.7) * 0.3) * 0.5; }
-      function bCol(nr) {
-        if (nr < 0.22) return [0.40, 0.06, 0.06];
-        if (nr < 0.42) return [0.67, 0.20, 0.07];
-        if (nr < 0.60) return [0.80, 0.40, 0.20];
-        if (nr < 0.73) return [0.73, 0.47, 0.33];
-        if (nr < 0.83) return [0.65, 0.40, 0.35];
-        return Math.abs(fN(nr * 3, nr * 2, nr)) > 0.22 ? [0.27, 0.13, 0.13] : [0.80, 0.53, 0.47];
-      }
-      let fi = 0, tri = 0;
-      while (fi < BN && tri < BN * 5) {
-        tri++;
-        const u = rand(-1, 1), v = rand(-1, 1), w = rand(-1, 1);
-        if (u * u + v * v + w * w > 1) continue;
-        const xw = u * 3.9, yw = v * 4.4 + 0.3, zw = w * 3.5;
-        const nr = Math.sqrt(u * u + v * v + w * w);
-        const fold = fN(xw * 0.09, yw * 0.09, zw * 0.1) * 0.70;
-        const th = Math.atan2(v, u);
-        bP[fi * 3] = xw + fold * Math.cos(th); bP[fi * 3 + 1] = yw + fold * 0.42; bP[fi * 3 + 2] = zw + fold * Math.sin(th);
-        const [r2, g2, b2] = bCol(nr); bC[fi * 3] = r2; bC[fi * 3 + 1] = g2; bC[fi * 3 + 2] = b2; fi++;
-      }
-      bGeo.setAttribute('position', new THREE.BufferAttribute(bP, 3));
-      bGeo.setAttribute('color', new THREE.BufferAttribute(bC, 3));
-      const brainM = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0, sizeAttenuation: true });
-      const brainPts = new THREE.Points(bGeo, brainM); brainPts.position.set(0, 0.3, 0); grpHead.add(brainPts);
-
-      // Neural surface sparks
-      const SNS = 120, bsG = new THREE.BufferGeometry(), bsP3 = new Float32Array(SNS * 3);
-      const bsSt3 = Array.from({ length: SNS }, () => ({ th: Math.random() * Math.PI * 2, ph: Math.random() * Math.PI, t: Math.random(), sp: rand(0.003, 0.012) }));
-      bsG.setAttribute('position', new THREE.BufferAttribute(bsP3, 3));
-      const bsM = new THREE.PointsMaterial({ size: 0.35, color: 0xffcc55, transparent: true, opacity: 0, sizeAttenuation: true });
-      grpHead.add(new THREE.Points(bsG, bsM));
-
-      // Inner glow sphere
-      const innerGlow = new THREE.Mesh(new THREE.SphereGeometry(3.8, 20, 14),
-        new THREE.MeshBasicMaterial({ color: 0xff6622, transparent: true, opacity: 0, side: THREE.BackSide }));
-      innerGlow.scale.set(0.92, 1.0, 0.86); grpHead.add(innerGlow);
-
-      // Spiritual bg sphere
-      const spirM = new THREE.MeshBasicMaterial({ color: 0x220044, transparent: true, opacity: 0, side: THREE.BackSide });
-      scene.add(new THREE.Mesh(new THREE.SphereGeometry(400, 16, 10), spirM));
-
-      // ═══════════════════════════════════════════════════════════════
-      // BACKGROUND: distant amino clusters (CPK-colored dot groups)
-      // These replace generic square particles — each "dot" group
-      // looks like a tiny amino cluster drifting far in space
-      // ═══════════════════════════════════════════════════════════════
-      // Distant background amino clusters — rendered as tiny SPHERE meshes (not points)
-      // so they look like genuine amino structures, never squares
-      const CPK = [0xff2244, 0x1188ff, 0xdddddd, 0xaaee00, 0xff6600, 0x00ddcc, 0xffcc00, 0xaa22ff];
-      const DIST_N = isMobile ? 55 : 140;
-      const _bgAtomGeo = new THREE.SphereGeometry(0.12, 6, 5); // tiny sphere per dot
-      const _bgBondGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.55, 5, 1);
-      for (let ci = 0; ci < DIST_N; ci++) {
-        const th2 = Math.random() * Math.PI * 2, ph2 = Math.acos(2 * Math.random() - 1), r2 = rand(55, 145);
-        const cx = r2 * Math.sin(ph2) * Math.cos(th2), cy = r2 * Math.sin(ph2) * Math.sin(th2), cz = r2 * Math.cos(ph2);
-        const colA = new THREE.Color(CPK[ci % CPK.length]);
-        const colB = new THREE.Color(CPK[(ci + 3) % CPK.length]);
-        const grpBg = new THREE.Group(); grpBg.position.set(cx, cy, cz);
-        // 4-6 atoms per distant cluster
-        const nA = 4 + Math.floor(Math.random() * 3);
-        const atomPts = [];
-        for (let a = 0; a < nA; a++) {
-          const ar = rand(0.0, 0.9), at = Math.random() * Math.PI * 2, ap = Math.acos(2 * Math.random() - 1);
-          const ap3 = new THREE.Vector3(ar * Math.sin(ap) * Math.cos(at), ar * Math.sin(ap) * Math.sin(at), ar * Math.cos(ap));
-          const amat = new THREE.MeshStandardMaterial({ color: a % 2 === 0 ? colA : colB, roughness: 0.15, metalness: 0.75, transparent: true, opacity: 0.55 });
-          const am = new THREE.Mesh(_bgAtomGeo, amat); am.position.copy(ap3); grpBg.add(am);
-          atomPts.push(ap3);
-        }
-        // 2-3 bonds between adjacent atoms
-        for (let b = 0; b < Math.min(3, atomPts.length - 1); b++) {
-          const a3 = atomPts[b], b3 = atomPts[b + 1];
-          const dir = new THREE.Vector3().subVectors(b3, a3), len = dir.length();
-          if (len < 0.001) continue;
-          const bGeo = new THREE.CylinderGeometry(0.025, 0.025, len, 5, 1);
-          const bmat = new THREE.MeshStandardMaterial({ color: colA, roughness: 0.3, metalness: 0.5, transparent: true, opacity: 0.35 });
-          const bm = new THREE.Mesh(bGeo, bmat);
-          bm.position.copy(a3).lerp(b3, 0.5);
-          bm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-          grpBg.add(bm);
-        }
-        // Random static orientation
-        grpBg.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI);
-        scene.add(grpBg);
-      }
-
-      // True stars — tiny, very far, white/blue
-      const SN = isMobile ? 500 : 1400;
-      const sG = new THREE.BufferGeometry(); const sP = new Float32Array(SN * 3), sC = new Float32Array(SN * 3);
-      for (let i = 0; i < SN; i++) {
-        const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), r = rand(150, 320);
-        sP[i * 3] = r * Math.sin(ph) * Math.cos(th); sP[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th); sP[i * 3 + 2] = r * Math.cos(ph);
-        const p = Math.random();
-        if (p < 0.3) { sC[i * 3] = 0.70; sC[i * 3 + 1] = 0.85; sC[i * 3 + 2] = 1.0; }
-        else if (p < 0.7) { sC[i * 3] = 1; sC[i * 3 + 1] = 1; sC[i * 3 + 2] = 1; }
-        else { sC[i * 3] = 1; sC[i * 3 + 1] = 0.92; sC[i * 3 + 2] = 0.78; }
-      }
-      sG.setAttribute('position', new THREE.BufferAttribute(sP, 3));
-      sG.setAttribute('color', new THREE.BufferAttribute(sC, 3));
-      const starM = new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true, opacity: 0.60, sizeAttenuation: true });
-      scene.add(new THREE.Points(sG, starM));
-      // Solar giant emissive stars
-      const gCols = [0xff8800, 0xffdd44, 0xff3311, 0xaaccff, 0xffff88];
-      const gG3 = new THREE.SphereGeometry(0.18, 8, 6);
-      for (let i = 0; i < (isMobile ? 6 : 16); i++) {
-        const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), r = rand(100, 230);
-        const gm = new THREE.MeshStandardMaterial({ color: gCols[i % 5], roughness: 0, metalness: 0, emissive: gCols[i % 5], emissiveIntensity: 3 + Math.random() * 2 });
-        const gs = new THREE.Mesh(gG3, gm); gs.position.set(r * Math.sin(ph) * Math.cos(th), r * Math.sin(ph) * Math.sin(th), r * Math.cos(ph)); scene.add(gs);
-      }
-
-      // ═══════════════════════════════════════════════════════════════
-      // LIGHTS
-      // ═══════════════════════════════════════════════════════════════
-      scene.add(new THREE.AmbientLight(0x0a0820, 6));
-      const sunL = new THREE.DirectionalLight(0xffffff, 2.0); sunL.position.set(8, 14, 10); scene.add(sunL);
-      const fillL = new THREE.PointLight(0x4466ff, 2.5, 120); fillL.position.set(-14, 7, 9); scene.add(fillL);
-      const rimL = new THREE.PointLight(0xff5522, 2.0, 100); rimL.position.set(10, -9, -14); scene.add(rimL);
-      const headKeyL = new THREE.PointLight(0xeeeeff, 0, 50); headKeyL.position.set(6, 10, 14); scene.add(headKeyL);
-      const headFillL = new THREE.PointLight(0xff8844, 0, 40); headFillL.position.set(-8, 4, -6); scene.add(headFillL);
-      const brainGlowL = new THREE.PointLight(0xff6622, 0, 24); brainGlowL.position.set(0, 0.5, 0); scene.add(brainGlowL);
-
-      // ═══════════════════════════════════════════════════════════════
-      // CAMERA KEYFRAMES
-      // ═══════════════════════════════════════════════════════════════
-      const CAMS = [
-        { s: 0.00, p: [0, 2, 14], t: [0, 1, 0] },    // hero: above cluster, particles visible
-        { s: 0.06, p: [0, -5, 14], t: [0, -12, 0] },    // scroll begins — camera tilts down toward cluster
-        { s: 0.13, p: [2, -16, 22], t: [0, -28, -2] },   // cluster comes into view as we zoom out
-        { s: 0.20, p: [-3, -22, 35], t: [0, -28, -5] },  // wider — satellite clusters appear
-        { s: 0.27, p: [4, -24, 48], t: [0, -28, -8] },   // full cluster field visible + attraction
-        { s: 0.33, p: [4, 20, 44], t: [0, 0, 0] },    // S2 isometric neuron approach
-        { s: 0.44, p: [3, 17, 35], t: [0, -4, 0] },    // S2 neuron
-        { s: 0.48, p: [1, 11, 58], t: [0, 0, -7] },    // S3 network
-        { s: 0.58, p: [0, 9, 70], t: [0, 2, -8] },    // S3 wide
-        { s: 0.66, p: [7, 16, 84], t: [0, 0, -5] },    // S4 space blue
-        { s: 0.71, p: [1, 3, 44], t: [0, 0, 0] },    // S5 head
-        { s: 0.80, p: [-2, 1, 30], t: [0, -0.5, 0] },   // S5 close
-        { s: 0.88, p: [3, 5, 42], t: [0, 0, 0] },    // S6 wider
-        { s: 1.00, p: [0, 7, 60], t: [0, 0, 0] },    // S7 fade
-      ];
-      function getCam(s) {
-        let lo = 0, hi = 1;
-        for (let i = 0; i < CAMS.length - 1; i++) { if (s >= CAMS[i].s && s <= CAMS[i + 1].s) { lo = i; hi = i + 1; break; } }
-        const span = CAMS[hi].s - CAMS[lo].s, f = span < 0.001 ? 0 : eio((s - CAMS[lo].s) / span);
-        const lp = CAMS[lo].p, hp = CAMS[hi].p, lt = CAMS[lo].t, ht = CAMS[hi].t;
-        return {
-          pos: new THREE.Vector3(lp[0] + (hp[0] - lp[0]) * f, lp[1] + (hp[1] - lp[1]) * f, lp[2] + (hp[2] - lp[2]) * f),
-          tgt: new THREE.Vector3(lt[0] + (ht[0] - lt[0]) * f, lt[1] + (ht[1] - lt[1]) * f, lt[2] + (ht[2] - lt[2]) * f),
-        };
-      }
-
-      // Background colour keyframes
-      const BG = [
-        { s: 0.00, c: [0.008, 0.020, 0.031] },
-        { s: 0.55, c: [0.008, 0.020, 0.031] },
-        { s: 0.65, c: [0.012, 0.038, 0.100] },
-        { s: 0.76, c: [0.022, 0.016, 0.094] },
-        { s: 0.82, c: [0.038, 0.008, 0.122] },
-        { s: 0.93, c: [0.030, 0.005, 0.090] },
-        { s: 1.00, c: [0.008, 0.020, 0.031] },
-      ];
-      function getBg(s) {
-        let lo = 0, hi = BG.length - 1;
-        for (let i = 0; i < BG.length - 1; i++) { if (s >= BG[i].s && s <= BG[i + 1].s) { lo = i; hi = i + 1; break; } }
-        const span = BG[hi].s - BG[lo].s, f = span < 0.001 ? 0 : (s - BG[lo].s) / span;
-        const a = BG[lo].c, b = BG[hi].c;
-        return new THREE.Color(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f);
-      }
-
-      // ═══════════════════════════════════════════════════════════════
-      // ANIMATE
-      // ═══════════════════════════════════════════════════════════════
-      const clock = new THREE.Clock();
-      let pulseT = 0;
-      let prevT = 0;
-
-      function setGroupAlpha(grp, alpha) {
-        grp.traverse(child => {
-          if (child.isMesh && child.material) {
-            const m = child.material;
-            if (Array.isArray(m)) { m.forEach(mat => { if (mat.transparent && mat.opacity !== undefined) mat.opacity = Math.min(mat._base || mat.opacity, alpha); }); }
-            else if (m.transparent && m.opacity !== undefined) {
-              if (m._base === undefined) m._base = m.opacity;
-              m.opacity = m._base * alpha;
-            }
-          }
-        });
-      }
-
-      function animate() {
-        requestAnimationFrame(animate);
-        const t = clock.getElapsedTime();
-        const dt = Math.min(t - prevT, 0.05); prevT = t; // cap dt to avoid huge jumps
-        smoothScroll += (rawScroll - smoothScroll) * 0.050;
-        cmx += (mx - cmx) * 0.04; cmy += (my - cmy) * 0.04;
-        const s = smoothScroll;
-
-        // Background + fog
-        const bg = getBg(s);
-        renderer.setClearColor(bg, 1);
-        scene.fog = new THREE.FogExp2(bg.getHex(), 0.006);
-        spirM.opacity = clamp((s - 0.77) * 5, 0, 1) * (0.06 + Math.sin(t * 0.28) * 0.02);
-        spirM.color.set(s > 0.83 ? 0x330066 : 0x220044);
-
-        // Camera
-        const cam = getCam(s);
-        camera.position.copy(cam.pos);
-        camera.position.x += cmx * 2.0; camera.position.y += cmy * -1.0;
-        camera.lookAt(cam.tgt);
-
-        // Compute section alphas
-        // grpAmino is always visible (S0 from frame 0, S1 as zoom-out reveals clusters)
-        const aminoAlpha = clamp(fadeOut(s, 0.38, 0.07), 0, 1); // fade out when S2 takes over
-        const aS1reveal = clamp(fadeIn(s, 0.10, 0.08), 0, 1);  // 0→1 as clusters reveal
-        const aS2 = clamp(fadeIn(s, 0.28, 0.06), 0, 1) * clamp(fadeOut(s, 0.54, 0.07), 0, 1);
-        const aS3 = clamp(fadeIn(s, 0.42, 0.06), 0, 1) * clamp(fadeOut(s, 0.74, 0.07), 0, 1);
-        const aHd = clamp(fadeIn(s, 0.65, 0.07), 0, 1) * clamp(fadeOut(s, 0.97, 0.06), 0, 1);
-
-        grpAmino.visible = aminoAlpha > 0.001;
-        grpS2.visible = aS2 > 0.001; grpS3.visible = aS3 > 0.001; grpHead.visible = aHd > 0.001;
-
-        // ── Center amino cluster — always on from frame 0 ─────────
-        if (grpAmino.visible) {
-          // Center cluster: gentle rotation, opacity driven by _base (never corrupted)
-          aMs.forEach(m => {
-            const sp = m.sp * 0.18, ph = m.ph; // 0.18x = very slow drift oscillation
-            m.mesh.rotation.y = m.br[1] + Math.sin(t * sp + ph) * 0.12;
-            m.mesh.rotation.x = m.br[0] + Math.cos(t * sp * 0.7 + ph) * 0.08;
-            m.mesh.rotation.z = m.br[2] + Math.sin(t * sp * 0.5 + ph + 1.2) * 0.06;
-            // Restore full opacity from _base — never let it drift
-            m.mesh.traverse(ch => {
-              if (ch.isMesh && ch.material && ch.material._base !== undefined)
-                ch.material.opacity = ch.material._base * aminoAlpha;
-            });
-          });
-          orgM.opacity = aminoAlpha * 0.50;
-
-          // ── Satellite clusters: staggered gravity approach ──────────
-          let worstMerge = 1.0;
-          clusterGroups.forEach((cg, ci) => {
-            // Staggered fade-in: each cluster appears a bit later than previous
-            const appearAt = ci * 0.045;
-            const appeared = clamp((aS1reveal - appearAt) / 0.04, 0, 1);
-            if (appeared < 0.001) { cg.g.visible = false; return; }
-            cg.g.visible = true;
-
-            // Individual attraction progress — each cluster has its own speed
-            const rawAttract = clamp((aS1reveal - appearAt) * CLUSTER_SPEED[ci] * 2.0, 0, 1);
-            const attract = eio(rawAttract);
-            worstMerge = Math.min(worstMerge, rawAttract);
-
-            // Once fully merged, lock position and stop rotating
-            if (rawAttract >= 1.0) {
-              cg.g.position.set(PROTEIN_TARGET[ci].x, PROTEIN_TARGET[ci].y, PROTEIN_TARGET[ci].z);
-              // opacity: bonds invisible, atoms full
-              cg.g.traverse(ch => {
-                if (ch.isMesh && ch.material && ch.material._base !== undefined) {
-                  const isCyl = ch.geometry && ch.geometry.type === 'CylinderGeometry';
-                  ch.material.opacity = isCyl ? 0 : ch.material._base * aminoAlpha;
-                }
-              });
-              return; // no position/rotation update
-            }
-
-            const base = CLUSTER_BASE[ci];
-            const tgt = PROTEIN_TARGET[ci];
-
-            // Gentle organic oscillation that fades as cluster approaches
-            const oscAmp = (1 - attract) * 0.55;
-            cg.g.position.set(
-              base.x + (tgt.x - base.x) * attract + Math.sin(t * 0.14 + cg.ph) * oscAmp,
-              base.y + (tgt.y - base.y) * attract + Math.cos(t * 0.11 + cg.ph * 1.4) * oscAmp,
-              base.z + (tgt.z - base.z) * attract + Math.sin(t * 0.09 + cg.ph * 0.8) * oscAmp
-            );
-
-            // Fade in. Bonds start fading near merge end.
-            const alpha = appeared * aminoAlpha;
-            const bondFade = clamp(1 - attract * 0.9, 0.08, 1);
-            cg.g.traverse(ch => {
-              if (ch.isMesh && ch.material && ch.material._base !== undefined) {
-                const isCyl = ch.geometry && ch.geometry.type === 'CylinderGeometry';
-                ch.material.opacity = ch.material._base * alpha * (isCyl ? bondFade : 1);
-              }
-            });
-
-            // Rotation: only while traveling — SLOW, stops smoothly at destination
-            const rotActive = clamp(1 - attract, 0, 1); // 1 when far, 0 when arrived
-            cg.rotX = (cg.rotX || 0) + cg.rotSp * rotActive;
-            cg.rotY = (cg.rotY || 0) + cg.rotSp * 0.6 * rotActive;
-            cg.g.rotation.x = cg.rotX;
-            cg.g.rotation.y = cg.rotY;
-          });
-
-          // ── Update global merge ratio (persistent, only increases) ──
-          globalMergeRatio = Math.max(globalMergeRatio, clamp((worstMerge - 0.88) / 0.12, 0, 1));
-
-          // ── Protein: slow unified rotation ONLY once all clusters settled ──
-          // Uses globalMergeRatio so it never resets if scroll goes back
-          if (globalMergeRatio > 0) {
-            grpAmino.rotation.y += 0.0018 * globalMergeRatio; // very slow
-          }
-        }
-
-        // ── S2 neuron + pulse ────────────────────────────────────
-        if (grpS2.visible) {
-          pulseT = (pulseT + 0.0065) % 1.0;
-          const pi = clamp(Math.floor(pulseT * (axPts.length - 1)), 0, axPts.length - 2);
-          const pf = pulseT * (axPts.length - 1) - pi;
-          const pp = axPts[pi].clone().lerp(axPts[pi + 1], pf);
-          pulseCore.position.copy(pp); pulseHalo.position.copy(pp); pulseLight.position.copy(pp);
-          pulseCoreMat.opacity = aS2 * 0.94;
-          pulseHaloMat.opacity = aS2 * 0.10;
-          pulseLight.intensity = aS2 * (4 + Math.sin(t * 10) * 2);
-          pulseCoreMat.emissiveIntensity = 3.5 + Math.sin(t * 14) * 2;
-          const atTip = pulseT > 0.88;
-          dTips.forEach((dt, di) => {
-            dt.mat.emissiveIntensity = atTip ? (4 + Math.sin(t * 22 + di * 0.8) * 2) : 0;
-            dt.mat.opacity = aS2 * (atTip ? 0.96 : 0.80);
-          });
-          somaM.emissiveIntensity = pulseT < 0.10 ? (2.5 + Math.sin(t * 8) * 1) : 0;
-          grpS2.rotation.z = Math.sin(t * 0.06) * 0.035;
-        }
-
-        // ── S3 network + stochastic electric bolts ────────────────
-        if (grpS3.visible) {
-          grpS3.rotation.y = t * 0.013;
-          nGrps.forEach((ng, i) => { ng.g.rotation.x += 0.00025; ng.g.rotation.y += 0.00035 + i * 0.00008; });
-          synBolts.forEach(sb => {
-            if (!sb) return;
-            sb.nextFire -= dt;
-            if (!sb.active && sb.nextFire <= 0) {
-              sb.active = true;
-              sb.holdTime = rand(0.04, 0.16); // short flash: 40–160ms
-              sb.nextFire = Infinity;
-            }
-            if (sb.active) {
-              sb.holdTime -= dt;
-              if (sb.holdTime <= 0) {
-                sb.active = false;
-                sb.nextFire = rand(0.4, 3.0); // random cooldown
-              }
-              // Regenerate jagged lightning path every frame
-              const N = sb.pts.length, jAmp = Math.min(sb.dist * 0.20, 3.0);
-              for (let k = 0; k < N; k++) {
-                const f = k / (N - 1), jit = (k > 0 && k < N - 1);
-                sb.pts[k].set(
-                  sb.a.x + (sb.b.x - sb.a.x) * f + (jit ? rand(-jAmp, jAmp) : 0),
-                  sb.a.y + (sb.b.y - sb.a.y) * f + (jit ? rand(-jAmp, jAmp) : 0),
-                  sb.a.z + (sb.b.z - sb.a.z) * f + (jit ? rand(-jAmp, jAmp) * 0.6 : 0)
-                );
-              }
-              sb.geo.setFromPoints(sb.pts);
-              sb.mat.opacity = aS3 * (0.65 + Math.random() * 0.35);
-              sb.mat.color.set(Math.random() > 0.4 ? 0x66ffdd : 0xaaffff);
-            } else {
-              sb.mat.opacity = 0;
-            }
-          });
-          // Spark travel along active bolts
-          const spArr = spkG2.attributes.position.array;
-          spkSt2.forEach((sp2, i) => {
-            sp2.t += sp2.sp; if (sp2.t > 1) { sp2.t = 0; sp2.bi = Math.floor(Math.random() * synBolts.length); }
-            const sb2 = synBolts[sp2.bi]; if (!sb2 || !sb2.active) return;
-            const lp3 = sb2.a.clone().lerp(sb2.b, sp2.t);
-            spArr[i * 3] = lp3.x; spArr[i * 3 + 1] = lp3.y; spArr[i * 3 + 2] = lp3.z;
-          });
-          spkG2.attributes.position.needsUpdate = true;
-          spkM2.opacity = aS3 * 0.80;
-        }
-
-        // ── Head S5+S6 ───────────────────────────────────────────
-        if (grpHead.visible) {
-          headKeyL.intensity = aHd * (3.5 + Math.sin(t * 0.4) * 0.5);
-          headFillL.intensity = aHd * (2.0 + Math.sin(t * 0.6) * 0.4);
-          brainGlowL.intensity = aHd * (1.8 + Math.sin(t * 1.2) * 0.8);
-          // skin
-          skinBase.opacity = aHd * 0.36 + Math.sin(t * 0.8) * 0.03;
-          wireSkinM.opacity = aHd * 0.09 + Math.sin(t * 0.5) * 0.015;
-          // iridescent shimmer
-          shimA.material.opacity = aHd * 0.045 + Math.sin(t * 0.88) * 0.020;
-          shimB.material.opacity = aHd * 0.035 + Math.cos(t * 0.72) * 0.016;
-          shimC.material.opacity = aHd * 0.022 + Math.sin(t * 1.10) * 0.010;
-          shimA.rotation.y = t * 0.04; shimB.rotation.y = -t * 0.03; shimC.rotation.y = t * 0.05;
-          // inner glow
-          innerGlow.material.opacity = aHd * (0.08 + Math.sin(t * 1.0) * 0.04);
-          // brain
-          brainM.opacity = aHd * 0.82;
-          bsM.opacity = aHd * (0.52 + Math.sin(t * 1.9) * 0.26);
-          // Animate surface sparks
-          const bs3 = bsG.attributes.position.array;
-          bsSt3.forEach((bs, i) => {
-            bs.t += bs.sp; if (bs.t > 1) { bs.t = 0; bs.th = Math.random() * Math.PI * 2; bs.ph = Math.random() * Math.PI; }
-            const th3 = bs.th + bs.t * Math.PI * 0.5, ph3 = bs.ph + bs.t * Math.PI * 0.28;
-            bs3[i * 3] = 3.85 * Math.sin(ph3) * Math.cos(th3);
-            bs3[i * 3 + 1] = 4.35 * Math.sin(ph3) * Math.sin(th3) * 0.92 + 0.3;
-            bs3[i * 3 + 2] = 3.45 * Math.cos(ph3);
-          });
-          bsG.attributes.position.needsUpdate = true;
-          grpHead.rotation.y = Math.sin(t * 0.07) * 0.12;
-        }
-
-        // Stars twinkle
-        starM.opacity = 0.60 + Math.sin(t * 1.3) * 0.10;
-
-        renderer.render(scene, camera);
-      }
-
-      animate();
+      const rain = new THREE.LineSegments(rGeo, rMat);
+      rain.frustumCulled = false;
+      scene.add(rain);
+
+      // Store ref for animate
+      window._rainPos = pos;
+      window._rainData = rData;
+      window._rainGeo = rGeo;
+      window._rainN = RAIN_N;
     })();
 
     // ═══════════════════════════════════════════════════════════════
-    // AUDIO SYSTEM
+    // CAMERA PATH — desert exploration
+    // 8 waypoints: wide establishing → dune closeup → water →
+    //              rise over dune → deep desert → cross oasis → pullback → final
+    // ═══════════════════════════════════════════════════════════════
+    // Approximate terrain height at a given XZ position
+    // (same formula as terrain vertex displacement)
+    function terrainHeight(x, z) {
+      return Math.sin(x * .028 + .4) * 6.5
+        + Math.cos(z * .038 - .3) * 5.2
+        + Math.sin(x * .075 + z * .055) * 2.8
+        + Math.cos(x * .12 - z * .09) * 1.8
+        + Math.sin((x + z) * .095) * .9
+        + Math.cos(x * .22 + z * .15) * .45
+        - 3.0;
+    }
+
+    const CAMS = [
+      { s: .00, p: [0, 14, 32], t: [0, 4, 0] },  // wide establishing — drone view
+      { s: .12, p: [-10, 10, 22], t: [2, 5, -4] },  // drift left, see dune ridge
+      { s: .24, p: [12, 8, 16], t: [0, 5, -6] },  // sweep right, golden dune flank
+      { s: .36, p: [2, 5, 9], t: [0, 2, -4] },  // descend toward oasis level
+      { s: .48, p: [-14, 14, 2], t: [0, 6, -10] },  // climb left dune spine, vista
+      { s: .60, p: [6, 18, -6], t: [0, 6, -18] },  // over major dune crest, deep desert
+      { s: .72, p: [-8, 11, -14], t: [6, 7, -6] }, // across far dune valley
+      { s: .84, p: [16, 9, -8], t: [-4, 5, -2] },  // far right ridge, looking back
+      { s: 1.0, p: [0, 28, 26], t: [0, 2, 0] }, // high drone pullback — full scene
+    ];
+    function getCam(s) {
+      let lo = 0, hi = 1;
+      for (let i = 0; i < CAMS.length - 1; i++) { if (s >= CAMS[i].s && s <= CAMS[i + 1].s) { lo = i; hi = i + 1; break; } }
+      const span = CAMS[hi].s - CAMS[lo].s, f = span < .001 ? 0 : eio((s - CAMS[lo].s) / span);
+      const lp = CAMS[lo].p, hp = CAMS[hi].p, lt = CAMS[lo].t, ht = CAMS[hi].t;
+      return {
+        p: [lp[0] + (hp[0] - lp[0]) * f, lp[1] + (hp[1] - lp[1]) * f, lp[2] + (hp[2] - lp[2]) * f],
+        t: [lt[0] + (ht[0] - lt[0]) * f, lt[1] + (ht[1] - lt[1]) * f, lt[2] + (ht[2] - lt[2]) * f],
+      };
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANELS
+    // ═══════════════════════════════════════════════════════════════
+    const PANELS = [
+      { id: 'p0', lo: .00, hi: .12 }, { id: 'p1', lo: .11, hi: .24 },
+      { id: 'p2', lo: .22, hi: .35 }, { id: 'p3', lo: .33, hi: .47 },
+      { id: 'p4', lo: .45, hi: .57 }, { id: 'p5', lo: .55, hi: .68 },
+      { id: 'p6', lo: .66, hi: .78 }, { id: 'p7', lo: .76, hi: 1.0 },
+    ];
+    const pEls = PANELS.map(p => ({ ...p, el: document.getElementById(p.id) }));
+    const scrollHint = document.getElementById('scroll-hint');
+    function updatePanels(s) {
+      pEls.forEach(p => {
+        if (!p.el) return;
+        const m = .035;
+        const active = s >= p.lo - m && s <= p.hi + m;
+        p.el.classList.toggle('active', active);
+        if (active) {
+          const raw = clamp((s - p.lo) / (p.hi - p.lo), 0, 1);
+          p.el.style.opacity = Math.min(clamp(raw / .1, 0, 1), clamp((1 - raw) / .1, 0, 1));
+        }
+      });
+      scrollHint.style.opacity = Math.max(0, 1 - s * 10);
+      // AMINOACID fades independently: visible from s=0, fades out s=0.18→0.28
+      const heroEl = document.getElementById('hero-brand');
+      if (heroEl) heroEl.style.opacity = Math.max(0, 1 - clamp((s - .18) / .10, 0, 1));
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATE
+    // ═══════════════════════════════════════════════════════════════
+    const clock = new THREE.Clock();
+    let pmx = 0, pmy = 0, cpmx = 0, cpmy = 0;
+    document.addEventListener('mousemove', e => { pmx = (e.clientX / innerWidth - .5) * 2; pmy = (e.clientY / innerHeight - .5) * 2; }, { passive: true });
+
+    // Pre-allocate color objects — avoid GC pressure
+    const colA = new THREE.Color();
+    const colB = new THREE.Color();
+    const colC = new THREE.Color();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+      scrollSmooth += (scrollRaw - scrollSmooth) * .055;
+      const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
+
+      // ── Animated color cycle — hue sweeps through spectrum ──────
+      // Match video: ~45s full cycle, multiple layers at offset phases
+      const h1 = t * .022;                    // ~45s period
+      const h2 = h1 + .33;                    // 120° offset
+      const h3 = h1 + .66;                    // 240° offset
+      colA.setHSL(h1 % 1, .85, .18);         // main color
+      colB.setHSL(h2 % 1, .80, .15);         // complementary
+      colC.setHSL(h3 % 1, .75, .12);         // triad
+
+      // ── Sky ──────────────────────────────────────────────────────
+      skyMat.uniforms.uTime.value = t;
+
+      // ── Fog color follows sky hue ────────────────────────────────
+      scene.fog.color.setHSL(h1 % 1, .6, .04);
+
+      // ── Lights cycle in sync with colors ────────────────────────
+      colorLightA.color.copy(colA).multiplyScalar(2.5);
+      colorLightB.color.copy(colB).multiplyScalar(2.0);
+      colorLightC.color.copy(colC).multiplyScalar(1.8);
+      // Slow drift of light positions
+      colorLightA.position.set(-30 + Math.sin(t * .07) * 10, 15, Math.cos(t * .05) * 8);
+      colorLightB.position.set(30 + Math.cos(t * .06) * 8, 10, -20 + Math.sin(t * .08) * 8);
+      colorLightC.position.set(Math.sin(t * .04) * 15, 20, 10 + Math.cos(t * .06) * 8);
+
+      // ── Desert terrain color ─────────────────────────────────────
+      desertMat.uniforms.uTime.value = t;
+      desertMat.uniforms.uColA.value.copy(colA);
+      desertMat.uniforms.uColB.value.copy(colB);
+
+      // ── Water ───────────────────────────────────────────────────
+      waterMat.uniforms.uTime.value = t * .52;
+      waterMat.uniforms.uColA.value.copy(colA);
+      waterMat.uniforms.uColB.value.copy(colB);
+
+      // ── Camera ──────────────────────────────────────────────────
+      cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04;
+      const ck = getCam(s);
+      const camX = ck.p[0] + cpmx * 1.2, camZ = ck.p[2];
+      // Enforce minimum camera height — always at least 4.5 units above terrain
+      const floorH = terrainHeight(camX, camZ) + 4.5;
+      const camY = Math.max(ck.p[1] + cpmy * -.5, floorH);
+      camera.position.set(camX, camY, camZ);
+      // Also ensure look-at target isn't underground
+      const tgtFloor = terrainHeight(ck.t[0], ck.t[2]) + 1.5;
+      camera.lookAt(ck.t[0], Math.max(ck.t[1], tgtFloor), ck.t[2]);
+
+      // ── Panels ──────────────────────────────────────────────────
+      updatePanels(s);
+
+      // ── Rain animation ───────────────────────────────────────────
+      if (window._rainPos) {
+        const rp = window._rainPos, rd = window._rainData, rN = window._rainN;
+        const windX = 0.8, windZ = 0.2; // slight wind direction
+        const dropLen = 0.5; // length of each raindrop streak
+        for (let i = 0; i < rN; i++) {
+          // Phase advances = falling speed
+          rd[i * 4 + 2] = (rd[i * 4 + 2] + 0.012 * rd[i * 4 + 3]) % 1.0;
+          const phase = rd[i * 4 + 2];
+          // Y: falls from top (18) to bottom (-6), wraps
+          const y = 18 - (phase * 24);
+          const x = rd[i * 4] + windX * phase * 8;
+          const z = rd[i * 4 + 1] + windZ * phase * 8;
+          // Top point
+          rp[i * 6] = x; rp[i * 6 + 1] = y; rp[i * 6 + 2] = z;
+          // Bottom point (streak direction matches fall+wind angle)
+          rp[i * 6 + 3] = x - windX * dropLen; rp[i * 6 + 4] = y - dropLen; rp[i * 6 + 5] = z - windZ * dropLen;
+        }
+        window._rainGeo.attributes.position.needsUpdate = true;
+        // Vary opacity slightly with time for shimmering effect
+        window._rainGeo.material = window._rainGeo.material || new THREE.LineBasicMaterial({ color: 0x88aacc, transparent: true, opacity: .18 });
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // AUDIO — Web Audio API (native, no external deps)
+    // Soundtrack loop + per-section filter chain + organ pad on letters
     // ═══════════════════════════════════════════════════════════════
     (function () {
-      let audioCtx = null;
-      let soundtrackSource = null;
-      let masterGain = null;
-      let padActive = false;
-      let padTimeout = null;
+      'use strict';
 
       // ── Audio state ──────────────────────────────────────────────
-      let audioPlaying = false;
-      let soundtrackBuffer = null;
-      const audioToggleBtn = document.getElementById('audio-toggle');
+      let ctx = null, srcNode = null, audioBuffer = null;
+      let masterGain, lpFilter, hpFilter, convolver, panner, compressor, dryG, wetG;
+      let audioReady = false, audioPlaying = false, currentSection = -1;
 
-      function updateToggleIcon() {
-        if (audioToggleBtn) audioToggleBtn.textContent = audioPlaying ? '⏸' : '▶';
-      }
-
-      function pauseAudio() {
-        if (!audioCtx) return;
-        audioCtx.suspend();
-        audioPlaying = false;
-        updateToggleIcon();
-      }
-
-      function resumeAudio() {
-        if (!audioCtx) { initAudio(); return; }
-        audioCtx.resume();
-        audioPlaying = true;
-        updateToggleIcon();
-      }
-
-      if (audioToggleBtn) {
-        audioToggleBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          if (audioPlaying) pauseAudio(); else resumeAudio();
-        });
-      }
-
-      // ── Init Web Audio (requires user gesture) ───────────────────
-      function initAudio() {
-        if (audioCtx) {
-          if (audioCtx.state === 'suspended') audioCtx.resume();
-          audioPlaying = true; updateToggleIcon();
-          return;
+      // ── Build impulse response for convolver (room reverb) ───────
+      function makeIR(ctx2, dur, decay) {
+        const sr = ctx2.sampleRate, len = sr * dur;
+        const buf = ctx2.createBuffer(2, len, sr);
+        for (let ch = 0; ch < 2; ch++) {
+          const d = buf.getChannelData(ch);
+          for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
         }
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.32, audioCtx.currentTime + 3);
-        masterGain.connect(audioCtx.destination);
-        audioPlaying = true;
-        updateToggleIcon();
-
-        // ── Load soundtrack.mp3 ──────────────────────────────────────
-        fetch('soundtrack.mp3')
-          .then(r => r.arrayBuffer())
-          .then(buf => audioCtx.decodeAudioData(buf))
-          .then(decoded => {
-            soundtrackBuffer = decoded;
-            soundtrackSource = audioCtx.createBufferSource();
-            soundtrackSource.buffer = decoded;
-            soundtrackSource.loop = true;
-            soundtrackSource.connect(masterGain);
-            soundtrackSource.start(0);
-          })
-          .catch(() => { /* no file — pad still works */ });
+        return buf;
       }
 
-      // ── Convolver reverb (impulse response generated programmatically) ──
-      function makeReverb(ctx, duration, decay) {
-        const sr = ctx.sampleRate;
-        const len = sr * duration;
-        const buf = ctx.createBuffer(2, len, sr);
-        for (let c = 0; c < 2; c++) {
-          const d = buf.getChannelData(c);
-          for (let i = 0; i < len; i++) {
-            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-          }
+      // ── Build audio chain ────────────────────────────────────────
+      function buildChain(ctx2) {
+        // nodes
+        masterGain = ctx2.createGain(); masterGain.gain.value = 0.75;
+        lpFilter = ctx2.createBiquadFilter(); lpFilter.type = 'lowpass'; lpFilter.frequency.value = 18000;
+        hpFilter = ctx2.createBiquadFilter(); hpFilter.type = 'highpass'; hpFilter.frequency.value = 20;
+        convolver = ctx2.createConvolver(); convolver.buffer = makeIR(ctx2, 2.5, 2.2);
+        panner = ctx2.createStereoPanner(); panner.pan.value = 0;
+        compressor = ctx2.createDynamicsCompressor();
+        compressor.threshold.value = -24; compressor.knee.value = 12;
+        compressor.ratio.value = 4; compressor.attack.value = 0.003; compressor.release.value = 0.25;
+        // Dry/wet mix for reverb (exposed to outer scope for applyPreset)
+        dryG = ctx2.createGain(); dryG.gain.value = 0.78;
+        wetG = ctx2.createGain(); wetG.gain.value = 0.22;
+        // Route: source→lpFilter→hpFilter→panner→dryG→compressor→masterGain→destination
+        //                                         →convolver→wetG→compressor
+        lpFilter.connect(hpFilter);
+        hpFilter.connect(panner);
+        panner.connect(dryG); dryG.connect(compressor);
+        panner.connect(convolver); convolver.connect(wetG); wetG.connect(compressor);
+        compressor.connect(masterGain);
+        masterGain.connect(ctx2.destination);
+        return lpFilter; // entry point for source
+      }
+
+      // ── Load and loop soundtrack ─────────────────────────────────
+      async function loadAndPlay(ctx2, entry) {
+        const res = await fetch('soundtrack.mp3');
+        const ab = await res.arrayBuffer();
+        audioBuffer = await ctx2.decodeAudioData(ab);
+        function startLoop(offset) {
+          srcNode = ctx2.createBufferSource();
+          srcNode.buffer = audioBuffer;
+          srcNode.loop = false;
+          srcNode.connect(entry);
+          srcNode.onended = () => { if (audioPlaying) startLoop(0); };
+          srcNode.start(0, offset || 0);
         }
-        const conv = ctx.createConvolver();
-        conv.buffer = buf;
-        return conv;
+        startLoop(0);
+        audioPlaying = true;
+        updateBtn();
       }
 
-      // ── Church organ — C minor scale (matches soundtrack key) ──────
-      // Soundtrack analyzed: C natural minor (C D Eb F G Ab Bb)
-      // Strongest pitch classes: G, D, Bb, C, Ab — 2 octaves
-      const C_MINOR_FREQS = [
-        130.81, // C3
-        146.83, // D3
-        155.56, // Eb3
-        174.61, // F3
-        196.00, // G3  ← strongest in soundtrack
-        207.65, // Ab3
-        233.08, // Bb3
-        261.63, // C4
-        293.66, // D4
-        311.13, // Eb4
-        349.23, // F4
-        392.00, // G4  ← strongest in soundtrack (octave up)
-        415.30, // Ab4
-        466.16, // Bb4
+      async function initAudio() {
+        if (audioReady) return;
+        audioReady = true; // set first so pad can play even if soundtrack fails
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') await ctx.resume();
+        const entry = buildChain(ctx);
+        // Fade in master
+        masterGain.gain.setValueAtTime(0, ctx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.75, ctx.currentTime + 2.5);
+        // Start soundtrack (non-blocking — pad works regardless)
+        loadAndPlay(ctx, entry).catch(e => console.warn('Soundtrack:', e));
+      }
+
+      // ── Per-section effect presets ───────────────────────────────
+      // Each section morphs the filter + reverb wet + spatial feel
+      // [lpFreq, hpFreq, reverbWet, panAmt, masterVol, reverbDecay]
+      // [lpFreq, hpFreq, reverbWet, reverbDry, masterVol, pan]
+      // Dramatic enough differences to be clearly audible
+      const PRESETS = [
+        [16000, 20, 0.15, 0.85, 0.72, 0.00], // S0 Hero:     bright, clean, center
+        [8000, 30, 0.35, 0.65, 0.68, 0.08], // S1 Manifest: muffled, more reverb
+        [3500, 20, 0.60, 0.40, 0.62, 0.00], // S2 Fact1:    very dark + cavernous
+        [10000, 60, 0.20, 0.80, 0.74, 0.00], // S3 Services: mid-bright, tight
+        [18000, 20, 0.45, 0.55, 0.65, 0.12], // S4 Fact2:    full bright + spacious
+        [2200, 80, 0.25, 0.75, 0.76, 0.00], // S5 Process:  extreme low-pass
+        [14000, 20, 0.70, 0.30, 0.60, 0.15], // S6 Fact3:    mostly reverb, airy
+        [5000, 100, 0.30, 0.70, 0.78, 0.00], // S7 CTA:      dark punch
       ];
-
-      function playOrganNote(ctx, destination, baseFreq) {
-        const noteGain = ctx.createGain();
-        noteGain.gain.setValueAtTime(0, ctx.currentTime);
-        noteGain.gain.linearRampToValueAtTime(0.50, ctx.currentTime + 0.05); // organ attack
-        noteGain.gain.setValueAtTime(0.50, ctx.currentTime + 0.4);
-        noteGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.6);
-
-        const reverb = makeReverb(ctx, 4.0, 1.6);
-        const dry = ctx.createGain(); dry.gain.value = 0.40;
-        const wet = ctx.createGain(); wet.gain.value = 0.60;
-        noteGain.connect(dry); dry.connect(destination);
-        noteGain.connect(reverb); reverb.connect(wet); wet.connect(destination);
-
-        // Pipe organ harmonic series: 8', 4', 2-2/3', 2', 1-3/5' stops
-        const stops = [
-          { mult: 1.000, amp: 1.00 }, // 8' principal — fundamental
-          { mult: 2.000, amp: 0.65 }, // 4' octave
-          { mult: 3.000, amp: 0.45 }, // 2-2/3' nazard (quint)
-          { mult: 4.000, amp: 0.28 }, // 2' super octave
-          { mult: 5.000, amp: 0.15 }, // 1-3/5' tierce
-          { mult: 0.500, amp: 0.20 }, // 16' sub — warmth
-        ];
-        stops.forEach(s => {
-          const osc = ctx.createOscillator();
-          osc.type = 'sawtooth';
-          osc.frequency.value = baseFreq * s.mult;
-          osc.detune.value = (Math.random() - 0.5) * 2;
-          const g = ctx.createGain();
-          g.gain.value = s.amp / stops.length;
-          osc.connect(g); g.connect(noteGain);
-          osc.start(ctx.currentTime);
-          osc.stop(ctx.currentTime + 3.2);
-        });
-      }
-
-      function playPad(ctx, destination) {
-        if (padActive) return;
-        padActive = true;
-        // Pick a random note from C minor scale
-        const freq = C_MINOR_FREQS[Math.floor(Math.random() * C_MINOR_FREQS.length)];
-        playOrganNote(ctx, destination, freq);
-        padTimeout = setTimeout(() => { padActive = false; }, 1200);
-      }
-
-      // ── Per-letter distortion system ────────────────────────────
-      // Each word/letter gets its own SVG filter instance so distortion
-      // is local — only letters near the cursor are affected.
-      // We split the hero title into <span> per word, each with its own filter.
-
-      const heroTitle = document.querySelector('.hero-title');
-      if (!heroTitle) return;
-
-      // Create N filter instances (one per word span)
-      // Each has its own feTurbulence + feDisplacementMap
-      function makeLetterFilter(id) {
-        const svgFilters = document.getElementById('svg-filters').querySelector('defs');
-        const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-        filter.id = id;
-        filter.setAttribute('x', '-30%'); filter.setAttribute('y', '-30%');
-        filter.setAttribute('width', '160%'); filter.setAttribute('height', '160%');
-        filter.setAttribute('color-interpolation-filters', 'linearRGB');
-        const turb = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
-        turb.setAttribute('type', 'turbulence');
-        turb.setAttribute('baseFrequency', '0.018 0.010');
-        turb.setAttribute('numOctaves', '3');
-        turb.setAttribute('seed', String(Math.floor(Math.random() * 99)));
-        turb.setAttribute('result', 'noise');
-        const disp = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
-        disp.setAttribute('in', 'SourceGraphic'); disp.setAttribute('in2', 'noise');
-        disp.setAttribute('scale', '0');
-        disp.setAttribute('xChannelSelector', 'R'); disp.setAttribute('yChannelSelector', 'G');
-        filter.appendChild(turb); filter.appendChild(disp);
-        svgFilters.appendChild(filter);
-        return { filter, turb, disp };
-      }
-
-      // Split title into word spans
-      // Preserve the <em> tag by working at the DOM level
-      const words = [];
-      heroTitle.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          node.textContent.split(/(\s+)/).forEach(part => {
-            if (part.trim()) {
-              const span = document.createElement('span');
-              span.className = 'hero-word';
-              span.textContent = part;
-              words.push(span);
-            } else if (part) {
-              // whitespace — insert as text node
-              words.push(document.createTextNode(part));
-            }
-          });
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-          // em tag — wrap its text in a word span too
-          const span = document.createElement('span');
-          span.className = 'hero-word';
-          span.innerHTML = node.outerHTML;
-          words.push(span);
+      const RAMP = 2.0; // 2 seconds — fast enough to notice, smooth enough not to click
+      function applyPreset(i) {
+        if (!audioReady || i === currentSection) return;
+        currentSection = i;
+        const p = PRESETS[Math.min(i, PRESETS.length - 1)];
+        const now = ctx.currentTime;
+        lpFilter.frequency.cancelScheduledValues(now);
+        lpFilter.frequency.setValueAtTime(lpFilter.frequency.value, now);
+        lpFilter.frequency.linearRampToValueAtTime(p[0], now + RAMP);
+        hpFilter.frequency.cancelScheduledValues(now);
+        hpFilter.frequency.setValueAtTime(hpFilter.frequency.value, now);
+        hpFilter.frequency.linearRampToValueAtTime(p[1], now + RAMP);
+        if (dryG) { dryG.gain.cancelScheduledValues(now); dryG.gain.setValueAtTime(dryG.gain.value, now); dryG.gain.linearRampToValueAtTime(p[3], now + RAMP); }
+        if (wetG) { wetG.gain.cancelScheduledValues(now); wetG.gain.setValueAtTime(wetG.gain.value, now); wetG.gain.linearRampToValueAtTime(p[2], now + RAMP); }
+        if (panner) { panner.pan.cancelScheduledValues(now); panner.pan.setValueAtTime(panner.pan.value, now); panner.pan.linearRampToValueAtTime(p[5], now + RAMP); }
+        // masterGain: don't conflict with fade-in; only ramp if already faded in
+        if (masterGain && masterGain.gain.value > 0.3) {
+          masterGain.gain.cancelScheduledValues(now);
+          masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+          masterGain.gain.linearRampToValueAtTime(p[4], now + RAMP);
         }
-      });
-      heroTitle.innerHTML = '';
-      const wordSpans = [];
-      words.forEach(w => {
-        heroTitle.appendChild(w);
-        if (w.classList && w.classList.contains('hero-word')) wordSpans.push(w);
-      });
+      }
 
-      // Assign a unique filter to each word span
-      const wordFilters = wordSpans.map((span, i) => {
-        const id = `wf-${i}`;
-        const { turb, disp } = makeLetterFilter(id);
-        span.style.display = 'inline-block';
-        span.style.filter = `url(#${id})`;
-        span.style.willChange = 'filter';
-        return { span, turb, disp, current: 0, target: 0, phase: Math.random() * Math.PI * 2 };
-      });
-
-      let turbPhase = 0;
-      let animId = null;
-      let lastMx = -1, lastMy = -1;
-      let padTriggeredAt = -999;
-
-      function animateLetterFilters() {
-        turbPhase += 0.014;
-        let anyActive = false;
-        wordFilters.forEach(wf => {
-          wf.current += (wf.target - wf.current) * 0.10;
-          if (wf.current > 0.4) {
-            const bf1 = (0.018 + Math.sin(turbPhase + wf.phase) * 0.006).toFixed(4);
-            const bf2 = (0.010 + Math.cos(turbPhase * 0.7 + wf.phase) * 0.004).toFixed(4);
-            wf.turb.setAttribute('baseFrequency', `${bf1} ${bf2}`);
-            wf.disp.setAttribute('scale', wf.current.toFixed(2));
-            anyActive = true;
-          } else {
-            wf.disp.setAttribute('scale', '0');
-            if (wf.current > 0.05) anyActive = true;
-          }
+      // ── Church organ pad (native oscillators) ────────────────────
+      const CM = [130.81, 146.83, 155.56, 174.61, 196, 207.65, 233.08,
+        261.63, 293.66, 311.13, 349.23, 392, 415.3, 466.16];
+      let padOn = false, padTimer;
+      function playPad() {
+        // Auto-init audio context if not ready (e.g. first mouse interaction)
+        if (!ctx && !_started) { _started = true; initAudio(); return; }
+        if (!ctx || padOn) return;
+        padOn = true;
+        const freq = CM[Math.floor(Math.random() * CM.length)];
+        const padGain = ctx.createGain();
+        padGain.gain.setValueAtTime(0, ctx.currentTime);
+        padGain.gain.linearRampToValueAtTime(0.45, ctx.currentTime + 0.06);
+        padGain.gain.setValueAtTime(0.45, ctx.currentTime + 0.5);
+        padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.8);
+        // Reverb for pad
+        const padRev = ctx.createConvolver(); padRev.buffer = makeIR(ctx, 3.5, 1.8);
+        const padDry = ctx.createGain(); padDry.gain.value = 0.4;
+        const padWet = ctx.createGain(); padWet.gain.value = 0.6;
+        padGain.connect(padDry); padDry.connect(ctx.destination);
+        padGain.connect(padRev); padRev.connect(padWet); padWet.connect(ctx.destination);
+        // Organ harmonics (pipe organ stops)
+        [1, 2, 3, 4, 0.5].forEach((mult, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sawtooth';
+          o.frequency.value = freq * mult;
+          o.detune.value = (Math.random() - .5) * 3;
+          g.gain.value = [1, .65, .45, .28, .2][i] / 5;
+          o.connect(g); g.connect(padGain);
+          o.start(ctx.currentTime);
+          o.stop(ctx.currentTime + 3.2);
         });
-        if (anyActive) animId = requestAnimationFrame(animateLetterFilters);
-        else animId = null;
+        clearTimeout(padTimer);
+        padTimer = setTimeout(() => padOn = false, 1300);
       }
 
-      function startAnim() {
-        if (!animId) animId = requestAnimationFrame(animateLetterFilters);
-      }
-
-      // ── Vibration (mobile only — Vibration API, silent fail on iOS) ─
-      const canVibrate = 'vibrate' in navigator;
-      let vibCooldown = 0; // timestamp of last vibration
-
-      function vibrateSubtle(intensity) {
-        if (!canVibrate) return;
-        const now = performance.now();
-        // Cooldown: minimum 180ms between vibrations — subtle, not buzzing
-        if (now - vibCooldown < 180) return;
-        vibCooldown = now;
-        // Map intensity (0–26) to pulse duration (4–18ms) — very short = subtle
-        const dur = Math.round(4 + (intensity / 26) * 14);
-        navigator.vibrate(dur);
-      }
-
-      function handlePointer(px, py, speed, isTouch) {
-        if (!audioCtx) initAudio();
-        let anyHit = false;
-        let maxIntensity = 0;
-        wordFilters.forEach(wf => {
-          const r = wf.span.getBoundingClientRect();
-          if (r.width === 0) return;
-          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-          const dx = px - cx, dy = py - cy;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const influence = clamp(1 - dist / 120, 0, 1);
-          if (influence > 0) {
-            const intensity = influence * (18 + speed * 0.3);
-            wf.target = clamp(intensity, 0, 26);
-            anyHit = true;
-            maxIntensity = Math.max(maxIntensity, intensity);
-            // Play organ note when a word is meaningfully distorted
-            if (intensity > 6 && audioCtx && (performance.now() - padTriggeredAt) > 1500) {
-              if (audioCtx.state === 'suspended') audioCtx.resume();
-              padTriggeredAt = performance.now();
-              playPad(audioCtx, masterGain);
-            }
-          } else {
-            wf.target = 0;
-          }
+      // ── Per-letter visual distortion only ────────────────────────
+      // (organ pad fires separately above, distortion is only visual)
+      function setupDistortion() {
+        const defs = document.getElementById('svg-filter-defs');
+        const letters = [...document.querySelectorAll('.hw')];
+        if (!defs || !letters.length) return;
+        const wf = letters.map((sp, i) => {
+          const f = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+          f.id = `hf${i}`;
+          f.setAttribute('x', '-30%'); f.setAttribute('y', '-30%');
+          f.setAttribute('width', '160%'); f.setAttribute('height', '160%');
+          const tb = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+          tb.setAttribute('type', 'turbulence');
+          tb.setAttribute('baseFrequency', '0.016 0.009');
+          tb.setAttribute('numOctaves', '3');
+          tb.setAttribute('seed', String(i * 13 + 5));
+          tb.setAttribute('result', 'noise');
+          const dp = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
+          dp.setAttribute('in', 'SourceGraphic'); dp.setAttribute('in2', 'noise');
+          dp.setAttribute('scale', '0');
+          dp.setAttribute('xChannelSelector', 'R'); dp.setAttribute('yChannelSelector', 'G');
+          f.appendChild(tb); f.appendChild(dp); defs.appendChild(f);
+          sp.style.filter = `url(#hf${i})`;
+          sp.style.willChange = 'filter';
+          return { sp, tb, dp, cur: 0, tgt: 0, ph: Math.random() * Math.PI * 2 };
         });
-        // Vibrate on touch only (no vibration for mouse — would be jarring on desktop)
-        if (isTouch && anyHit && maxIntensity > 4) vibrateSubtle(maxIntensity);
-        startAnim();
+        let tp = 0, aid = null, pAt = -999, lx = 0, ly = 0;
+        function tick() {
+          tp += .016; let any = false;
+          wf.forEach(w => {
+            w.cur += (w.tgt - w.cur) * .09;
+            if (w.cur > .3) {
+              const bf1 = (.016 + Math.sin(tp + w.ph) * .007).toFixed(4);
+              const bf2 = (.009 + Math.cos(tp * .65 + w.ph) * .004).toFixed(4);
+              w.tb.setAttribute('baseFrequency', `${bf1} ${bf2}`);
+              w.dp.setAttribute('scale', w.cur.toFixed(2));
+              any = true;
+            } else { w.dp.setAttribute('scale', '0'); if (w.cur > .04) any = true; }
+          });
+          if (any) aid = requestAnimationFrame(tick); else aid = null;
+        }
+        function go() { if (!aid) aid = requestAnimationFrame(tick); }
+        function ptr(px, py, spd) {
+          let mx2 = 0;
+          wf.forEach(w => {
+            const r = w.sp.getBoundingClientRect();
+            if (!r.width) return;
+            const dist = Math.sqrt((px - r.left - r.width / 2) ** 2 + (py - r.top - r.height / 2) ** 2);
+            const inf = Math.max(0, 1 - dist / 160);
+            w.tgt = inf > 0 ? Math.min(inf * (24 + spd * .25), 30) : 0;
+            mx2 = Math.max(mx2, w.tgt);
+          });
+          // Visual distortion only — no sound on letter hover
+          go();
+        }
+        document.addEventListener('mousemove', e => {
+          const s = Math.abs(e.clientX - lx) + Math.abs(e.clientY - ly);
+          lx = e.clientX; ly = e.clientY; ptr(e.clientX, e.clientY, s);
+        }, { passive: true });
+        document.addEventListener('touchmove', e => {
+          const t = e.touches[0]; ptr(t.clientX, t.clientY, 4);
+        }, { passive: true });
+        document.addEventListener('touchend', () => { wf.forEach(w => w.tgt = 0); go(); }, { passive: true });
       }
 
-      function releaseAll() {
-        wordFilters.forEach(wf => { wf.target = 0; });
-        if (canVibrate) navigator.vibrate(0); // stop any ongoing vibration
-        startAnim();
-      }
+      // ── Audio toggle button ───────────────────────────────────────
+      const btn = document.createElement('button');
+      btn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(224,216,240,.4);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s;line-height:1';
+      btn.textContent = '▶';
+      btn.title = 'Toggle audio';
+      btn.onmouseenter = () => btn.style.color = '#e0d8f0';
+      btn.onmouseleave = () => btn.style.color = 'rgba(224,216,240,.4)';
+      document.body.appendChild(btn);
+      function updateBtn() { btn.textContent = audioPlaying ? '⏸' : '▶'; }
+      btn.onclick = async () => {
+        if (!audioReady) { await initAudio(); return; }
+        if (audioPlaying) {
+          srcNode && srcNode.stop(); audioPlaying = false;
+        } else {
+          if (!audioBuffer) { await loadAndPlay(ctx, lpFilter); }
+          else {
+            srcNode = ctx.createBufferSource();
+            srcNode.buffer = audioBuffer; srcNode.loop = false;
+            srcNode.connect(lpFilter);
+            srcNode.onended = () => { if (audioPlaying) { const n = ctx.createBufferSource(); n.buffer = audioBuffer; n.connect(lpFilter); n.onended = srcNode.onended; n.start(); srcNode = n; } };
+            srcNode.start(); audioPlaying = true;
+          }
+        }
+        updateBtn();
+      };
 
-      // ── Mouse ─────────────────────────────────────────────────────
-      document.addEventListener('mousemove', e => {
-        const speed = Math.abs(e.clientX - lastMx) + Math.abs(e.clientY - lastMy);
-        lastMx = e.clientX; lastMy = e.clientY;
-        handlePointer(e.clientX, e.clientY, speed, false);
+      // ── Scroll → section audio morphing ──────────────────────────
+      const BANDS = [{ lo: .00, hi: .12 }, { lo: .11, hi: .24 }, { lo: .22, hi: .35 }, { lo: .33, hi: .47 },
+      { lo: .45, hi: .57 }, { lo: .55, hi: .68 }, { lo: .66, hi: .78 }, { lo: .76, hi: 1.0 }];
+      window.addEventListener('scroll', () => {
+        if (!audioReady) return;
+        const s = window.scrollY / Math.max(1, document.body.scrollHeight - innerHeight);
+        for (let i = 0; i < BANDS.length; i++) {
+          const b = BANDS[i];
+          if (s >= b.lo - .02 && s <= b.hi + .02) { applyPreset(i); break; }
+        }
       }, { passive: true });
 
-      // ── Touch ─────────────────────────────────────────────────────
-      document.addEventListener('touchstart', () => { if (!audioCtx) initAudio(); }, { passive: true });
-      document.addEventListener('touchmove', e => {
-        const t = e.touches[0];
-        handlePointer(t.clientX, t.clientY, 0, true);
-      }, { passive: true });
-      document.addEventListener('touchend', releaseAll, { passive: true });
-
-      // clamp helper (local, doesn't conflict with Three.js scope)
-      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-      // ── First user gesture → init audio ─────────────────────────
-      // Listen on first scroll too (common on mobile)
-      function onFirstGesture() {
-        initAudio();
-        document.removeEventListener('click', onFirstGesture);
-        document.removeEventListener('keydown', onFirstGesture);
-        window.removeEventListener('scroll', onFirstGesture, { passive: true });
+      // ── Auto-start on first user gesture ─────────────────────────
+      // Auto-start: fires on ANY interaction — capture phase, once
+      let _started = false;
+      async function onGesture() {
+        if (_started) return; _started = true;
+        await initAudio();
       }
-      document.addEventListener('click', onFirstGesture);
-      document.addEventListener('keydown', onFirstGesture);
-      window.addEventListener('scroll', onFirstGesture, { passive: true });
+      ['click', 'keydown', 'touchstart', 'pointerdown', 'scroll'].forEach(ev => {
+        window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
+      });
+
+      // ── Init distortion after DOM ─────────────────────────────────
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupDistortion);
+      } else { setupDistortion(); }
+
     })();
   </script>
 </body>
