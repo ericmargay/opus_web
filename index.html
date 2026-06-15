@@ -743,8 +743,7 @@
     'use strict';
     const IS_MOB = innerWidth < 768;
     if (IS_MOB) {
-      // Hide cursor (touch device, no cursor needed)
-      document.body.style.cursor = 'auto';
+      document.body.style.cursor = 'auto'; // no pointer cursor on touch
     }
 
     // ── Cursor ────────────────────────────────────────────────────
@@ -793,16 +792,14 @@
     scene.add(new THREE.AmbientLight(0x0a0520, 5));
 
     // Blue-electric "star" light — main key
+    // Lights: starLight + hemisphere on ALL devices; colorB/C desktop only
     const starLight = new THREE.DirectionalLight(0x2255ff, 2.8);
-    if (!IS_MOB) { starLight.position.set(20, 12, -15); scene.add(starLight); }
-
-    // Animated color lights — driven by time (color cycle)
-    // Use HemisphereLight instead of 3 PointLights — much cheaper
+    starLight.position.set(20, 12, -15); scene.add(starLight);
     const colorLightA = new THREE.HemisphereLight(0xff00aa, 0x001122, 2.0);
+    scene.add(colorLightA);
     const colorLightB = new THREE.DirectionalLight(0x00ffcc, 1.5);
     const colorLightC = new THREE.DirectionalLight(0xaa00ff, 1.2);
     if (!IS_MOB) {
-      scene.add(colorLightA);
       colorLightB.position.set(30, 10, -20); scene.add(colorLightB);
       colorLightC.position.set(-15, 20, 10); scene.add(colorLightC);
     }
@@ -1032,8 +1029,8 @@
     }
     tPos.needsUpdate = true;
     tGeo.computeVertexNormals();
-    // Terrain: desktop only. Mobile has zero 3D meshes for max performance.
-    if (!IS_MOB) {
+    // Terrain: both desktop and mobile (testing mobile performance)
+    {
       const terrain = new THREE.Mesh(tGeo, desertMat);
       terrain.receiveShadow = false;
       scene.add(terrain);
@@ -1209,8 +1206,8 @@
     function animate() {
       requestAnimationFrame(animate);
       _frame++;
-      // Mobile: no rendering at all — pure CSS background handles visuals
-      if (IS_MOB || window._mobNoRender) return;
+      // Mobile: render every other frame (~30fps) — skip for perf
+      if (IS_MOB && _frame % 2 !== 0) return;
       const t = clock.getElapsedTime();
       scrollSmooth += (scrollRaw - scrollSmooth) * .12;
       const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
@@ -1221,19 +1218,21 @@
       colB.setHSL(h2 % 1, .80, .15);
       colC.setHSL(h3 % 1, .75, .12);
 
-      {// Desktop only from here
-        // Desktop: full shader updates
+      // ── Scene updates: terrain always, sky+water desktop only ──────
+      // Terrain colors — both devices
+      desertMat.uniforms.uTime.value = t;
+      desertMat.uniforms.uColA.value.copy(colA);
+      desertMat.uniforms.uColB.value.copy(colB);
+      // Hemisphere light color — both devices
+      colorLightA.color.copy(colA).multiplyScalar(IS_MOB ? 3.0 : 2.0);
+      colorLightA.groundColor.copy(colC).multiplyScalar(IS_MOB ? 1.5 : 0.5);
+      if (!IS_MOB) {
+        // Desktop-only: sky shader, extra lights, water
         skyMat.uniforms.uTime.value = t;
-        colorLightA.color.copy(colA).multiplyScalar(2.0);
-        colorLightA.groundColor.copy(colC).multiplyScalar(0.5);
         colorLightB.color.copy(colB).multiplyScalar(1.8);
         colorLightC.color.copy(colC).multiplyScalar(1.4);
         colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
         colorLightC.position.set(-15 + Math.cos(t * .04) * 8, 20, 10);
-        // (these are only added to scene on desktop, so safe to update)
-        desertMat.uniforms.uTime.value = t;
-        desertMat.uniforms.uColA.value.copy(colA);
-        desertMat.uniforms.uColB.value.copy(colB);
         if (water) {
           waterMat.uniforms.uTime.value = t * .52;
           waterMat.uniforms.uColA.value.copy(colA);
@@ -1241,18 +1240,17 @@
         }
       }
 
-      // ── Camera ──────────────────────────────────────────────────
-      if (!IS_MOB) {
-        cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04;
+      // ── Camera — both desktop (with parallax) and mobile (no parallax) ──
+      {
+        if (!IS_MOB) { cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04; }
         const ck = getCam(s);
-        const camX = ck.p[0] + cpmx * 1.2, camZ = ck.p[2];
+        const camX = ck.p[0] + (IS_MOB ? 0 : cpmx * 1.2), camZ = ck.p[2];
         const floorH = terrainHeight(camX, camZ) + 4.5;
-        const camY = Math.max(ck.p[1] + cpmy * -.5, floorH);
+        const camY = Math.max(ck.p[1] + (IS_MOB ? 0 : cpmy * -.5), floorH);
         camera.position.set(camX, camY, camZ);
         const tgtFloor = terrainHeight(ck.t[0], ck.t[2]) + 1.5;
         camera.lookAt(ck.t[0], Math.max(ck.t[1], tgtFloor), ck.t[2]);
       }
-      // (mobile camera is static — set once at scene init)
 
       // ── Panels ──────────────────────────────────────────────────
       updatePanels(s);
@@ -1366,40 +1364,34 @@
       _snapPts.forEach(el => _panelIO.observe(el));
     }
 
-    // ── Mobile: no canvas, auto-dismiss loader ───────────────────────
-    if (IS_MOB) {
-      const canvasEl = document.getElementById('c');
-      if (canvasEl) canvasEl.style.display = 'none';
-      document.body.style.cursor = 'auto';
-      window._mobNoRender = true;
-      // On mobile: skip CTA entirely, auto-hide loader after brief delay
-      setTimeout(() => {
-        _loaderGone = true;
-        if (_loaderEl) {
-          _loaderEl.style.opacity = '0';
-          setTimeout(() => { _loaderEl.style.display = 'none'; }, 600);
+    // ── Start animate loop (both desktop and mobile) ─────────────────
+    animate();
+    // Detect first rendered frame → reveal CTA on desktop, auto-dismiss on mobile
+    const _origRender = renderer.render.bind(renderer);
+    renderer.render = function (sc, cam) {
+      _origRender(sc, cam);
+      if (!IS_MOB) {
+        _onSceneReady(); // desktop: show CTA button
+      } else {
+        // Mobile: auto-dismiss loader on first frame
+        if (!_loaderGone) {
+          _loaderGone = true;
+          if (_loaderEl) {
+            _loaderEl.style.opacity = '0';
+            setTimeout(() => { _loaderEl.style.display = 'none'; }, 600);
+          }
+          const p0 = document.getElementById('p0');
+          if (p0) p0.classList.add('active');
+          const hb = document.getElementById('hero-brand');
+          if (hb) hb.style.opacity = '1';
+          ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+          });
         }
-        // Show only p0 panel and hero brand
-        const p0 = document.getElementById('p0');
-        if (p0) p0.classList.add('active');
-        const hb = document.getElementById('hero-brand');
-        if (hb) hb.style.opacity = '1';
-        // Ensure all other panels are hidden
-        ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.classList.remove('active');
-        });
-      }, 800);
-    } else {
-      animate();
-      // Detect first rendered frame → reveal CTA button
-      const _origRender = renderer.render.bind(renderer);
-      renderer.render = function (sc, cam) {
-        _origRender(sc, cam);
-        _onSceneReady();
-        renderer.render = _origRender;
-      };
-    }
+      }
+      renderer.render = _origRender; // restore after first frame
+    };
   </script>
 
   <script>
