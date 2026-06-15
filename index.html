@@ -640,7 +640,7 @@
     renderer.toneMappingExposure = 1.1;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x100820, 0.010);
+    // scene.fog disabled for performance
 
     const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, .05, 600);
     camera.position.set(0, 4, 28);
@@ -665,9 +665,10 @@
     scene.add(starLight);
 
     // Animated color lights — driven by time (color cycle)
-    const colorLightA = new THREE.PointLight(0xff00aa, 3.0, 120); colorLightA.position.set(-30, 15, 0); scene.add(colorLightA);
-    const colorLightB = new THREE.PointLight(0x00ffcc, 2.5, 100); colorLightB.position.set(30, 10, -20); scene.add(colorLightB);
-    const colorLightC = new THREE.PointLight(0xaa00ff, 2.0, 80); colorLightC.position.set(0, 20, 10); scene.add(colorLightC);
+    // Use HemisphereLight instead of 3 PointLights — much cheaper
+    const colorLightA = new THREE.HemisphereLight(0xff00aa, 0x001122, 2.0); scene.add(colorLightA);
+    const colorLightB = new THREE.DirectionalLight(0x00ffcc, 1.5); colorLightB.position.set(30, 10, -20); scene.add(colorLightB);
+    const colorLightC = new THREE.DirectionalLight(0xaa00ff, 1.2); colorLightC.position.set(-15, 20, 10); scene.add(colorLightC);
 
     // ═══════════════════════════════════════════════════════════════
     // SKY — full animated color cycle matching video
@@ -766,121 +767,10 @@
       // Fine noise texture variation
       sky*=.9+n3*.2;
 
-      // === STAR FLOCKS — 6 groups moving like murmuration ===
-      // Flock colors declared outside loops (GLSL array-in-loop bug fix)
-      vec3 fc0col=vec3(.72,.88,1.0), fc1col=vec3(1.,1.,1.),
-           fc2col=vec3(1.,.91,.70),  fc3col=vec3(.84,.95,1.),
-           fc4col=vec3(1.,.96,.82),  fc5col=vec3(.92,.82,1.);
+      // Star flocks moved to JS particle system — sky shader is now cheap
+      // (see THREE.Points _starFlock below)
 
-      // Global slow rotation of entire star field
-      float br=uTime*.0018;
-      float cbr=cos(br),sbr=sin(br);
-      vec3 dR=vec3(d.x*cbr+d.z*sbr,d.y,-d.x*sbr+d.z*cbr);
-
-      // Flock 0
-      {float ff=0.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
-       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
-       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
-       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
-       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
-       for(int pi=0;pi<30;pi++){float pf=float(pi);
-        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
-        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
-        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
-        vec3 sd=normalize(fc+fright*sx+fup2*sy);
-        float dv=dot(dR,sd);if(dv<0.99996)continue;
-        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
-        if(ang>sr)continue;
-        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
-        sky+=fc0col*br2*2.2;}
-      }
-      // Flock 1
-      {float ff=1.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
-       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
-       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
-       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
-       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
-       for(int pi=0;pi<30;pi++){float pf=float(pi);
-        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
-        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
-        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
-        vec3 sd=normalize(fc+fright*sx+fup2*sy);
-        float dv=dot(dR,sd);if(dv<0.99996)continue;
-        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
-        if(ang>sr)continue;
-        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
-        sky+=fc1col*br2*2.2;}
-      }
-      // Flock 2
-      {float ff=2.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
-       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
-       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
-       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
-       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
-       for(int pi=0;pi<30;pi++){float pf=float(pi);
-        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
-        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
-        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
-        vec3 sd=normalize(fc+fright*sx+fup2*sy);
-        float dv=dot(dR,sd);if(dv<0.99996)continue;
-        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
-        if(ang>sr)continue;
-        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
-        sky+=fc2col*br2*2.2;}
-      }
-      // Flock 3
-      {float ff=3.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
-       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
-       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
-       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
-       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
-       for(int pi=0;pi<30;pi++){float pf=float(pi);
-        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
-        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
-        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
-        vec3 sd=normalize(fc+fright*sx+fup2*sy);
-        float dv=dot(dR,sd);if(dv<0.99996)continue;
-        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
-        if(ang>sr)continue;
-        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
-        sky+=fc3col*br2*2.2;}
-      }
-      // Flock 4
-      {float ff=4.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
-       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
-       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
-       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
-       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
-       for(int pi=0;pi<30;pi++){float pf=float(pi);
-        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
-        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
-        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
-        vec3 sd=normalize(fc+fright*sx+fup2*sy);
-        float dv=dot(dR,sd);if(dv<0.99996)continue;
-        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
-        if(ang>sr)continue;
-        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
-        sky+=fc4col*br2*2.2;}
-      }
-      // Flock 5
-      {float ff=5.;float op=ff*1.047+0.5;float ot=uTime*(0.025+ff*.008)+op;
-       float phi=0.9+sin(uTime*(0.008+ff*.002)+op)*0.5;
-       vec3 fc=normalize(vec3(sin(phi)*cos(ot),cos(phi),sin(phi)*sin(ot)));
-       vec3 fu=abs(fc.y)<.98?vec3(0,1,0):vec3(1,0,0);
-       vec3 fright=normalize(cross(fu,fc));vec3 fup2=cross(fc,fright);
-       for(int pi=0;pi<30;pi++){float pf=float(pi);
-        float s1=ff*37.4+pf*6.1,s2=ff*22.9+pf*9.7,s3=ff*17.3+pf*4.3;
-        float sx=sin(s1*.8)*.18+cos(s2*.6)*.08+sin(uTime*(.003+hash21(vec2(s1,s2))*.005)+s1)*.05;
-        float sy=cos(s1*.7)*.14+sin(s3*.9)*.07+cos(uTime*(.002+hash21(vec2(s2,s3))*.004)+s2)*.04;
-        vec3 sd=normalize(fc+fright*sx+fup2*sy);
-        float dv=dot(dR,sd);if(dv<0.99996)continue;
-        float ang=acos(clamp(dv,-1.,1.));float sr=0.0006+hash21(vec2(s1*.1,s2*.1))*0.001;
-        if(ang>sr)continue;
-        float br2=exp(-3.*(ang/sr)*(ang/sr))*(0.72+0.28*sin(uTime*3.8+ff*2.1))*(0.9+0.1*sin(uTime*14.+s1*.5));
-        sky+=fc5col*br2*2.2;}
-      }
-
-      // === ELECTRIC BLUE SUN DISC ===
+            // === ELECTRIC BLUE SUN DISC ===
       vec3 sunDir=normalize(vec3(.6,.12,-.8));
       float sd2=max(0.,dot(d,sunDir));
       float disc   =smoothstep(.9990,.9998,sd2);
@@ -897,12 +787,92 @@
       gl_FragColor=vec4(sky,1.);
     }`
     });
-    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, 4), skyMat));
+    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, 3), skyMat)); // reduced detail
+
+    // ── Star flocks — JS particle system (far cheaper than per-pixel GLSL) ──
+    const FLOCK_N = 6, STARS_PER_FLOCK = IS_MOB ? 25 : 50;
+    const TOTAL_STARS = FLOCK_N * STARS_PER_FLOCK;
+    const starPositions = new Float32Array(TOTAL_STARS * 3);
+    const starColors = new Float32Array(TOTAL_STARS * 3);
+    const FLOCK_COLS = [[.72, .88, 1], [1, 1, 1], [1, .91, .70], [.84, .95, 1], [1, .96, .82], [.92, .82, 1]];
+    // Fixed offsets within each flock (random but stable)
+    const flockOffsets = [];
+    for (let fi = 0; fi < FLOCK_N; fi++) {
+      const offs = [];
+      for (let pi = 0; pi < STARS_PER_FLOCK; pi++) {
+        offs.push({
+          ax: Math.random() * Math.PI * 2, ay: Math.random() * Math.PI * 2,
+          r: 0.12 + Math.random() * 0.18,
+          sp: 0.002 + Math.random() * 0.003,
+          ph: Math.random() * Math.PI * 2
+        });
+      }
+      flockOffsets.push(offs);
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+    const starMat2 = new THREE.PointsMaterial({
+      size: IS_MOB ? 1.8 : 2.2, vertexColors: true,
+      transparent: true, opacity: 0.9, sizeAttenuation: false,
+      // Use a circular sprite for round dots
+      map: (() => {
+        const cv = document.createElement('canvas'); cv.width = 32; cv.height = 32;
+        const gx = cv.getContext('2d');
+        const gr = gx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gr.addColorStop(0, 'rgba(255,255,255,1)');
+        gr.addColorStop(0.4, 'rgba(255,255,255,0.8)');
+        gr.addColorStop(1, 'rgba(255,255,255,0)');
+        gx.fillStyle = gr; gx.beginPath(); gx.arc(16, 16, 16, 0, Math.PI * 2); gx.fill();
+        return new THREE.CanvasTexture(cv);
+      })(),
+      depthWrite: false, alphaTest: 0.01,
+    });
+    const starPoints = new THREE.Points(starGeo, starMat2);
+    starPoints.frustumCulled = false;
+    scene.add(starPoints);
+    window._updateStars = function (t) {
+      for (let fi = 0; fi < FLOCK_N; fi++) {
+        // Flock center orbits the sky sphere
+        const op = fi * 1.047 + 0.5;
+        const speed = 0.025 + fi * 0.008;
+        const ot = t * speed + op;
+        const phi = 0.9 + Math.sin(t * (0.008 + fi * 0.002) + op) * 0.5;
+        const fcx = Math.sin(phi) * Math.cos(ot) * 250;
+        const fcy = Math.cos(phi) * 250;
+        const fcz = Math.sin(phi) * Math.sin(ot) * 250;
+        // Flock tangent frame
+        const len = Math.sqrt(fcx * fcx + fcy * fcy + fcz * fcz);
+        const nx = fcx / len, ny = fcy / len, nz = fcz / len;
+        const ux = 0, uy = Math.abs(ny) < 0.98 ? 1 : 0, uz = Math.abs(ny) < 0.98 ? 0 : 1;
+        // right = cross(up, n)
+        const rx = uy * nz - uz * ny, ry = uz * nx - ux * nz, rz = ux * ny - uy * nx;
+        const rl = Math.sqrt(rx * rx + ry * ry + rz * rz) || 1;
+        // up2 = cross(n, right)
+        const u2x = (ny * (rz / rl) - nz * (ry / rl));
+        const u2y = (nz * (rx / rl) - nx * (rz / rl));
+        const u2z = (nx * (ry / rl) - ny * (rx / rl));
+        const [cr, cg, cb] = FLOCK_COLS[fi];
+        for (let pi = 0; pi < STARS_PER_FLOCK; pi++) {
+          const o = flockOffsets[fi][pi];
+          const sx = (Math.sin(o.ax + t * o.sp) * o.r + Math.sin(t * o.sp * 1.7 + o.ph) * 0.04);
+          const sy = (Math.cos(o.ay + t * o.sp) * o.r + Math.cos(t * o.sp * 1.3 + o.ph) * 0.04);
+          const idx = (fi * STARS_PER_FLOCK + pi) * 3;
+          starPositions[idx] = fcx + (rx / rl) * sx * 250 + u2x * sy * 250;
+          starPositions[idx + 1] = fcy + (ry / rl) * sx * 250 + u2y * sy * 250;
+          starPositions[idx + 2] = fcz + (rz / rl) * sx * 250 + u2z * sy * 250;
+          const tw = 0.7 + 0.3 * Math.sin(t * 4 + fi * 2.1) * Math.sin(t * 15 + pi * 0.5 + o.ph);
+          starColors[idx] = cr * tw; starColors[idx + 1] = cg * tw; starColors[idx + 2] = cb * tw;
+        }
+      }
+      starGeo.attributes.position.needsUpdate = true;
+      starGeo.attributes.color.needsUpdate = true;
+    };
 
     // ═══════════════════════════════════════════════════════════════
     // DESERT TERRAIN — procedural dunes with sand shader
     // ═══════════════════════════════════════════════════════════════
-    const TRES = IS_MOB ? 56 : 88;
+    const TRES = IS_MOB ? 40 : 64;
     const desertMat = new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() } },
       vertexShader: `
@@ -979,7 +949,7 @@
     });
 
     // Build dune terrain geometry
-    const tGeo = new THREE.PlaneGeometry(160, 160, TRES, TRES);
+    const tGeo = new THREE.PlaneGeometry(160, 160, TRES, TRES); // reduced
     tGeo.rotateX(-Math.PI / 2);
     const tPos = tGeo.attributes.position;
     for (let i = 0; i < tPos.count; i++) {
@@ -1074,7 +1044,7 @@
       gl_FragColor=vec4(col,clamp(.78+fr*.15,0.,1.));
     }`
     });
-    const wGeo = new THREE.PlaneGeometry(38, 38, IS_MOB ? 48 : 92, IS_MOB ? 48 : 92);
+    const wGeo = new THREE.PlaneGeometry(38, 38, IS_MOB ? 32 : 64, IS_MOB ? 32 : 64);
     wGeo.rotateX(-Math.PI / 2);
     const water = new THREE.Mesh(wGeo, waterMat);
     water.position.y = -3.0;
@@ -1083,7 +1053,7 @@
     // ═══════════════════════════════════════════════════════════════
     // RAIN — instanced line segments falling with wind
     // ═══════════════════════════════════════════════════════════════
-    const RAIN_N = IS_MOB ? 1200 : 3500;
+    const RAIN_N = IS_MOB ? 600 : 1800;
     (function () {
       // Each raindrop = short vertical line (2 verts)
       const rGeo = new THREE.BufferGeometry();
@@ -1203,7 +1173,7 @@
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
-      scrollSmooth += (scrollRaw - scrollSmooth) * .055;
+      scrollSmooth += (scrollRaw - scrollSmooth) * .12; // faster section transitions
       const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
 
       // ── Animated color cycle — hue sweeps through spectrum ──────
@@ -1219,16 +1189,16 @@
       skyMat.uniforms.uTime.value = t;
 
       // ── Fog color follows sky hue ────────────────────────────────
-      scene.fog.color.setHSL(h1 % 1, .6, .04);
+      // fog disabled
 
       // ── Lights cycle in sync with colors ────────────────────────
-      colorLightA.color.copy(colA).multiplyScalar(2.5);
-      colorLightB.color.copy(colB).multiplyScalar(2.0);
-      colorLightC.color.copy(colC).multiplyScalar(1.8);
-      // Slow drift of light positions
-      colorLightA.position.set(-30 + Math.sin(t * .07) * 10, 15, Math.cos(t * .05) * 8);
-      colorLightB.position.set(30 + Math.cos(t * .06) * 8, 10, -20 + Math.sin(t * .08) * 8);
-      colorLightC.position.set(Math.sin(t * .04) * 15, 20, 10 + Math.cos(t * .06) * 8);
+      colorLightA.color.copy(colA).multiplyScalar(2.0);
+      colorLightA.groundColor.copy(colC).multiplyScalar(0.5);
+      colorLightB.color.copy(colB).multiplyScalar(1.8);
+      colorLightC.color.copy(colC).multiplyScalar(1.4);
+      // Directional lights: just rotate direction, no position distance calc
+      colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
+      colorLightC.position.set(-15 + Math.cos(t * .04) * 8, 20, 10);
 
       // ── Desert terrain color ─────────────────────────────────────
       desertMat.uniforms.uTime.value = t;
@@ -1284,6 +1254,9 @@
         // Vary opacity slightly with time for shimmering effect
         window._rainGeo.material = window._rainGeo.material || new THREE.LineBasicMaterial({ color: 0x88aacc, transparent: true, opacity: .18 });
       }
+
+      // Update star flocks (cheap JS, not GPU-heavy GLSL per-pixel)
+      if (window._updateStars) window._updateStars(t);
 
       renderer.render(scene, camera);
     }
@@ -1356,6 +1329,7 @@
           srcNode = ctx2.createBufferSource();
           srcNode.buffer = audioBuffer;
           srcNode.loop = false;
+          srcNode.playbackRate.value = window._targetRate || 1.0;
           srcNode.connect(entry);
           srcNode.onended = () => { if (audioPlaying) startLoop(0); };
           srcNode.start(0, offset || 0);
@@ -1395,18 +1369,20 @@
         tremoloOsc.connect(tremoloGain.gain);
       }
 
-      // [lpFreq, hpFreq, wetGain, dryGain, masterVol, pan, tremoloHz]
+      // Per-section presets — DRASTIC changes so they're unmistakably audible
+      // [lpFreq, hpFreq, wetGain, dryGain, masterVol, playbackRate]
+      // playbackRate shifts pitch: 1.0=normal, 0.75=lower, 1.25=higher
       const PRESETS = [
-        [18000, 20, 0.12, 0.88, 0.72, 0.00, 0], // S0: bright open clean
-        [6000, 40, 0.50, 0.50, 0.68, 0.10, 0], // S1: muffled + roomy
-        [1800, 20, 0.72, 0.28, 0.58, 0.00, 0], // S2: very dark cavernous
-        [12000, 80, 0.18, 0.82, 0.76, 0.00, 0], // S3: punchy bright tight
-        [18000, 20, 0.58, 0.42, 0.64, 0.16, 0], // S4: wide spacious bright
-        [700, 130, 0.22, 0.78, 0.74, 0.00, 0], // S5: extreme muffle
-        [14000, 20, 0.82, 0.18, 0.56, 0.20, 4.0], // S6: wash+tremolo
-        [3500, 160, 0.32, 0.68, 0.82, 0.00, 0], // S7: dark punch
+        [18000, 20, 0.10, 0.90, 0.72, 1.00], // S0: full bright, normal pitch
+        [2000, 20, 0.75, 0.25, 0.65, 0.85], // S1: dark+cavernous+pitch down
+        [400, 20, 0.90, 0.10, 0.55, 0.70], // S2: extreme darkness, deep pitch
+        [16000, 200, 0.05, 0.95, 0.80, 1.15], // S3: ultra bright, stripped, pitch up
+        [18000, 20, 0.65, 0.35, 0.68, 1.25], // S4: bright + swimming reverb + high
+        [300, 300, 0.85, 0.15, 0.60, 0.75], // S5: almost inaudible + subterranean
+        [14000, 20, 0.92, 0.08, 0.55, 1.00], // S6: all reverb, washed out
+        [1200, 100, 0.40, 0.60, 0.82, 0.90], // S7: dark+loud+punchy return
       ];
-      const RAMP = 1.6;
+      const RAMP = 1.2; // faster transitions
       function applyPreset(i) {
         if (!audioReady || !ctx) return;
         if (i === currentSection) return;
@@ -1422,13 +1398,17 @@
         ramp(hpFilter.frequency, p[1]);
         if (wetG) ramp(wetG.gain, p[2]);
         if (dryG) ramp(dryG.gain, p[3]);
-        if (panner) ramp(panner.pan, p[5]);
-        // Tremolo amount
-        if (tremoloOsc) ramp(tremoloOsc.frequency, p[6]);
-        // Master vol after fade-in completes
+        // Playback rate = pitch shift (most dramatic perceptible change)
+        if (srcNode) {
+          srcNode.playbackRate.cancelScheduledValues(now);
+          srcNode.playbackRate.setValueAtTime(srcNode.playbackRate.value, now);
+          srcNode.playbackRate.linearRampToValueAtTime(p[5], now + RAMP);
+        }
+        // Also store target rate for when loop restarts
+        window._targetRate = p[5];
         setTimeout(() => {
           if (masterGain && audioPlaying) ramp(masterGain.gain, p[4]);
-        }, 400);
+        }, 300);
       }
 
       // ── Church organ pad (native oscillators) ────────────────────
