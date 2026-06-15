@@ -162,6 +162,11 @@
     }
 
     /* HERO BRAND */
+    #hero-brand.hidden {
+      opacity: 0;
+      pointer-events: none
+    }
+
     #hero-brand {
       position: fixed;
       top: 50%;
@@ -219,6 +224,22 @@
     .panel.active {
       opacity: 1;
       pointer-events: auto
+    }
+
+    /* Mobile: panels use class toggling via IO, not rAF opacity writes */
+    @media(max-width:767px) {
+      .panel {
+        transition: opacity .5s ease
+      }
+
+      #cur,
+      #cur2 {
+        display: none
+      }
+
+      #prog {
+        display: none
+      }
     }
 
     .panel-left .inner {
@@ -709,15 +730,17 @@
     // ── Cursor ────────────────────────────────────────────────────
     const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
     let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; }, { passive: true });
-    (function ac() { rx += (mx - rx) * .1; ry += (my - ry) * .1; cur2.style.left = rx + 'px'; cur2.style.top = ry + 'px'; requestAnimationFrame(ac); })();
+    if (!IS_MOB) { // Cursor only on desktop
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; }, { passive: true });
+      (function ac() { rx += (mx - rx) * .1; ry += (my - ry) * .1; cur2.style.left = rx + 'px'; cur2.style.top = ry + 'px'; requestAnimationFrame(ac); })();
+    }
 
     // ── Scroll ────────────────────────────────────────────────────
     let scrollRaw = 0, scrollSmooth = 0;
     const prog = document.getElementById('prog');
     window.addEventListener('scroll', () => {
       scrollRaw = window.scrollY;
-      prog.style.width = (scrollRaw / Math.max(1, document.body.scrollHeight - innerHeight) * 100) + '%';
+      if (!IS_MOB) prog.style.width = (scrollRaw / Math.max(1, document.body.scrollHeight - innerHeight) * 100) + '%';
     }, { passive: true });
 
     // ── Renderer ──────────────────────────────────────────────────
@@ -1068,6 +1091,45 @@
       gl_FragColor=vec4(col,clamp(.78+fr*.15,0.,1.));
     }`
     });
+    // ── Mobile scene: single full-screen gradient quad ──────────────
+    // 2 triangles. ShaderMaterial. No lights. No geometry displacement.
+    // Faster than CSS because it avoids compositor layer blending.
+    if (IS_MOB) {
+      const mobScene = true; // marker
+      // Full-screen quad in clip space (-1 to 1) — no perspective needed
+      const fsGeo = new THREE.PlaneGeometry(2, 2);
+      const fsMat = new THREE.ShaderMaterial({
+        depthTest: false, depthWrite: false,
+        uniforms: { uH1: { value: 0 }, uH2: { value: .33 }, uH3: { value: .66 } },
+        vertexShader: `void main(){gl_Position=vec4(position.xy,0.,1.);}`,
+        fragmentShader: `
+      precision mediump float;
+      uniform float uH1,uH2,uH3;
+      vec3 hsl(float h,float s,float l){
+        h=mod(h,1.);float c=(1.-abs(2.*l-1.))*s,x=c*(1.-abs(mod(h*6.,2.)-1.)),m=l-c*.5;
+        if(h<1./6.)return vec3(c,x,0.)+m;if(h<2./6.)return vec3(x,c,0.)+m;
+        if(h<3./6.)return vec3(0.,c,x)+m;if(h<4./6.)return vec3(0.,x,c)+m;
+        if(h<5./6.)return vec3(x,0.,c)+m;return vec3(c,0.,x)+m;
+      }
+      void main(){
+        vec2 uv=gl_FragCoord.xy/vec2(800.,1200.); // approx mobile res
+        // Simple 3-color radial gradient — no noise, no loop
+        float d=length(uv-vec2(.5,.35));
+        vec3 col=hsl(uH1,.80,.14);
+        col=mix(col,hsl(uH2,.75,.09),smoothstep(.0,.6,d));
+        col=mix(col,hsl(uH3,.70,.05),smoothstep(.4,.9,d));
+        gl_FragColor=vec4(col,1.);
+      }`
+      });
+      const fsMesh = new THREE.Mesh(fsGeo, fsMat);
+      fsMesh.frustumCulled = false;
+      scene.add(fsMesh);
+      window._mobFsMat = fsMat;
+      // Mobile camera: static, no movement needed for bg quad
+      camera.position.set(0, 0, 1);
+      camera.lookAt(0, 0, 0);
+    }
+
     // Water: only on desktop (too expensive for mobile)
     let water = null;
     if (!IS_MOB) {
@@ -1137,16 +1199,22 @@
         const m = .035;
         const active = s >= p.lo - m && s <= p.hi + m;
         p.el.classList.toggle('active', active);
-        if (active) {
+        if (!IS_MOB && active) {
+          // Desktop: smooth opacity within section
           const raw = clamp((s - p.lo) / (p.hi - p.lo), 0, 1);
           p.el.style.opacity = Math.min(clamp(raw / .1, 0, 1), clamp((1 - raw) / .1, 0, 1));
         }
       });
-      scrollHint.style.opacity = Math.max(0, 1 - s * 10);
-      // AMINOACID fades independently: visible from s=0, fades out s=0.18→0.28
+      if (!IS_MOB) scrollHint.style.opacity = Math.max(0, 1 - s * 10);
       const heroEl = document.getElementById('hero-brand');
-      // Fade out quickly: starts at s=0.06, fully gone by s=0.14
-      if (heroEl) heroEl.style.opacity = Math.max(0, 1 - clamp((s - .06) / .08, 0, 1));
+      if (heroEl) {
+        if (IS_MOB) {
+          // Mobile: just toggle class, let CSS handle transition
+          heroEl.classList.toggle('hidden', s > .12);
+        } else {
+          heroEl.style.opacity = Math.max(0, 1 - clamp((s - .06) / .08, 0, 1));
+        }
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -1161,15 +1229,23 @@
     const colB = new THREE.Color();
     const colC = new THREE.Color();
 
-    let _frame = 0;
+    let _frame = 0, _lastScrollRaw = -1, _needsRender = true;
+    // Mobile: only re-render when scroll position changed or color cycle tick
+    window.addEventListener('scroll', () => { _needsRender = true; }, { passive: true });
     function animate() {
       requestAnimationFrame(animate);
       _frame++;
-      // Mobile: render at ~30fps (skip odd frames)
-      // Mobile: ~20fps (every 3rd frame). Landscape is slow-moving, unnoticeable.
-      if (IS_MOB && (_frame % 3 !== 0)) return;
+      if (IS_MOB) {
+        // Only render every 2nd frame AND only if scroll changed or 500ms elapsed
+        if (_frame % 2 !== 0) return;
+        const scrollChanged = scrollRaw !== _lastScrollRaw;
+        const colorTick = (_frame % 30 === 0); // color update ~1fps on mobile
+        if (!scrollChanged && !colorTick && !_needsRender) return;
+        _lastScrollRaw = scrollRaw;
+        _needsRender = false;
+      }
       const t = clock.getElapsedTime();
-      scrollSmooth += (scrollRaw - scrollSmooth) * .12; // faster section transitions
+      scrollSmooth += (scrollRaw - scrollSmooth) * .12;
       const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
 
       // ── Color cycle ──────────────────────────────────────────────
@@ -1179,13 +1255,11 @@
       colC.setHSL(h3 % 1, .75, .12);
 
       if (IS_MOB) {
-        // Mobile: pure CSS gradient — zero GPU shader cost
-        const _mb = document.getElementById('mob-bg');
-        if (_mb) {
-          const c1 = `hsl(${Math.round(h1 * 360)},70%,12%)`;
-          const c2 = `hsl(${Math.round(h2 * 360)},65%,8%)`;
-          const c3 = `hsl(${Math.round(h3 * 360)},60%,5%)`;
-          _mb.style.background = `radial-gradient(ellipse at 60% 30%,${c1},${c2} 50%,${c3})`;
+        // Drive the full-screen gradient quad (2 triangles, ~free)
+        if (window._mobFsMat) {
+          window._mobFsMat.uniforms.uH1.value = h1 % 1;
+          window._mobFsMat.uniforms.uH2.value = h2 % 1;
+          window._mobFsMat.uniforms.uH3.value = h3 % 1;
         }
       } else {
         // Desktop: full shader updates
@@ -1208,16 +1282,17 @@
       }
 
       // ── Camera ──────────────────────────────────────────────────
-      if (!IS_MOB) { cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04; }
-      const ck = getCam(s);
-      const camX = ck.p[0] + (IS_MOB ? 0 : cpmx * 1.2), camZ = ck.p[2];
-      // Enforce minimum camera height — always at least 4.5 units above terrain
-      const floorH = terrainHeight(camX, camZ) + 4.5;
-      const camY = Math.max(ck.p[1] + cpmy * -.5, floorH);
-      camera.position.set(camX, camY, camZ);
-      // Also ensure look-at target isn't underground
-      const tgtFloor = terrainHeight(ck.t[0], ck.t[2]) + 1.5;
-      camera.lookAt(ck.t[0], Math.max(ck.t[1], tgtFloor), ck.t[2]);
+      if (!IS_MOB) {
+        cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04;
+        const ck = getCam(s);
+        const camX = ck.p[0] + cpmx * 1.2, camZ = ck.p[2];
+        const floorH = terrainHeight(camX, camZ) + 4.5;
+        const camY = Math.max(ck.p[1] + cpmy * -.5, floorH);
+        camera.position.set(camX, camY, camZ);
+        const tgtFloor = terrainHeight(ck.t[0], ck.t[2]) + 1.5;
+        camera.lookAt(ck.t[0], Math.max(ck.t[1], tgtFloor), ck.t[2]);
+      }
+      // (mobile camera is static — set once at scene init)
 
       // ── Panels ──────────────────────────────────────────────────
       updatePanels(s);
