@@ -1,686 +1,269 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aminoacid Studio — Experiencias digitales</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&family=DM+Mono:wght@300&display=swap"
-    rel="stylesheet">
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aminoacid Studio — Experiencias digitales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&family=DM+Mono:wght@300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:auto}
+body{background:#04020a;color:#e0d8f0;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+#root{position:relative;height:800vh}
+canvas{position:fixed;inset:0;z-index:0}
+#cur{position:fixed;width:5px;height:5px;background:#e0d8f0;border-radius:50%;pointer-events:none;z-index:999;transform:translate(-50%,-50%);mix-blend-mode:exclusion}
+#cur2{position:fixed;width:28px;height:28px;border:1px solid rgba(224,216,240,.25);border-radius:50%;pointer-events:none;z-index:998;transform:translate(-50%,-50%)}
+#prog{position:fixed;top:0;left:0;height:1px;background:rgba(180,160,255,.5);z-index:200;width:0;transition:width .08s linear}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:2rem 4rem}
+.logo{font-family:'Cormorant',serif;font-size:1rem;letter-spacing:.18em;text-transform:uppercase;color:#e0d8f0;text-decoration:none;opacity:.9}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,216,240,.5);text-decoration:none;transition:color .3s}
+.nav-links a:hover{color:#e0d8f0}
+#lang-switcher{display:flex;gap:.5rem;margin-left:2rem}
+.lang-btn{background:none;border:none;color:rgba(224,216,240,.4);font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;cursor:pointer;padding:.2rem .3rem;transition:color .3s}
+.lang-btn.active,.lang-btn:hover{color:#e0d8f0}
+@media(max-width:768px){.nav-links{display:none}nav{padding:1.5rem}#cur,#cur2{display:none}body{cursor:auto}}
 
-    html {
-      font-size: 16px;
-      scroll-behavior: auto
-    }
-
-    body {
-      background: #04020a;
-      color: #e0d8f0;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      overflow-x: hidden;
-      cursor: none
-    }
-
-    #root {
-      position: relative;
-      height: 800vh
-    }
-
-    canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0
-    }
-
-    #cur {
-      position: fixed;
-      width: 5px;
-      height: 5px;
-      background: #e0d8f0;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 999;
-      transform: translate(-50%, -50%);
-      mix-blend-mode: exclusion
-    }
-
-    #cur2 {
-      position: fixed;
-      width: 28px;
-      height: 28px;
-      border: 1px solid rgba(224, 216, 240, .25);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 998;
-      transform: translate(-50%, -50%)
-    }
-
-    #prog {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 1px;
-      background: rgba(180, 160, 255, .5);
-      z-index: 200;
-      width: 0;
-      transition: width .08s linear
-    }
-
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 4rem
-    }
-
-    .logo {
-      font-family: 'Cormorant', serif;
-      font-size: 1rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: #e0d8f0;
-      text-decoration: none;
-      opacity: .9
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      list-style: none
-    }
-
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: .62rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: rgba(224, 216, 240, .5);
-      text-decoration: none;
-      transition: color .3s
-    }
-
-    .nav-links a:hover {
-      color: #e0d8f0
-    }
-
-    #lang-switcher {
-      display: flex;
-      gap: .5rem;
-      margin-left: 2rem
-    }
-
-    .lang-btn {
-      background: none;
-      border: none;
-      color: rgba(224, 216, 240, .4);
-      font-family: 'DM Mono', monospace;
-      font-size: .58rem;
-      letter-spacing: .18em;
-      cursor: pointer;
-      padding: .2rem .3rem;
-      transition: color .3s
-    }
-
-    .lang-btn.active,
-    .lang-btn:hover {
-      color: #e0d8f0
-    }
-
-    @media(max-width:768px) {
-      .nav-links {
-        display: none
-      }
-
-      nav {
-        padding: 1.5rem
-      }
-
-      #cur,
-      #cur2 {
-        display: none
-      }
-
-      body {
-        cursor: auto
-      }
-    }
-
-    /* HERO BRAND */
-    #hero-brand {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 15;
-      text-align: center;
-      pointer-events: none;
-      transition: opacity .6s ease;
-      /* Controlled by JS scroll — does NOT follow panel system */
-    }
-
-    #hero-word-row {
-      display: flex;
-      gap: 0;
-      justify-content: center;
-      line-height: 1;
-      margin-bottom: .5rem;
-      flex-wrap: nowrap;
-      width: 100%;
-      max-width: 98vw;
-      overflow: hidden;
-    }
-
-    .hw {
-      font-family: 'Cormorant', serif;
-      font-size: clamp(1.8rem, 9.5vw, 11rem);
-      font-weight: 300;
-      letter-spacing: .04em;
-      color: #e8e0f8;
-      text-shadow: 0 0 80px rgba(100, 80, 200, .4), 0 2px 60px rgba(0, 0, 0, .9);
-      display: inline-block;
-      will-change: filter;
-      pointer-events: all;
-      cursor: none;
-    }
-
-    #hero-sub-row {
-      text-align: center;
-      margin-top: .6rem;
-    }
-
-    /* PANELS */
-    .panel {
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .4s ease
-    }
-
-    .panel.active {
-      opacity: 1;
-      pointer-events: auto
-    }
-
-    .panel-left .inner {
-      margin-left: 8vw;
-      max-width: 500px
-    }
-
-    #p0 {
-      flex-direction: column;
-      justify-content: flex-end
-    }
-
-    .panel-right .inner {
-      margin-left: auto;
-      margin-right: 8vw;
-      max-width: 500px
-    }
-
-    .panel-center .inner {
-      margin: 0 auto;
-      max-width: 640px;
-      text-align: center
-    }
-
-    .eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: .6rem;
-      letter-spacing: .35em;
-      text-transform: uppercase;
-      color: rgba(200, 180, 255, .65);
-      margin-bottom: 1.4rem;
-      display: block
-    }
-
-    .display {
-      font-family: 'Cormorant', serif;
-      font-size: clamp(2.6rem, 5.2vw, 5.8rem);
-      font-weight: 300;
-      line-height: 1.0;
-      letter-spacing: -.02em;
-      color: #e8e0f8;
-      text-shadow: 0 2px 60px rgba(0, 0, 0, .8)
-    }
-
-    .display em {
-      font-style: italic;
-      color: rgba(200, 160, 255, .85)
-    }
-
-    .body-text {
-      margin-top: 1.8rem;
-      font-size: clamp(.88rem, 1.3vw, 1rem);
-      color: rgba(224, 216, 240, .55);
-      line-height: 1.8
-    }
-
-    .divider {
-      width: 36px;
-      height: 1px;
-      background: rgba(180, 140, 255, .35);
-      margin: 1.6rem 0
-    }
-
-    .tag {
-      display: inline-block;
-      font-family: 'DM Mono', monospace;
-      font-size: .56rem;
-      letter-spacing: .25em;
-      text-transform: uppercase;
-      border: 1px solid rgba(180, 140, 255, .25);
-      color: rgba(180, 140, 255, .55);
-      padding: .3rem .75rem;
-      margin-bottom: 1.2rem
-    }
-
-    .svc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-      margin-top: 1.8rem
-    }
-
-    .svc-item {
-      padding: 1.2rem 1.4rem;
-      border: 1px solid rgba(180, 140, 255, .1);
-      background: rgba(4, 2, 10, .55);
-      backdrop-filter: blur(12px)
-    }
-
-    .svc-num {
-      font-family: 'DM Mono', monospace;
-      font-size: .54rem;
-      letter-spacing: .3em;
-      color: rgba(180, 140, 255, .4);
-      display: block;
-      margin-bottom: .5rem
-    }
-
-    .svc-name {
-      font-family: 'Cormorant', serif;
-      font-size: 1.15rem;
-      color: #e8e0f8;
-      margin-bottom: .4rem
-    }
-
-    .svc-desc {
-      font-size: .76rem;
-      color: rgba(224, 216, 240, .45);
-      line-height: 1.55
-    }
-
-    .process-row {
-      display: flex;
-      gap: 1.8rem;
-      margin-top: 1.8rem;
-      flex-wrap: wrap
-    }
-
-    .step {
-      flex: 1;
-      min-width: 110px
-    }
-
-    .step-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      border: 1px solid rgba(180, 140, 255, .4);
-      margin-bottom: .9rem
-    }
-
-    .step-num {
-      font-family: 'DM Mono', monospace;
-      font-size: .54rem;
-      letter-spacing: .3em;
-      color: rgba(180, 140, 255, .4);
-      display: block;
-      margin-bottom: .4rem
-    }
-
-    .step-name {
-      font-family: 'Cormorant', serif;
-      font-size: 1.05rem;
-      color: #e8e0f8;
-      margin-bottom: .3rem
-    }
-
-    .step-desc {
-      font-size: .73rem;
-      color: rgba(224, 216, 240, .4);
-      line-height: 1.5
-    }
-
-    .cta-link {
-      display: inline-block;
-      margin-top: 2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: .68rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: rgba(200, 170, 255, .8);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(200, 170, 255, .3);
-      padding-bottom: .3rem;
-      transition: color .3s, border-color .3s
-    }
-
-    .cta-link:hover {
-      color: #e8e0f8;
-      border-color: rgba(224, 216, 240, .5)
-    }
-
-    #scroll-hint {
-      position: fixed;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: .6rem;
-      pointer-events: none;
-      transition: opacity .5s
-    }
-
-    #scroll-hint .line {
-      width: 1px;
-      height: 48px;
-      background: linear-gradient(to bottom, rgba(200, 170, 255, .5), transparent);
-      animation: lp 2s ease-in-out infinite
-    }
-
-    #scroll-hint span {
-      font-family: 'DM Mono', monospace;
-      font-size: .54rem;
-      letter-spacing: .28em;
-      text-transform: uppercase;
-      color: rgba(200, 170, 255, .35)
-    }
-
-    @keyframes lp {
-
-      0%,
-      100% {
-        opacity: .3;
-        transform: scaleY(1)
-      }
-
-      50% {
-        opacity: .9;
-        transform: scaleY(.85)
-      }
-    }
-
-    @media(max-width:768px) {
-      .svc-grid {
-        grid-template-columns: 1fr
-      }
-
-      .panel-left .inner,
-      .panel-right .inner {
-        margin: 0 5vw;
-        max-width: 100%
-      }
-
-      .display {
-        font-size: clamp(2rem, 7vw, 3rem)
-      }
-    }
-  </style>
+/* HERO BRAND */
+#hero-brand{
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:15;
+  text-align:center;
+  pointer-events:none;
+  transition:opacity .6s ease;
+  /* Controlled by JS scroll — does NOT follow panel system */
+}
+#hero-word-row{
+  display:flex;
+  gap:0;
+  justify-content:center;
+  line-height:1;
+  margin-bottom:.5rem;
+  flex-wrap:nowrap;
+  width:100%;
+  max-width:98vw;
+  overflow:hidden;
+}
+.hw{
+  font-family:'Cormorant',serif;
+  font-size:clamp(1.8rem,9.5vw,11rem);
+  font-weight:300;
+  letter-spacing:.04em;
+  color:#e8e0f8;
+  text-shadow:0 0 80px rgba(100,80,200,.4),0 2px 60px rgba(0,0,0,.9);
+  display:inline-block;
+  will-change:filter;
+  pointer-events:all;
+  cursor:none;
+}
+#hero-sub-row{
+  text-align:center;
+  margin-top:.6rem;
+}
+/* PANELS */
+.panel{position:fixed;inset:0;z-index:10;display:flex;align-items:center;pointer-events:none;opacity:0;transition:opacity .4s ease}
+.panel.active{opacity:1;pointer-events:auto}
+.panel-left  .inner{margin-left:8vw;max-width:500px}
+#p0{flex-direction:column;justify-content:flex-end}
+.panel-right .inner{margin-left:auto;margin-right:8vw;max-width:500px}
+.panel-center .inner{margin:0 auto;max-width:640px;text-align:center}
+.eyebrow{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(200,180,255,.65);margin-bottom:1.4rem;display:block}
+.display{font-family:'Cormorant',serif;font-size:clamp(2.6rem,5.2vw,5.8rem);font-weight:300;line-height:1.0;letter-spacing:-.02em;color:#e8e0f8;text-shadow:0 2px 60px rgba(0,0,0,.8)}
+.display em{font-style:italic;color:rgba(200,160,255,.85)}
+.body-text{margin-top:1.8rem;font-size:clamp(.88rem,1.3vw,1rem);color:rgba(224,216,240,.55);line-height:1.8}
+.divider{width:36px;height:1px;background:rgba(180,140,255,.35);margin:1.6rem 0}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.25em;text-transform:uppercase;border:1px solid rgba(180,140,255,.25);color:rgba(180,140,255,.55);padding:.3rem .75rem;margin-bottom:1.2rem}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.8rem}
+.svc-item{padding:1.2rem 1.4rem;border:1px solid rgba(180,140,255,.1);background:rgba(4,2,10,.55);backdrop-filter:blur(12px)}
+.svc-num{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.3em;color:rgba(180,140,255,.4);display:block;margin-bottom:.5rem}
+.svc-name{font-family:'Cormorant',serif;font-size:1.15rem;color:#e8e0f8;margin-bottom:.4rem}
+.svc-desc{font-size:.76rem;color:rgba(224,216,240,.45);line-height:1.55}
+.process-row{display:flex;gap:1.8rem;margin-top:1.8rem;flex-wrap:wrap}
+.step{flex:1;min-width:110px}
+.step-dot{width:5px;height:5px;border-radius:50%;border:1px solid rgba(180,140,255,.4);margin-bottom:.9rem}
+.step-num{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.3em;color:rgba(180,140,255,.4);display:block;margin-bottom:.4rem}
+.step-name{font-family:'Cormorant',serif;font-size:1.05rem;color:#e8e0f8;margin-bottom:.3rem}
+.step-desc{font-size:.73rem;color:rgba(224,216,240,.4);line-height:1.5}
+.cta-link{display:inline-block;margin-top:2rem;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,170,255,.8);text-decoration:none;border-bottom:1px solid rgba(200,170,255,.3);padding-bottom:.3rem;transition:color .3s,border-color .3s}
+.cta-link:hover{color:#e8e0f8;border-color:rgba(224,216,240,.5)}
+#scroll-hint{position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:.6rem;pointer-events:none;transition:opacity .5s}
+#scroll-hint .line{width:1px;height:48px;background:linear-gradient(to bottom,rgba(200,170,255,.5),transparent);animation:lp 2s ease-in-out infinite}
+#scroll-hint span{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,170,255,.35)}
+@keyframes lp{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:.9;transform:scaleY(.85)}}
+@media(max-width:768px){.svc-grid{grid-template-columns:1fr}.panel-left .inner,.panel-right .inner{margin:0 5vw;max-width:100%}.display{font-size:clamp(2rem,7vw,3rem)}}
+</style>
 </head>
-
 <body>
-  <canvas id="c"></canvas>
+<canvas id="c"></canvas>
 
-  <!-- SVG distortion filters -->
-  <svg id="svg-defs" style="position:absolute;width:0;height:0;overflow:hidden">
-    <defs id="svg-filter-defs"></defs>
-  </svg>
-  <div id="root"></div>
-  <div id="cur"></div>
-  <div id="cur2"></div>
-  <div id="prog"></div>
-  <nav>
-    <a href="#" class="logo">Aminoacid Studio</a>
-    <ul class="nav-links">
-      <li><a href="#" data-i18n="nav.services">Servicios</a></li>
-      <li><a href="#" data-i18n="nav.process">Proceso</a></li>
-      <li><a href="#" data-i18n="nav.work">Trabajo</a></li>
-      <li><a href="#" data-i18n="nav.contact">Contacto</a></li>
-    </ul>
-    <div id="lang-switcher">
-      <button class="lang-btn active" data-lang="es">ES</button>
-      <button class="lang-btn" data-lang="en">EN</button>
-      <button class="lang-btn" data-lang="fr">FR</button>
-    </div>
-  </nav>
-
-  <!-- AMINOACID hero — standalone fixed, independent of panel system -->
-  <div id="hero-brand">
-    <div id="hero-word-row" aria-label="AMINOACID">
-      <span class="hw">A</span><span class="hw">M</span><span class="hw">I</span><span class="hw">N</span><span
-        class="hw">O</span><span class="hw">A</span><span class="hw">C</span><span class="hw">I</span><span
-        class="hw">D</span>
-    </div>
-    <div id="hero-sub-row">
-      <span class="eyebrow" style="margin-bottom:0;opacity:.65" data-i18n="hero.eyebrow">Experiencias digitales</span>
-    </div>
+<!-- SVG distortion filters -->
+<svg id="svg-defs" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs id="svg-filter-defs"></defs>
+</svg>
+<div id="root"></div>
+<div id="cur"></div><div id="cur2"></div>
+<div id="prog"></div>
+<nav>
+  <a href="#" class="logo">Aminoacid Studio</a>
+  <ul class="nav-links">
+    <li><a href="#" data-i18n="nav.services">Servicios</a></li>
+    <li><a href="#" data-i18n="nav.process">Proceso</a></li>
+    <li><a href="#" data-i18n="nav.work">Trabajo</a></li>
+    <li><a href="#" data-i18n="nav.contact">Contacto</a></li>
+  </ul>
+  <div id="lang-switcher">
+    <button class="lang-btn active" data-lang="es">ES</button>
+    <button class="lang-btn" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="fr">FR</button>
   </div>
+</nav>
 
-  <div class="panel panel-left active" id="p0">
-    <div class="inner" style="margin-top:auto;padding-bottom:10vh">
-      <p class="body-text" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan
-        huella.</p>
-    </div>
+<!-- AMINOACID hero — standalone fixed, independent of panel system -->
+<div id="hero-brand">
+  <div id="hero-word-row" aria-label="AMINOACID">
+    <span class="hw">A</span><span class="hw">M</span><span class="hw">I</span><span class="hw">N</span><span class="hw">O</span><span class="hw">A</span><span class="hw">C</span><span class="hw">I</span><span class="hw">D</span>
   </div>
-
-  <div class="panel panel-right" id="p1">
-    <div class="inner">
-      <span class="tag" data-i18n="p1.tag">Sobre el estudio</span>
-      <h2 class="display" data-i18n="p1.title">Donde el <em>diseño</em><br>encuentra la<br>ingeniería.</h2>
-      <div class="divider"></div>
-      <p class="body-text">Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos
-        pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales
-        que dejan huella.</p>
-    </div>
+  <div id="hero-sub-row">
+    <span class="eyebrow" style="margin-bottom:0;opacity:.65" data-i18n="hero.eyebrow">Experiencias digitales</span>
   </div>
+</div>
 
-  <div class="panel panel-center" id="p2">
-    <div class="inner">
-      <span class="eyebrow" data-i18n="p2.eyebrow">01 — Artesanía digital</span>
-      <h2 class="display" data-i18n="p2.title">Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en
-        irse.</h2>
-    </div>
+<div class="panel panel-left active" id="p0">
+  <div class="inner" style="margin-top:auto;padding-bottom:10vh">
+    <p class="body-text" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan huella.</p>
   </div>
+</div>
 
-  <div class="panel panel-left" id="p3">
-    <div class="inner" style="max-width:680px">
-      <span class="eyebrow">Lo que construimos</span>
-      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">Nuestro <em>craft</em></h2>
-      <div class="svc-grid">
-        <div class="svc-item"><span class="svc-num">01</span>
-          <div class="svc-name">Desarrollo Web Moderno</div>
-          <p class="svc-desc">React, Next.js y arquitecturas personalizadas.</p>
-        </div>
-        <div class="svc-item"><span class="svc-num">02</span>
-          <div class="svc-name">Landing Pages</div>
-          <p class="svc-desc">Conversión, narrativa de marca y resultados.</p>
-        </div>
-        <div class="svc-item"><span class="svc-num">03</span>
-          <div class="svc-name">Experiencias 3D</div>
-          <p class="svc-desc">Escenas WebGL inmersivas en tiempo real.</p>
-        </div>
-        <div class="svc-item"><span class="svc-num">04</span>
-          <div class="svc-name">UX/UI Interfaces</div>
-          <p class="svc-desc">Del wireframe al sistema de alta fidelidad.</p>
-        </div>
-        <div class="svc-item"><span class="svc-num">05</span>
-          <div class="svc-name">Automatizaciones</div>
-          <p class="svc-desc">Pipelines de API que eliminan la fricción.</p>
-        </div>
-        <div class="svc-item"><span class="svc-num">06</span>
-          <div class="svc-name">Performance</div>
-          <p class="svc-desc">Sitios lentos → experiencias ultrarrápidas.</p>
-        </div>
-      </div>
-    </div>
+<div class="panel panel-right" id="p1"><div class="inner">
+  <span class="tag" data-i18n="p1.tag">Sobre el estudio</span>
+  <h2 class="display" data-i18n="p1.title">Donde el <em>diseño</em><br>encuentra la<br>ingeniería.</h2>
+  <div class="divider"></div>
+  <p class="body-text">Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales que dejan huella.</p>
+</div></div>
+
+<div class="panel panel-center" id="p2"><div class="inner">
+  <span class="eyebrow" data-i18n="p2.eyebrow">01 — Artesanía digital</span>
+  <h2 class="display" data-i18n="p2.title">Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.</h2>
+</div></div>
+
+<div class="panel panel-left" id="p3"><div class="inner" style="max-width:680px">
+  <span class="eyebrow">Lo que construimos</span>
+  <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">Nuestro <em>craft</em></h2>
+  <div class="svc-grid">
+    <div class="svc-item"><span class="svc-num">01</span><div class="svc-name">Desarrollo Web Moderno</div><p class="svc-desc">React, Next.js y arquitecturas personalizadas.</p></div>
+    <div class="svc-item"><span class="svc-num">02</span><div class="svc-name">Landing Pages</div><p class="svc-desc">Conversión, narrativa de marca y resultados.</p></div>
+    <div class="svc-item"><span class="svc-num">03</span><div class="svc-name">Experiencias 3D</div><p class="svc-desc">Escenas WebGL inmersivas en tiempo real.</p></div>
+    <div class="svc-item"><span class="svc-num">04</span><div class="svc-name">UX/UI Interfaces</div><p class="svc-desc">Del wireframe al sistema de alta fidelidad.</p></div>
+    <div class="svc-item"><span class="svc-num">05</span><div class="svc-name">Automatizaciones</div><p class="svc-desc">Pipelines de API que eliminan la fricción.</p></div>
+    <div class="svc-item"><span class="svc-num">06</span><div class="svc-name">Performance</div><p class="svc-desc">Sitios lentos → experiencias ultrarrápidas.</p></div>
   </div>
+</div></div>
 
-  <div class="panel panel-center" id="p4">
-    <div class="inner">
-      <span class="eyebrow">02 — Artesanía digital</span>
-      <h2 class="display"><em>La interacción</em><br>convierte una página<br>en una experiencia.</h2>
-    </div>
+<div class="panel panel-center" id="p4"><div class="inner">
+  <span class="eyebrow">02 — Artesanía digital</span>
+  <h2 class="display"><em>La interacción</em><br>convierte una página<br>en una experiencia.</h2>
+</div></div>
+
+<div class="panel panel-right" id="p5"><div class="inner" style="max-width:540px">
+  <span class="tag">Cómo trabajamos</span>
+  <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">El <em>proceso</em></h2>
+  <div class="process-row">
+    <div class="step"><div class="step-dot"></div><span class="step-num">01</span><div class="step-name">Descubrimiento</div><p class="step-desc">Objetivos, usuarios y contexto.</p></div>
+    <div class="step"><div class="step-dot"></div><span class="step-num">02</span><div class="step-name">Diseño</div><p class="step-desc">Sistémico y visual.</p></div>
+    <div class="step"><div class="step-dot"></div><span class="step-num">03</span><div class="step-name">Prototipo</div><p class="step-desc">Validar antes de construir.</p></div>
+    <div class="step"><div class="step-dot"></div><span class="step-num">04</span><div class="step-name">Desarrollo</div><p class="step-desc">Código limpio y medible.</p></div>
+    <div class="step"><div class="step-dot"></div><span class="step-num">05</span><div class="step-name">Lanzamiento</div><p class="step-desc">Deploy y refinamiento continuo.</p></div>
   </div>
+</div></div>
 
-  <div class="panel panel-right" id="p5">
-    <div class="inner" style="max-width:540px">
-      <span class="tag">Cómo trabajamos</span>
-      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">El <em>proceso</em></h2>
-      <div class="process-row">
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">01</span>
-          <div class="step-name">Descubrimiento</div>
-          <p class="step-desc">Objetivos, usuarios y contexto.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">02</span>
-          <div class="step-name">Diseño</div>
-          <p class="step-desc">Sistémico y visual.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">03</span>
-          <div class="step-name">Prototipo</div>
-          <p class="step-desc">Validar antes de construir.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">04</span>
-          <div class="step-name">Desarrollo</div>
-          <p class="step-desc">Código limpio y medible.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">05</span>
-          <div class="step-name">Lanzamiento</div>
-          <p class="step-desc">Deploy y refinamiento continuo.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="panel panel-center" id="p6"><div class="inner">
+  <span class="eyebrow">03 — Artesanía digital</span>
+  <h2 class="display">El 3D no decora;<br>debe <em>contar<br>una historia.</em></h2>
+</div></div>
 
-  <div class="panel panel-center" id="p6">
-    <div class="inner">
-      <span class="eyebrow">03 — Artesanía digital</span>
-      <h2 class="display">El 3D no decora;<br>debe <em>contar<br>una historia.</em></h2>
-    </div>
-  </div>
+<div class="panel panel-left" id="p7"><div class="inner">
+  <span class="eyebrow">¿Listo para comenzar?</span>
+  <h2 class="display">Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em></h2>
+  <div class="divider"></div>
+  <p class="body-text">Hablemos sobre tu proyecto.</p>
+  <a href="mailto:hello@aminoacid.studio" class="cta-link">hello@aminoacid.studio →</a>
+</div></div>
 
-  <div class="panel panel-left" id="p7">
-    <div class="inner">
-      <span class="eyebrow">¿Listo para comenzar?</span>
-      <h2 class="display">Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em></h2>
-      <div class="divider"></div>
-      <p class="body-text">Hablemos sobre tu proyecto.</p>
-      <a href="mailto:hello@aminoacid.studio" class="cta-link">hello@aminoacid.studio →</a>
-    </div>
-  </div>
+<div id="scroll-hint"><div class="line"></div><span data-i18n="scroll">Desplazar</span></div>
 
-  <div id="scroll-hint">
-    <div class="line"></div><span data-i18n="scroll">Desplazar</span>
-  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+const IS_MOB=innerWidth<768;
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-    'use strict';
-    const IS_MOB = innerWidth < 768;
+// ── Cursor ────────────────────────────────────────────────────
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';},{passive:true});
+(function ac(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cur2.style.left=rx+'px';cur2.style.top=ry+'px';requestAnimationFrame(ac);})();
 
-    // ── Cursor ────────────────────────────────────────────────────
-    const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; }, { passive: true });
-    (function ac() { rx += (mx - rx) * .1; ry += (my - ry) * .1; cur2.style.left = rx + 'px'; cur2.style.top = ry + 'px'; requestAnimationFrame(ac); })();
+// ── Scroll ────────────────────────────────────────────────────
+let scrollRaw=0,scrollSmooth=0;
+const prog=document.getElementById('prog');
+window.addEventListener('scroll',()=>{
+  scrollRaw=window.scrollY;
+  prog.style.width=(scrollRaw/Math.max(1,document.body.scrollHeight-innerHeight)*100)+'%';
+},{passive:true});
 
-    // ── Scroll ────────────────────────────────────────────────────
-    let scrollRaw = 0, scrollSmooth = 0;
-    const prog = document.getElementById('prog');
-    window.addEventListener('scroll', () => {
-      scrollRaw = window.scrollY;
-      prog.style.width = (scrollRaw / Math.max(1, document.body.scrollHeight - innerHeight) * 100) + '%';
-    }, { passive: true });
+// ── Renderer ──────────────────────────────────────────────────
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:!IS_MOB,alpha:false,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,IS_MOB?1.0:2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.setClearColor(0x04020a,1);
+renderer.toneMapping=IS_MOB?THREE.LinearToneMapping:THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=IS_MOB?1.0:1.1;
 
-    // ── Renderer ──────────────────────────────────────────────────
-    const canvas = document.getElementById('c');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOB, alpha: false, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOB ? 1.0 : 2));
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setClearColor(0x04020a, 1);
-    renderer.toneMapping = IS_MOB ? THREE.LinearToneMapping : THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = IS_MOB ? 1.0 : 1.1;
+const scene=new THREE.Scene();
+// scene.fog disabled for performance
 
-    const scene = new THREE.Scene();
-    // scene.fog disabled for performance
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.05,600);
+camera.position.set(0,4,28);
 
-    const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, .05, 600);
-    camera.position.set(0, 4, 28);
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
 
-    window.addEventListener('resize', () => {
-      camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
+const lerp=(a,b,t)=>a+(b-a)*t;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function eio(t){return t<.5?2*t*t:-1+(4-2*t)*t}
 
-    const lerp = (a, b, t) => a + (b - a) * t;
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-    function eio(t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t }
+// ═══════════════════════════════════════════════════════════════
+// LIGHTS
+// ═══════════════════════════════════════════════════════════════
+scene.add(new THREE.AmbientLight(0x0a0520,5));
 
-    // ═══════════════════════════════════════════════════════════════
-    // LIGHTS
-    // ═══════════════════════════════════════════════════════════════
-    scene.add(new THREE.AmbientLight(0x0a0520, 5));
+// Blue-electric "star" light — main key
+const starLight=new THREE.DirectionalLight(0x2255ff,2.8);
+starLight.position.set(20,12,-15);
+scene.add(starLight);
 
-    // Blue-electric "star" light — main key
-    const starLight = new THREE.DirectionalLight(0x2255ff, 2.8);
-    starLight.position.set(20, 12, -15);
-    scene.add(starLight);
+// Animated color lights — driven by time (color cycle)
+// Use HemisphereLight instead of 3 PointLights — much cheaper
+const colorLightA=new THREE.HemisphereLight(0xff00aa,0x001122,2.0); scene.add(colorLightA);
+const colorLightB=new THREE.DirectionalLight(0x00ffcc,1.5); colorLightB.position.set(30,10,-20); scene.add(colorLightB);
+const colorLightC=new THREE.DirectionalLight(0xaa00ff,1.2); colorLightC.position.set(-15,20,10); scene.add(colorLightC);
 
-    // Animated color lights — driven by time (color cycle)
-    // Use HemisphereLight instead of 3 PointLights — much cheaper
-    const colorLightA = new THREE.HemisphereLight(0xff00aa, 0x001122, 2.0); scene.add(colorLightA);
-    const colorLightB = new THREE.DirectionalLight(0x00ffcc, 1.5); colorLightB.position.set(30, 10, -20); scene.add(colorLightB);
-    const colorLightC = new THREE.DirectionalLight(0xaa00ff, 1.2); colorLightC.position.set(-15, 20, 10); scene.add(colorLightC);
-
-    // ═══════════════════════════════════════════════════════════════
-    // SKY — full animated color cycle matching video
-    // HSL hue rotates over time: magenta→yellow→green→cyan→blue→purple→magenta
-    // Multiple "nebula" layers pulse at different rates
-    // ═══════════════════════════════════════════════════════════════
-    const skyMat = new THREE.ShaderMaterial({
-      side: THREE.BackSide,
-      depthWrite: false,
-      uniforms: { uTime: { value: 0 } },
-      vertexShader: `varying vec3 vDir;void main(){vDir=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader: `
+// ═══════════════════════════════════════════════════════════════
+// SKY — full animated color cycle matching video
+// HSL hue rotates over time: magenta→yellow→green→cyan→blue→purple→magenta
+// Multiple "nebula" layers pulse at different rates
+// ═══════════════════════════════════════════════════════════════
+const skyMat=new THREE.ShaderMaterial({
+  side:THREE.BackSide,
+  depthWrite:false,
+  uniforms:{uTime:{value:0}},
+  vertexShader:`varying vec3 vDir;void main(){vDir=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`
     precision highp float;
     uniform float uTime;
     varying vec3 vDir;
@@ -753,9 +336,6 @@
       sky+=neb1*nebMask*.7;
       sky*=.92+n3*.16;
 
-      // Star flocks moved to JS particle system — sky shader is now cheap
-      // (see THREE.Points _starFlock below)
-
             // === ELECTRIC BLUE SUN DISC ===
       vec3 sunDir=normalize(vec3(.6,.12,-.8));
       float sd2=max(0.,dot(d,sunDir));
@@ -772,96 +352,17 @@
       sky=pow(max(sky,vec3(0.)),vec3(.88)); // slight gamma lift
       gl_FragColor=vec4(sky,1.);
     }`
-    });
-    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, IS_MOB ? 2 : 3), skyMat)); // reduced detail
+});
+scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300,IS_MOB?2:3),skyMat)); // reduced detail
 
-    // ── Star flocks — JS particle system (far cheaper than per-pixel GLSL) ──
-    const FLOCK_N = IS_MOB ? 3 : 6, STARS_PER_FLOCK = IS_MOB ? 15 : 50;
-    const TOTAL_STARS = FLOCK_N * STARS_PER_FLOCK;
-    const starPositions = new Float32Array(TOTAL_STARS * 3);
-    const starColors = new Float32Array(TOTAL_STARS * 3);
-    const FLOCK_COLS = [[.72, .88, 1], [1, 1, 1], [1, .91, .70], [.84, .95, 1], [1, .96, .82], [.92, .82, 1]];
-    // Fixed offsets within each flock (random but stable)
-    const flockOffsets = [];
-    for (let fi = 0; fi < FLOCK_N; fi++) {
-      const offs = [];
-      for (let pi = 0; pi < STARS_PER_FLOCK; pi++) {
-        offs.push({
-          ax: Math.random() * Math.PI * 2, ay: Math.random() * Math.PI * 2,
-          r: 0.12 + Math.random() * 0.18,
-          sp: 0.002 + Math.random() * 0.003,
-          ph: Math.random() * Math.PI * 2
-        });
-      }
-      flockOffsets.push(offs);
-    }
-    const starGeo = new THREE.BufferGeometry();
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-    const starMat2 = new THREE.PointsMaterial({
-      size: IS_MOB ? 1.8 : 2.2, vertexColors: true,
-      transparent: true, opacity: 0.9, sizeAttenuation: false,
-      // Use a circular sprite for round dots
-      map: (() => {
-        const cv = document.createElement('canvas'); cv.width = 32; cv.height = 32;
-        const gx = cv.getContext('2d');
-        const gr = gx.createRadialGradient(16, 16, 0, 16, 16, 16);
-        gr.addColorStop(0, 'rgba(255,255,255,1)');
-        gr.addColorStop(0.4, 'rgba(255,255,255,0.8)');
-        gr.addColorStop(1, 'rgba(255,255,255,0)');
-        gx.fillStyle = gr; gx.beginPath(); gx.arc(16, 16, 16, 0, Math.PI * 2); gx.fill();
-        return new THREE.CanvasTexture(cv);
-      })(),
-      depthWrite: false, alphaTest: 0.01,
-    });
-    const starPoints = new THREE.Points(starGeo, starMat2);
-    starPoints.frustumCulled = false;
-    scene.add(starPoints);
-    window._updateStars = function (t) {
-      for (let fi = 0; fi < FLOCK_N; fi++) {
-        // Flock center orbits the sky sphere
-        const op = fi * 1.047 + 0.5;
-        const speed = 0.025 + fi * 0.008;
-        const ot = t * speed + op;
-        const phi = 0.9 + Math.sin(t * (0.008 + fi * 0.002) + op) * 0.5;
-        const fcx = Math.sin(phi) * Math.cos(ot) * 250;
-        const fcy = Math.cos(phi) * 250;
-        const fcz = Math.sin(phi) * Math.sin(ot) * 250;
-        // Flock tangent frame
-        const len = Math.sqrt(fcx * fcx + fcy * fcy + fcz * fcz);
-        const nx = fcx / len, ny = fcy / len, nz = fcz / len;
-        const ux = 0, uy = Math.abs(ny) < 0.98 ? 1 : 0, uz = Math.abs(ny) < 0.98 ? 0 : 1;
-        // right = cross(up, n)
-        const rx = uy * nz - uz * ny, ry = uz * nx - ux * nz, rz = ux * ny - uy * nx;
-        const rl = Math.sqrt(rx * rx + ry * ry + rz * rz) || 1;
-        // up2 = cross(n, right)
-        const u2x = (ny * (rz / rl) - nz * (ry / rl));
-        const u2y = (nz * (rx / rl) - nx * (rz / rl));
-        const u2z = (nx * (ry / rl) - ny * (rx / rl));
-        const [cr, cg, cb] = FLOCK_COLS[fi];
-        for (let pi = 0; pi < STARS_PER_FLOCK; pi++) {
-          const o = flockOffsets[fi][pi];
-          const sx = (Math.sin(o.ax + t * o.sp) * o.r + Math.sin(t * o.sp * 1.7 + o.ph) * 0.04);
-          const sy = (Math.cos(o.ay + t * o.sp) * o.r + Math.cos(t * o.sp * 1.3 + o.ph) * 0.04);
-          const idx = (fi * STARS_PER_FLOCK + pi) * 3;
-          starPositions[idx] = fcx + (rx / rl) * sx * 250 + u2x * sy * 250;
-          starPositions[idx + 1] = fcy + (ry / rl) * sx * 250 + u2y * sy * 250;
-          starPositions[idx + 2] = fcz + (rz / rl) * sx * 250 + u2z * sy * 250;
-          const tw = 0.7 + 0.3 * Math.sin(t * 4 + fi * 2.1) * Math.sin(t * 15 + pi * 0.5 + o.ph);
-          starColors[idx] = cr * tw; starColors[idx + 1] = cg * tw; starColors[idx + 2] = cb * tw;
-        }
-      }
-      starGeo.attributes.position.needsUpdate = true;
-      starGeo.attributes.color.needsUpdate = true;
-    };
 
-    // ═══════════════════════════════════════════════════════════════
-    // DESERT TERRAIN — procedural dunes with sand shader
-    // ═══════════════════════════════════════════════════════════════
-    const TRES = IS_MOB ? 40 : 64;
-    const desertMat = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() } },
-      vertexShader: `
+// ═══════════════════════════════════════════════════════════════
+// DESERT TERRAIN — procedural dunes with sand shader
+// ═══════════════════════════════════════════════════════════════
+const TRES=IS_MOB?40:64;
+const desertMat=new THREE.ShaderMaterial({
+  uniforms:{uTime:{value:0},uColA:{value:new THREE.Color()},uColB:{value:new THREE.Color()}},
+  vertexShader:`
     varying vec3 vWorldPos;
     varying vec3 vNormal;
     varying float vH;
@@ -872,7 +373,7 @@
       vH=position.y;
       gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
     }`,
-      fragmentShader: `
+  fragmentShader:`
     precision highp float;
     uniform float uTime;
     uniform vec3 uColA,uColB;
@@ -933,44 +434,44 @@
 
       gl_FragColor=vec4(lit,1.);
     }`
-    });
+});
 
-    // Build dune terrain geometry
-    const tGeo = new THREE.PlaneGeometry(160, 160, TRES, TRES); // reduced
-    tGeo.rotateX(-Math.PI / 2);
-    const tPos = tGeo.attributes.position;
-    for (let i = 0; i < tPos.count; i++) {
-      const x = tPos.getX(i), z = tPos.getZ(i);
-      // Layered dune profiles — different frequencies/amplitudes
-      let h = Math.sin(x * .028 + .4) * 6.5     // mega dunes
-        + Math.cos(z * .038 - .3) * 5.2
-        + Math.sin(x * .075 + z * .055) * 2.8  // medium dunes
-        + Math.cos(x * .12 - z * .09) * 1.8
-        + Math.sin((x + z) * .095) * .9      // small ripples
-        + Math.cos(x * .22 + z * .15) * .45;
-      // Flatten oasis zone
-      const d = Math.sqrt(x * x + z * z);
-      const flat = clamp(1 - d / 20, 0, 1);
-      tPos.setY(i, h * (1 - flat * flat * flat) - 3.0);
-    }
-    tPos.needsUpdate = true;
-    tGeo.computeVertexNormals();
-    const terrain = new THREE.Mesh(tGeo, desertMat);
-    terrain.receiveShadow = false;
-    scene.add(terrain);
+// Build dune terrain geometry
+const tGeo=new THREE.PlaneGeometry(160,160,TRES,TRES); // reduced
+tGeo.rotateX(-Math.PI/2);
+const tPos=tGeo.attributes.position;
+for(let i=0;i<tPos.count;i++){
+  const x=tPos.getX(i),z=tPos.getZ(i);
+  // Layered dune profiles — different frequencies/amplitudes
+  let h = Math.sin(x*.028+.4)*6.5     // mega dunes
+          +Math.cos(z*.038-.3)*5.2
+          +Math.sin(x*.075+z*.055)*2.8  // medium dunes
+          +Math.cos(x*.12-z*.09)*1.8
+          +Math.sin((x+z)*.095)*.9      // small ripples
+          +Math.cos(x*.22+z*.15)*.45;
+  // Flatten oasis zone
+  const d=Math.sqrt(x*x+z*z);
+  const flat=clamp(1-d/20,0,1);
+  tPos.setY(i,h*(1-flat*flat*flat)-3.0);
+}
+tPos.needsUpdate=true;
+tGeo.computeVertexNormals();
+const terrain=new THREE.Mesh(tGeo,desertMat);
+terrain.receiveShadow=false;
+scene.add(terrain);
 
-    // ═══════════════════════════════════════════════════════════════
-    // WATER — improved Gerstner + fantasy color animation
-    // ═══════════════════════════════════════════════════════════════
-    const waterMat = new THREE.ShaderMaterial({
-      transparent: true,
-      side: THREE.DoubleSide,
-      uniforms: {
-        uTime: { value: 0 },
-        uColA: { value: new THREE.Color() },
-        uColB: { value: new THREE.Color() },
-      },
-      vertexShader: `
+// ═══════════════════════════════════════════════════════════════
+// WATER — improved Gerstner + fantasy color animation
+// ═══════════════════════════════════════════════════════════════
+const waterMat=new THREE.ShaderMaterial({
+  transparent:true,
+  side:THREE.DoubleSide,
+  uniforms:{
+    uTime:{value:0},
+    uColA:{value:new THREE.Color()},
+    uColB:{value:new THREE.Color()},
+  },
+  vertexShader:`
     uniform float uTime;
     varying vec3 vPos,vN;varying float vElev;
 
@@ -993,7 +494,7 @@
       vPos=p;vElev=p.y;
       gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
     }`,
-      fragmentShader: `
+  fragmentShader:`
     precision highp float;
     uniform float uTime;
     uniform vec3 uColA,uColB;
@@ -1030,672 +531,604 @@
 
       gl_FragColor=vec4(col,clamp(.78+fr*.15,0.,1.));
     }`
+});
+const wGeo=new THREE.PlaneGeometry(38,38,IS_MOB?32:64,IS_MOB?32:64);
+wGeo.rotateX(-Math.PI/2);
+const water=new THREE.Mesh(wGeo,waterMat);
+water.position.y=-3.0;
+scene.add(water);
+
+// ═══════════════════════════════════════════════════════════════
+// RAIN — instanced line segments falling with wind
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// CAMERA PATH — desert exploration
+// 8 waypoints: wide establishing → dune closeup → water →
+//              rise over dune → deep desert → cross oasis → pullback → final
+// ═══════════════════════════════════════════════════════════════
+// Approximate terrain height at a given XZ position
+// (same formula as terrain vertex displacement)
+function terrainHeight(x,z){
+  return Math.sin(x*.028+.4)*6.5
+        +Math.cos(z*.038-.3)*5.2
+        +Math.sin(x*.075+z*.055)*2.8
+        +Math.cos(x*.12-z*.09)*1.8
+        +Math.sin((x+z)*.095)*.9
+        +Math.cos(x*.22+z*.15)*.45
+        -3.0;
+}
+
+const CAMS=[
+  {s:.00,p:[  0, 14, 32],t:[ 0, 4,  0]},  // wide establishing — drone view
+  {s:.12,p:[-10, 10, 22],t:[ 2, 5, -4]},  // drift left, see dune ridge
+  {s:.24,p:[ 12, 8,  16],t:[ 0, 5, -6]},  // sweep right, golden dune flank
+  {s:.36,p:[  2,  5,  9],t:[ 0, 2, -4]},  // descend toward oasis level
+  {s:.48,p:[-14, 14,  2],t:[ 0, 6,-10]},  // climb left dune spine, vista
+  {s:.60,p:[  6, 18, -6],t:[ 0, 6,-18]},  // over major dune crest, deep desert
+  {s:.72,p:[ -8, 11,-14],t:[  6, 7, -6]}, // across far dune valley
+  {s:.84,p:[ 16, 9, -8],t:[ -4, 5, -2]},  // far right ridge, looking back
+  {s:1.0, p:[  0, 28, 26],t:[ 0, 2,  0]}, // high drone pullback — full scene
+];
+function getCam(s){
+  let lo=0,hi=1;
+  for(let i=0;i<CAMS.length-1;i++){if(s>=CAMS[i].s&&s<=CAMS[i+1].s){lo=i;hi=i+1;break;}}
+  const span=CAMS[hi].s-CAMS[lo].s,f=span<.001?0:eio((s-CAMS[lo].s)/span);
+  const lp=CAMS[lo].p,hp=CAMS[hi].p,lt=CAMS[lo].t,ht=CAMS[hi].t;
+  return{
+    p:[lp[0]+(hp[0]-lp[0])*f,lp[1]+(hp[1]-lp[1])*f,lp[2]+(hp[2]-lp[2])*f],
+    t:[lt[0]+(ht[0]-lt[0])*f,lt[1]+(ht[1]-lt[1])*f,lt[2]+(ht[2]-lt[2])*f],
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PANELS
+// ═══════════════════════════════════════════════════════════════
+const PANELS=[
+  {id:'p0',lo:.00,hi:.12},{id:'p1',lo:.11,hi:.24},
+  {id:'p2',lo:.22,hi:.35},{id:'p3',lo:.33,hi:.47},
+  {id:'p4',lo:.45,hi:.57},{id:'p5',lo:.55,hi:.68},
+  {id:'p6',lo:.66,hi:.78},{id:'p7',lo:.76,hi:1.0},
+];
+const pEls=PANELS.map(p=>({...p,el:document.getElementById(p.id)}));
+const scrollHint=document.getElementById('scroll-hint');
+function updatePanels(s){
+  pEls.forEach(p=>{
+    if(!p.el) return;
+    const m=.035;
+    const active=s>=p.lo-m&&s<=p.hi+m;
+    p.el.classList.toggle('active',active);
+    if(active){
+      const raw=clamp((s-p.lo)/(p.hi-p.lo),0,1);
+      p.el.style.opacity=Math.min(clamp(raw/.1,0,1),clamp((1-raw)/.1,0,1));
+    }
+  });
+  scrollHint.style.opacity=Math.max(0,1-s*10);
+  // AMINOACID fades independently: visible from s=0, fades out s=0.18→0.28
+  const heroEl=document.getElementById('hero-brand');
+  // Fade out quickly: starts at s=0.06, fully gone by s=0.14
+  if(heroEl) heroEl.style.opacity=Math.max(0,1-clamp((s-.06)/.08,0,1));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATE
+// ═══════════════════════════════════════════════════════════════
+const clock=new THREE.Clock();
+let pmx=0,pmy=0,cpmx=0,cpmy=0;
+document.addEventListener('mousemove',e=>{pmx=(e.clientX/innerWidth-.5)*2;pmy=(e.clientY/innerHeight-.5)*2;},{passive:true});
+
+// Pre-allocate color objects — avoid GC pressure
+const colA=new THREE.Color();
+const colB=new THREE.Color();
+const colC=new THREE.Color();
+
+let _frame=0;
+function animate(){
+  requestAnimationFrame(animate);
+  _frame++;
+  // Mobile: render at ~30fps (skip odd frames)
+  if(IS_MOB&&(_frame&1)) return;
+  const t=clock.getElapsedTime();
+  scrollSmooth+=(scrollRaw-scrollSmooth)*.12; // faster section transitions
+  const s=clamp(scrollSmooth/Math.max(1,document.body.scrollHeight-innerHeight),0,1);
+
+  // ── Animated color cycle — hue sweeps through spectrum ──────
+  // Match video: ~45s full cycle, multiple layers at offset phases
+  const h1=t*.022;                    // ~45s period
+  const h2=h1+.33;                    // 120° offset
+  const h3=h1+.66;                    // 240° offset
+  colA.setHSL(h1%1,.85,.18);         // main color
+  colB.setHSL(h2%1,.80,.15);         // complementary
+  colC.setHSL(h3%1,.75,.12);         // triad
+
+  // ── Sky ──────────────────────────────────────────────────────
+  skyMat.uniforms.uTime.value=t;
+
+  // ── Fog color follows sky hue ────────────────────────────────
+  // fog disabled
+
+  // ── Lights cycle in sync with colors ────────────────────────
+  colorLightA.color.copy(colA).multiplyScalar(2.0);
+  colorLightA.groundColor.copy(colC).multiplyScalar(0.5);
+  colorLightB.color.copy(colB).multiplyScalar(1.8);
+  colorLightC.color.copy(colC).multiplyScalar(1.4);
+  // Directional lights: just rotate direction, no position distance calc
+  colorLightB.position.set(30+Math.sin(t*.06)*8,10,-20);
+  colorLightC.position.set(-15+Math.cos(t*.04)*8,20,10);
+
+  // ── Desert terrain color ─────────────────────────────────────
+  desertMat.uniforms.uTime.value=t;
+  desertMat.uniforms.uColA.value.copy(colA);
+  desertMat.uniforms.uColB.value.copy(colB);
+
+  // ── Water ───────────────────────────────────────────────────
+  waterMat.uniforms.uTime.value=t*.52;
+  waterMat.uniforms.uColA.value.copy(colA);
+  waterMat.uniforms.uColB.value.copy(colB);
+
+  // ── Camera ──────────────────────────────────────────────────
+  cpmx+=(pmx-cpmx)*.04;cpmy+=(pmy-cpmy)*.04;
+  const ck=getCam(s);
+  const camX=ck.p[0]+cpmx*1.2, camZ=ck.p[2];
+  // Enforce minimum camera height — always at least 4.5 units above terrain
+  const floorH=terrainHeight(camX,camZ)+4.5;
+  const camY=Math.max(ck.p[1]+cpmy*-.5, floorH);
+  camera.position.set(camX, camY, camZ);
+  // Also ensure look-at target isn't underground
+  const tgtFloor=terrainHeight(ck.t[0],ck.t[2])+1.5;
+  camera.lookAt(ck.t[0], Math.max(ck.t[1],tgtFloor), ck.t[2]);
+
+  // ── Panels ──────────────────────────────────────────────────
+  updatePanels(s);
+
+  // ── Section audio trigger (checked every frame, not just on scroll) ──
+  if(window._applyPreset){
+    const maxS2=document.body.scrollHeight-innerHeight;
+    const sv=scrollSmooth/Math.max(1,maxS2);
+    const ABANDS=[{lo:.00,hi:.12},{lo:.11,hi:.24},{lo:.22,hi:.35},{lo:.33,hi:.47},
+                  {lo:.45,hi:.57},{lo:.55,hi:.68},{lo:.66,hi:.78},{lo:.76,hi:1.0}];
+    for(let ai=0;ai<ABANDS.length;ai++){
+      if(sv>=ABANDS[ai].lo&&sv<ABANDS[ai].hi){ window._applyPreset(ai); break; }
+    }
+  }
+
+
+  renderer.render(scene,camera);
+}
+
+animate();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// AUDIO — Web Audio API (native, no external deps)
+// Soundtrack loop + per-section filter chain + organ pad on letters
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  'use strict';
+  const IS_MOB=innerWidth<768; // local copy for audio IIFE
+
+  // ── Audio state ──────────────────────────────────────────────
+  let ctx=null, srcNode=null, audioBuffer=null;
+  let masterGain, lpFilter, hpFilter, convolver, panner, compressor, dryG, wetG;
+  let audioReady=false, audioPlaying=false, currentSection=-1;
+
+  // ── Build impulse response for convolver (room reverb) ───────
+  function makeIR(ctx2, dur, decay){
+    const sr=ctx2.sampleRate, len=sr*dur;
+    const buf=ctx2.createBuffer(2,len,sr);
+    for(let ch=0;ch<2;ch++){
+      const d=buf.getChannelData(ch);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
+    }
+    return buf;
+  }
+
+  // ── Build audio chain ────────────────────────────────────────
+  function buildChain(ctx2){
+    // nodes
+    masterGain = ctx2.createGain(); masterGain.gain.value=0.75;
+    lpFilter   = ctx2.createBiquadFilter(); lpFilter.type='lowpass'; lpFilter.frequency.value=18000;
+    hpFilter   = ctx2.createBiquadFilter(); hpFilter.type='highpass'; hpFilter.frequency.value=20;
+    convolver  = ctx2.createConvolver(); convolver.buffer=makeIR(ctx2,2.5,2.2);
+    panner     = ctx2.createStereoPanner(); panner.pan.value=0;
+    compressor = ctx2.createDynamicsCompressor();
+    compressor.threshold.value=-24; compressor.knee.value=12;
+    compressor.ratio.value=4; compressor.attack.value=0.003; compressor.release.value=0.25;
+    // Dry/wet mix for reverb (exposed to outer scope for applyPreset)
+    dryG=ctx2.createGain(); dryG.gain.value=0.78;
+    wetG=ctx2.createGain(); wetG.gain.value=0.22;
+    // Route: source→lpFilter→hpFilter→panner→dryG→compressor→masterGain→destination
+    //                                         →convolver→wetG→compressor
+    lpFilter.connect(hpFilter);
+    hpFilter.connect(panner);
+    panner.connect(dryG);     dryG.connect(compressor);
+    panner.connect(convolver); convolver.connect(wetG); wetG.connect(compressor);
+    compressor.connect(masterGain);
+    masterGain.connect(ctx2.destination);
+    return lpFilter; // entry point for source
+  }
+
+  // ── Load and loop soundtrack ─────────────────────────────────
+  async function loadAndPlay(ctx2, entry){
+    // Load via XHR — works on file:// and http:// alike
+    const ab=await new Promise((resolve,reject)=>{
+      const paths=['soundtrack.mp3','../agency-site/soundtrack.mp3','./soundtrack.mp3'];
+      let idx=0;
+      function tryNext(){
+        if(idx>=paths.length){reject(new Error('soundtrack not found'));return;}
+        const xhr=new XMLHttpRequest();
+        xhr.open('GET',paths[idx++],true);
+        xhr.responseType='arraybuffer';
+        xhr.onload=()=>xhr.status<400?resolve(xhr.response):tryNext();
+        xhr.onerror=tryNext;
+        xhr.send();
+      }
+      tryNext();
     });
-    const wGeo = new THREE.PlaneGeometry(38, 38, IS_MOB ? 32 : 64, IS_MOB ? 32 : 64);
-    wGeo.rotateX(-Math.PI / 2);
-    const water = new THREE.Mesh(wGeo, waterMat);
-    water.position.y = -3.0;
-    scene.add(water);
-
-    // ═══════════════════════════════════════════════════════════════
-    // RAIN — instanced line segments falling with wind
-    // ═══════════════════════════════════════════════════════════════
-    const RAIN_N = IS_MOB ? 0 : 1800; // disabled on mobile for performance
-    (function () {
-      // Each raindrop = short vertical line (2 verts)
-      const rGeo = new THREE.BufferGeometry();
-      const pos = new Float32Array(RAIN_N * 6); // 2 points × 3 coords per drop
-      const rData = new Float32Array(RAIN_N * 4); // x,z,phase,speed per drop
-
-      for (let i = 0; i < RAIN_N; i++) {
-        // Random XZ across the desert, Y will be computed in shader from phase
-        rData[i * 4] = (Math.random() - 0.5) * 90;   // x
-        rData[i * 4 + 1] = (Math.random() - 0.5) * 90;   // z
-        rData[i * 4 + 2] = Math.random();             // phase (0-1)
-        rData[i * 4 + 3] = 0.4 + Math.random() * 0.6;    // speed variation
-        // Initial positions — will be overwritten in animate
-        pos[i * 6] = pos[i * 6 + 3] = rData[i * 4];
-        pos[i * 6 + 1] = pos[i * 6 + 4] = 0;
-        pos[i * 6 + 2] = pos[i * 6 + 5] = rData[i * 4 + 1];
-      }
-      rGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      rGeo.setAttribute('rData', new THREE.InstancedBufferAttribute(rData, 4)); // won't use instanced, just store
-
-      const rMat = new THREE.LineBasicMaterial({
-        color: 0x88aacc,
-        transparent: true,
-        opacity: 0.18,
-      });
-      const rain = new THREE.LineSegments(rGeo, rMat);
-      rain.frustumCulled = false;
-      scene.add(rain);
-
-      // Store ref for animate
-      window._rainPos = pos;
-      window._rainData = rData;
-      window._rainGeo = rGeo;
-      window._rainN = RAIN_N;
-    })();
-
-    // ═══════════════════════════════════════════════════════════════
-    // CAMERA PATH — desert exploration
-    // 8 waypoints: wide establishing → dune closeup → water →
-    //              rise over dune → deep desert → cross oasis → pullback → final
-    // ═══════════════════════════════════════════════════════════════
-    // Approximate terrain height at a given XZ position
-    // (same formula as terrain vertex displacement)
-    function terrainHeight(x, z) {
-      return Math.sin(x * .028 + .4) * 6.5
-        + Math.cos(z * .038 - .3) * 5.2
-        + Math.sin(x * .075 + z * .055) * 2.8
-        + Math.cos(x * .12 - z * .09) * 1.8
-        + Math.sin((x + z) * .095) * .9
-        + Math.cos(x * .22 + z * .15) * .45
-        - 3.0;
+    audioBuffer=await ctx2.decodeAudioData(ab);
+    function startLoop(offset){
+      srcNode=ctx2.createBufferSource();
+      srcNode.buffer=audioBuffer;
+      srcNode.loop=false;
+      srcNode.playbackRate.value=window._targetRate||1.0;
+      srcNode.connect(entry);
+      srcNode.onended=()=>{ if(audioPlaying) startLoop(0); };
+      srcNode.start(0,offset||0);
     }
+    startLoop(0);
+    audioPlaying=true;
+    updateBtn();
+  }
 
-    const CAMS = [
-      { s: .00, p: [0, 14, 32], t: [0, 4, 0] },  // wide establishing — drone view
-      { s: .12, p: [-10, 10, 22], t: [2, 5, -4] },  // drift left, see dune ridge
-      { s: .24, p: [12, 8, 16], t: [0, 5, -6] },  // sweep right, golden dune flank
-      { s: .36, p: [2, 5, 9], t: [0, 2, -4] },  // descend toward oasis level
-      { s: .48, p: [-14, 14, 2], t: [0, 6, -10] },  // climb left dune spine, vista
-      { s: .60, p: [6, 18, -6], t: [0, 6, -18] },  // over major dune crest, deep desert
-      { s: .72, p: [-8, 11, -14], t: [6, 7, -6] }, // across far dune valley
-      { s: .84, p: [16, 9, -8], t: [-4, 5, -2] },  // far right ridge, looking back
-      { s: 1.0, p: [0, 28, 26], t: [0, 2, 0] }, // high drone pullback — full scene
-    ];
-    function getCam(s) {
-      let lo = 0, hi = 1;
-      for (let i = 0; i < CAMS.length - 1; i++) { if (s >= CAMS[i].s && s <= CAMS[i + 1].s) { lo = i; hi = i + 1; break; } }
-      const span = CAMS[hi].s - CAMS[lo].s, f = span < .001 ? 0 : eio((s - CAMS[lo].s) / span);
-      const lp = CAMS[lo].p, hp = CAMS[hi].p, lt = CAMS[lo].t, ht = CAMS[hi].t;
-      return {
-        p: [lp[0] + (hp[0] - lp[0]) * f, lp[1] + (hp[1] - lp[1]) * f, lp[2] + (hp[2] - lp[2]) * f],
-        t: [lt[0] + (ht[0] - lt[0]) * f, lt[1] + (ht[1] - lt[1]) * f, lt[2] + (ht[2] - lt[2]) * f],
-      };
+  async function initAudio(){
+    if(audioReady) return;
+    audioReady=true; // set first so pad can play even if soundtrack fails
+    ctx=new(window.AudioContext||window.webkitAudioContext)();
+    if(ctx.state==='suspended') await ctx.resume();
+    const entry=buildChain(ctx);
+    buildShaper(ctx);
+    // Fade in master
+    masterGain.gain.setValueAtTime(0,ctx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(0.75,ctx.currentTime+0.3); // fast fade-in
+    // Start soundtrack (non-blocking — pad works regardless)
+    loadAndPlay(ctx,entry).catch(e=>console.warn('Soundtrack:',e));
+  }
+
+  // ── Per-section effect presets — dramatically audible differences ──
+  // Add tremolo + shaper for extra timbral variety between sections
+  let shaperNode=null, tremoloGain=null, tremoloOsc=null;
+  function buildShaper(ctx2){
+    // Route panner → shaper → dryG (shaper adds harmonic grit in S7)
+    shaperNode=ctx2.createWaveShaper();
+    const curve=new Float32Array(256);
+    for(let i=0;i<256;i++){const x=i*2/256-1;curve[i]=x*(1-Math.abs(x)*0.3);}
+    shaperNode.curve=curve; shaperNode.oversample='4x';
+    // Tremolo LFO
+    tremoloOsc=ctx2.createOscillator(); tremoloOsc.type='sine';
+    tremoloOsc.frequency.value=0; tremoloOsc.start();
+    tremoloGain=ctx2.createGain(); tremoloGain.gain.value=1;
+    tremoloOsc.connect(tremoloGain.gain);
+  }
+
+  // Per-section presets — perceptible but musical, not jarring
+  // [lpFreq, hpFreq, wetGain, dryGain, masterVol, playbackRate]
+  const PRESETS=[
+    [16000,  20, 0.15, 0.85, 0.72, 1.00], // S0: bright, clean, normal
+    [3500,   30, 0.55, 0.45, 0.68, 0.93], // S1: warm+dark, slight pitch down
+    [900,    20, 0.72, 0.28, 0.62, 0.88], // S2: deep+cavernous, lower
+    [14000, 120, 0.12, 0.88, 0.76, 1.06], // S3: bright+dry, slightly up
+    [18000,  20, 0.52, 0.48, 0.68, 1.08], // S4: full+spacious, highest
+    [600,   100, 0.65, 0.35, 0.65, 0.90], // S5: muffled+reverby, lower
+    [12000,  20, 0.80, 0.20, 0.60, 0.96], // S6: washed reverb, near normal
+    [2500,   80, 0.38, 0.62, 0.78, 0.94], // S7: dark return, punchy
+  ];
+  const RAMP=1.2; // faster transitions
+  function applyPreset(i){
+    if(!audioReady||!ctx) return;
+    if(i===currentSection) return;
+    currentSection=i;
+    const p=PRESETS[Math.min(i,PRESETS.length-1)];
+    const now=ctx.currentTime;
+    function ramp(param,val){
+      param.cancelScheduledValues(now);
+      param.setValueAtTime(param.value,now);
+      param.linearRampToValueAtTime(val,now+RAMP);
     }
-
-    // ═══════════════════════════════════════════════════════════════
-    // PANELS
-    // ═══════════════════════════════════════════════════════════════
-    const PANELS = [
-      { id: 'p0', lo: .00, hi: .12 }, { id: 'p1', lo: .11, hi: .24 },
-      { id: 'p2', lo: .22, hi: .35 }, { id: 'p3', lo: .33, hi: .47 },
-      { id: 'p4', lo: .45, hi: .57 }, { id: 'p5', lo: .55, hi: .68 },
-      { id: 'p6', lo: .66, hi: .78 }, { id: 'p7', lo: .76, hi: 1.0 },
-    ];
-    const pEls = PANELS.map(p => ({ ...p, el: document.getElementById(p.id) }));
-    const scrollHint = document.getElementById('scroll-hint');
-    function updatePanels(s) {
-      pEls.forEach(p => {
-        if (!p.el) return;
-        const m = .035;
-        const active = s >= p.lo - m && s <= p.hi + m;
-        p.el.classList.toggle('active', active);
-        if (active) {
-          const raw = clamp((s - p.lo) / (p.hi - p.lo), 0, 1);
-          p.el.style.opacity = Math.min(clamp(raw / .1, 0, 1), clamp((1 - raw) / .1, 0, 1));
-        }
-      });
-      scrollHint.style.opacity = Math.max(0, 1 - s * 10);
-      // AMINOACID fades independently: visible from s=0, fades out s=0.18→0.28
-      const heroEl = document.getElementById('hero-brand');
-      // Fade out quickly: starts at s=0.06, fully gone by s=0.14
-      if (heroEl) heroEl.style.opacity = Math.max(0, 1 - clamp((s - .06) / .08, 0, 1));
+    ramp(lpFilter.frequency,  p[0]);
+    ramp(hpFilter.frequency,  p[1]);
+    if(wetG) ramp(wetG.gain,  p[2]);
+    if(dryG) ramp(dryG.gain,  p[3]);
+    // Playback rate = pitch shift (most dramatic perceptible change)
+    if(srcNode){
+      srcNode.playbackRate.cancelScheduledValues(now);
+      srcNode.playbackRate.setValueAtTime(srcNode.playbackRate.value,now);
+      srcNode.playbackRate.linearRampToValueAtTime(p[5],now+RAMP);
     }
+    // Also store target rate for when loop restarts
+    window._targetRate=p[5];
+    setTimeout(()=>{
+      if(masterGain&&audioPlaying) ramp(masterGain.gain,p[4]);
+    }, 300);
+  }
 
-    // ═══════════════════════════════════════════════════════════════
-    // ANIMATE
-    // ═══════════════════════════════════════════════════════════════
-    const clock = new THREE.Clock();
-    let pmx = 0, pmy = 0, cpmx = 0, cpmy = 0;
-    document.addEventListener('mousemove', e => { pmx = (e.clientX / innerWidth - .5) * 2; pmy = (e.clientY / innerHeight - .5) * 2; }, { passive: true });
+  // ── Church organ pad (native oscillators) ────────────────────
+  const CM=[130.81,146.83,155.56,174.61,196,207.65,233.08,
+            261.63,293.66,311.13,349.23,392,415.3,466.16];
+  let padOn=false, padTimer;
+  function playPad(){
+    // Auto-init audio context if not ready (e.g. first mouse interaction)
+    if(!ctx && !_started){ _started=true; initAudio(); return; }
+    if(!ctx||padOn) return;
+    padOn=true;
+    const freq=CM[Math.floor(Math.random()*CM.length)];
+    const padGain=ctx.createGain();
+    padGain.gain.setValueAtTime(0,ctx.currentTime);
+    padGain.gain.linearRampToValueAtTime(0.45,ctx.currentTime+0.06);
+    padGain.gain.setValueAtTime(0.45,ctx.currentTime+0.5);
+    padGain.gain.linearRampToValueAtTime(0,ctx.currentTime+2.8);
+    // Reverb for pad
+    const padRev=ctx.createConvolver(); padRev.buffer=makeIR(ctx,3.5,1.8);
+    const padDry=ctx.createGain(); padDry.gain.value=0.4;
+    const padWet=ctx.createGain(); padWet.gain.value=0.6;
+    padGain.connect(padDry); padDry.connect(ctx.destination);
+    padGain.connect(padRev); padRev.connect(padWet); padWet.connect(ctx.destination);
+    // Organ harmonics (pipe organ stops)
+    [1,2,3,4,0.5].forEach((mult,i)=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.type='sawtooth';
+      o.frequency.value=freq*mult;
+      o.detune.value=(Math.random()-.5)*3;
+      g.gain.value=[1,.65,.45,.28,.2][i]/5;
+      o.connect(g); g.connect(padGain);
+      o.start(ctx.currentTime);
+      o.stop(ctx.currentTime+3.2);
+    });
+    clearTimeout(padTimer);
+    padTimer=setTimeout(()=>padOn=false,1300);
+  }
 
-    // Pre-allocate color objects — avoid GC pressure
-    const colA = new THREE.Color();
-    const colB = new THREE.Color();
-    const colC = new THREE.Color();
-
-    let _frame = 0;
-    function animate() {
-      requestAnimationFrame(animate);
-      _frame++;
-      // Mobile: render at ~30fps (skip odd frames)
-      if (IS_MOB && (_frame & 1)) return;
-      const t = clock.getElapsedTime();
-      scrollSmooth += (scrollRaw - scrollSmooth) * .12; // faster section transitions
-      const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
-
-      // ── Animated color cycle — hue sweeps through spectrum ──────
-      // Match video: ~45s full cycle, multiple layers at offset phases
-      const h1 = t * .022;                    // ~45s period
-      const h2 = h1 + .33;                    // 120° offset
-      const h3 = h1 + .66;                    // 240° offset
-      colA.setHSL(h1 % 1, .85, .18);         // main color
-      colB.setHSL(h2 % 1, .80, .15);         // complementary
-      colC.setHSL(h3 % 1, .75, .12);         // triad
-
-      // ── Sky ──────────────────────────────────────────────────────
-      skyMat.uniforms.uTime.value = t;
-
-      // ── Fog color follows sky hue ────────────────────────────────
-      // fog disabled
-
-      // ── Lights cycle in sync with colors ────────────────────────
-      colorLightA.color.copy(colA).multiplyScalar(2.0);
-      colorLightA.groundColor.copy(colC).multiplyScalar(0.5);
-      colorLightB.color.copy(colB).multiplyScalar(1.8);
-      colorLightC.color.copy(colC).multiplyScalar(1.4);
-      // Directional lights: just rotate direction, no position distance calc
-      colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
-      colorLightC.position.set(-15 + Math.cos(t * .04) * 8, 20, 10);
-
-      // ── Desert terrain color ─────────────────────────────────────
-      desertMat.uniforms.uTime.value = t;
-      desertMat.uniforms.uColA.value.copy(colA);
-      desertMat.uniforms.uColB.value.copy(colB);
-
-      // ── Water ───────────────────────────────────────────────────
-      waterMat.uniforms.uTime.value = t * .52;
-      waterMat.uniforms.uColA.value.copy(colA);
-      waterMat.uniforms.uColB.value.copy(colB);
-
-      // ── Camera ──────────────────────────────────────────────────
-      cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04;
-      const ck = getCam(s);
-      const camX = ck.p[0] + cpmx * 1.2, camZ = ck.p[2];
-      // Enforce minimum camera height — always at least 4.5 units above terrain
-      const floorH = terrainHeight(camX, camZ) + 4.5;
-      const camY = Math.max(ck.p[1] + cpmy * -.5, floorH);
-      camera.position.set(camX, camY, camZ);
-      // Also ensure look-at target isn't underground
-      const tgtFloor = terrainHeight(ck.t[0], ck.t[2]) + 1.5;
-      camera.lookAt(ck.t[0], Math.max(ck.t[1], tgtFloor), ck.t[2]);
-
-      // ── Panels ──────────────────────────────────────────────────
-      updatePanels(s);
-
-      // ── Section audio trigger (checked every frame, not just on scroll) ──
-      if (window._applyPreset) {
-        const maxS2 = document.body.scrollHeight - innerHeight;
-        const sv = scrollSmooth / Math.max(1, maxS2);
-        const ABANDS = [{ lo: .00, hi: .12 }, { lo: .11, hi: .24 }, { lo: .22, hi: .35 }, { lo: .33, hi: .47 },
-        { lo: .45, hi: .57 }, { lo: .55, hi: .68 }, { lo: .66, hi: .78 }, { lo: .76, hi: 1.0 }];
-        for (let ai = 0; ai < ABANDS.length; ai++) {
-          if (sv >= ABANDS[ai].lo && sv < ABANDS[ai].hi) { window._applyPreset(ai); break; }
-        }
-      }
-
-      // ── Rain animation ───────────────────────────────────────────
-      if (window._rainPos) {
-        const rp = window._rainPos, rd = window._rainData, rN = window._rainN;
-        const dropLen = 0.6; // length of vertical streak
-        for (let i = 0; i < rN; i++) {
-          rd[i * 4 + 2] = (rd[i * 4 + 2] + 0.014 * rd[i * 4 + 3]) % 1.0;
-          const phase = rd[i * 4 + 2];
-          const y = 18 - (phase * 24);
-          const x = rd[i * 4]; // no horizontal drift — perfectly vertical
-          const z = rd[i * 4 + 1];
-          // Streak is VERTICAL: top point directly above bottom point
-          rp[i * 6] = x; rp[i * 6 + 1] = y; rp[i * 6 + 2] = z;
-          rp[i * 6 + 3] = x; rp[i * 6 + 4] = y - dropLen; rp[i * 6 + 5] = z;
-        }
-        window._rainGeo.attributes.position.needsUpdate = true;
-        // Vary opacity slightly with time for shimmering effect
-        window._rainGeo.material = window._rainGeo.material || new THREE.LineBasicMaterial({ color: 0x88aacc, transparent: true, opacity: .18 });
-      }
-
-      // Update star flocks (cheap JS, not GPU-heavy GLSL per-pixel)
-      if (window._updateStars) window._updateStars(t);
-
-      renderer.render(scene, camera);
+  // ── Per-letter visual distortion only ────────────────────────
+  // (organ pad fires separately above, distortion is only visual)
+  function setupDistortion(){
+    const defs=document.getElementById('svg-filter-defs');
+    const letters=[...document.querySelectorAll('.hw')];
+    if(!defs||!letters.length) return;
+    const wf=letters.map((sp,i)=>{
+      const f=document.createElementNS('http://www.w3.org/2000/svg','filter');
+      f.id=`hf${i}`;
+      f.setAttribute('x','-30%');f.setAttribute('y','-30%');
+      f.setAttribute('width','160%');f.setAttribute('height','160%');
+      const tb=document.createElementNS('http://www.w3.org/2000/svg','feTurbulence');
+      tb.setAttribute('type','turbulence');
+      tb.setAttribute('baseFrequency','0.016 0.009');
+      tb.setAttribute('numOctaves','3');
+      tb.setAttribute('seed',String(i*13+5));
+      tb.setAttribute('result','noise');
+      const dp=document.createElementNS('http://www.w3.org/2000/svg','feDisplacementMap');
+      dp.setAttribute('in','SourceGraphic');dp.setAttribute('in2','noise');
+      dp.setAttribute('scale','0');
+      dp.setAttribute('xChannelSelector','R');dp.setAttribute('yChannelSelector','G');
+      f.appendChild(tb);f.appendChild(dp);defs.appendChild(f);
+      sp.style.filter=`url(#hf${i})`;
+      sp.style.willChange='filter';
+      return{sp,tb,dp,cur:0,tgt:0,ph:Math.random()*Math.PI*2};
+    });
+    let tp=0,aid=null,pAt=-999,lx=0,ly=0;
+    function tick(){
+      tp+=.016; let any=false;
+      wf.forEach(w=>{
+        w.cur+=(w.tgt-w.cur)*.09;
+        if(w.cur>.3){
+          const bf1=(.016+Math.sin(tp+w.ph)*.007).toFixed(4);
+          const bf2=(.009+Math.cos(tp*.65+w.ph)*.004).toFixed(4);
+          w.tb.setAttribute('baseFrequency',`${bf1} ${bf2}`);
+          w.dp.setAttribute('scale',w.cur.toFixed(2));
+          any=true;
+        } else { w.dp.setAttribute('scale','0'); if(w.cur>.04) any=true; }
+      });
+      if(any) aid=requestAnimationFrame(tick); else aid=null;
     }
-
-    animate();
-  </script>
-
-  <script>
-    // ═══════════════════════════════════════════════════════════════
-    // AUDIO — Web Audio API (native, no external deps)
-    // Soundtrack loop + per-section filter chain + organ pad on letters
-    // ═══════════════════════════════════════════════════════════════
-    (function () {
-      'use strict';
-      const IS_MOB = innerWidth < 768; // local copy for audio IIFE
-
-      // ── Audio state ──────────────────────────────────────────────
-      let ctx = null, srcNode = null, audioBuffer = null;
-      let masterGain, lpFilter, hpFilter, convolver, panner, compressor, dryG, wetG;
-      let audioReady = false, audioPlaying = false, currentSection = -1;
-
-      // ── Build impulse response for convolver (room reverb) ───────
-      function makeIR(ctx2, dur, decay) {
-        const sr = ctx2.sampleRate, len = sr * dur;
-        const buf = ctx2.createBuffer(2, len, sr);
-        for (let ch = 0; ch < 2; ch++) {
-          const d = buf.getChannelData(ch);
-          for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-        }
-        return buf;
-      }
-
-      // ── Build audio chain ────────────────────────────────────────
-      function buildChain(ctx2) {
-        // nodes
-        masterGain = ctx2.createGain(); masterGain.gain.value = 0.75;
-        lpFilter = ctx2.createBiquadFilter(); lpFilter.type = 'lowpass'; lpFilter.frequency.value = 18000;
-        hpFilter = ctx2.createBiquadFilter(); hpFilter.type = 'highpass'; hpFilter.frequency.value = 20;
-        convolver = ctx2.createConvolver(); convolver.buffer = makeIR(ctx2, 2.5, 2.2);
-        panner = ctx2.createStereoPanner(); panner.pan.value = 0;
-        compressor = ctx2.createDynamicsCompressor();
-        compressor.threshold.value = -24; compressor.knee.value = 12;
-        compressor.ratio.value = 4; compressor.attack.value = 0.003; compressor.release.value = 0.25;
-        // Dry/wet mix for reverb (exposed to outer scope for applyPreset)
-        dryG = ctx2.createGain(); dryG.gain.value = 0.78;
-        wetG = ctx2.createGain(); wetG.gain.value = 0.22;
-        // Route: source→lpFilter→hpFilter→panner→dryG→compressor→masterGain→destination
-        //                                         →convolver→wetG→compressor
-        lpFilter.connect(hpFilter);
-        hpFilter.connect(panner);
-        panner.connect(dryG); dryG.connect(compressor);
-        panner.connect(convolver); convolver.connect(wetG); wetG.connect(compressor);
-        compressor.connect(masterGain);
-        masterGain.connect(ctx2.destination);
-        return lpFilter; // entry point for source
-      }
-
-      // ── Load and loop soundtrack ─────────────────────────────────
-      async function loadAndPlay(ctx2, entry) {
-        // Load via XHR — works on file:// and http:// alike
-        const ab = await new Promise((resolve, reject) => {
-          const paths = ['soundtrack.mp3', '../agency-site/soundtrack.mp3', './soundtrack.mp3'];
-          let idx = 0;
-          function tryNext() {
-            if (idx >= paths.length) { reject(new Error('soundtrack not found')); return; }
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', paths[idx++], true);
-            xhr.responseType = 'arraybuffer';
-            xhr.onload = () => xhr.status < 400 ? resolve(xhr.response) : tryNext();
-            xhr.onerror = tryNext;
-            xhr.send();
-          }
-          tryNext();
-        });
-        audioBuffer = await ctx2.decodeAudioData(ab);
-        function startLoop(offset) {
-          srcNode = ctx2.createBufferSource();
-          srcNode.buffer = audioBuffer;
-          srcNode.loop = false;
-          srcNode.playbackRate.value = window._targetRate || 1.0;
-          srcNode.connect(entry);
-          srcNode.onended = () => { if (audioPlaying) startLoop(0); };
-          srcNode.start(0, offset || 0);
-        }
-        startLoop(0);
-        audioPlaying = true;
-        updateBtn();
-      }
-
-      async function initAudio() {
-        if (audioReady) return;
-        audioReady = true; // set first so pad can play even if soundtrack fails
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-        if (ctx.state === 'suspended') await ctx.resume();
-        const entry = buildChain(ctx);
-        buildShaper(ctx);
-        // Fade in master
-        masterGain.gain.setValueAtTime(0, ctx.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.75, ctx.currentTime + 0.3); // fast fade-in
-        // Start soundtrack (non-blocking — pad works regardless)
-        loadAndPlay(ctx, entry).catch(e => console.warn('Soundtrack:', e));
-      }
-
-      // ── Per-section effect presets — dramatically audible differences ──
-      // Add tremolo + shaper for extra timbral variety between sections
-      let shaperNode = null, tremoloGain = null, tremoloOsc = null;
-      function buildShaper(ctx2) {
-        // Route panner → shaper → dryG (shaper adds harmonic grit in S7)
-        shaperNode = ctx2.createWaveShaper();
-        const curve = new Float32Array(256);
-        for (let i = 0; i < 256; i++) { const x = i * 2 / 256 - 1; curve[i] = x * (1 - Math.abs(x) * 0.3); }
-        shaperNode.curve = curve; shaperNode.oversample = '4x';
-        // Tremolo LFO
-        tremoloOsc = ctx2.createOscillator(); tremoloOsc.type = 'sine';
-        tremoloOsc.frequency.value = 0; tremoloOsc.start();
-        tremoloGain = ctx2.createGain(); tremoloGain.gain.value = 1;
-        tremoloOsc.connect(tremoloGain.gain);
-      }
-
-      // Per-section presets — perceptible but musical, not jarring
-      // [lpFreq, hpFreq, wetGain, dryGain, masterVol, playbackRate]
-      const PRESETS = [
-        [16000, 20, 0.15, 0.85, 0.72, 1.00], // S0: bright, clean, normal
-        [3500, 30, 0.55, 0.45, 0.68, 0.93], // S1: warm+dark, slight pitch down
-        [900, 20, 0.72, 0.28, 0.62, 0.88], // S2: deep+cavernous, lower
-        [14000, 120, 0.12, 0.88, 0.76, 1.06], // S3: bright+dry, slightly up
-        [18000, 20, 0.52, 0.48, 0.68, 1.08], // S4: full+spacious, highest
-        [600, 100, 0.65, 0.35, 0.65, 0.90], // S5: muffled+reverby, lower
-        [12000, 20, 0.80, 0.20, 0.60, 0.96], // S6: washed reverb, near normal
-        [2500, 80, 0.38, 0.62, 0.78, 0.94], // S7: dark return, punchy
-      ];
-      const RAMP = 1.2; // faster transitions
-      function applyPreset(i) {
-        if (!audioReady || !ctx) return;
-        if (i === currentSection) return;
-        currentSection = i;
-        const p = PRESETS[Math.min(i, PRESETS.length - 1)];
-        const now = ctx.currentTime;
-        function ramp(param, val) {
-          param.cancelScheduledValues(now);
-          param.setValueAtTime(param.value, now);
-          param.linearRampToValueAtTime(val, now + RAMP);
-        }
-        ramp(lpFilter.frequency, p[0]);
-        ramp(hpFilter.frequency, p[1]);
-        if (wetG) ramp(wetG.gain, p[2]);
-        if (dryG) ramp(dryG.gain, p[3]);
-        // Playback rate = pitch shift (most dramatic perceptible change)
-        if (srcNode) {
-          srcNode.playbackRate.cancelScheduledValues(now);
-          srcNode.playbackRate.setValueAtTime(srcNode.playbackRate.value, now);
-          srcNode.playbackRate.linearRampToValueAtTime(p[5], now + RAMP);
-        }
-        // Also store target rate for when loop restarts
-        window._targetRate = p[5];
-        setTimeout(() => {
-          if (masterGain && audioPlaying) ramp(masterGain.gain, p[4]);
-        }, 300);
-      }
-
-      // ── Church organ pad (native oscillators) ────────────────────
-      const CM = [130.81, 146.83, 155.56, 174.61, 196, 207.65, 233.08,
-        261.63, 293.66, 311.13, 349.23, 392, 415.3, 466.16];
-      let padOn = false, padTimer;
-      function playPad() {
-        // Auto-init audio context if not ready (e.g. first mouse interaction)
-        if (!ctx && !_started) { _started = true; initAudio(); return; }
-        if (!ctx || padOn) return;
-        padOn = true;
-        const freq = CM[Math.floor(Math.random() * CM.length)];
-        const padGain = ctx.createGain();
-        padGain.gain.setValueAtTime(0, ctx.currentTime);
-        padGain.gain.linearRampToValueAtTime(0.45, ctx.currentTime + 0.06);
-        padGain.gain.setValueAtTime(0.45, ctx.currentTime + 0.5);
-        padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.8);
-        // Reverb for pad
-        const padRev = ctx.createConvolver(); padRev.buffer = makeIR(ctx, 3.5, 1.8);
-        const padDry = ctx.createGain(); padDry.gain.value = 0.4;
-        const padWet = ctx.createGain(); padWet.gain.value = 0.6;
-        padGain.connect(padDry); padDry.connect(ctx.destination);
-        padGain.connect(padRev); padRev.connect(padWet); padWet.connect(ctx.destination);
-        // Organ harmonics (pipe organ stops)
-        [1, 2, 3, 4, 0.5].forEach((mult, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = 'sawtooth';
-          o.frequency.value = freq * mult;
-          o.detune.value = (Math.random() - .5) * 3;
-          g.gain.value = [1, .65, .45, .28, .2][i] / 5;
-          o.connect(g); g.connect(padGain);
-          o.start(ctx.currentTime);
-          o.stop(ctx.currentTime + 3.2);
-        });
-        clearTimeout(padTimer);
-        padTimer = setTimeout(() => padOn = false, 1300);
-      }
-
-      // ── Per-letter visual distortion only ────────────────────────
-      // (organ pad fires separately above, distortion is only visual)
-      function setupDistortion() {
-        const defs = document.getElementById('svg-filter-defs');
-        const letters = [...document.querySelectorAll('.hw')];
-        if (!defs || !letters.length) return;
-        const wf = letters.map((sp, i) => {
-          const f = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-          f.id = `hf${i}`;
-          f.setAttribute('x', '-30%'); f.setAttribute('y', '-30%');
-          f.setAttribute('width', '160%'); f.setAttribute('height', '160%');
-          const tb = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
-          tb.setAttribute('type', 'turbulence');
-          tb.setAttribute('baseFrequency', '0.016 0.009');
-          tb.setAttribute('numOctaves', '3');
-          tb.setAttribute('seed', String(i * 13 + 5));
-          tb.setAttribute('result', 'noise');
-          const dp = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
-          dp.setAttribute('in', 'SourceGraphic'); dp.setAttribute('in2', 'noise');
-          dp.setAttribute('scale', '0');
-          dp.setAttribute('xChannelSelector', 'R'); dp.setAttribute('yChannelSelector', 'G');
-          f.appendChild(tb); f.appendChild(dp); defs.appendChild(f);
-          sp.style.filter = `url(#hf${i})`;
-          sp.style.willChange = 'filter';
-          return { sp, tb, dp, cur: 0, tgt: 0, ph: Math.random() * Math.PI * 2 };
-        });
-        let tp = 0, aid = null, pAt = -999, lx = 0, ly = 0;
-        function tick() {
-          tp += .016; let any = false;
-          wf.forEach(w => {
-            w.cur += (w.tgt - w.cur) * .09;
-            if (w.cur > .3) {
-              const bf1 = (.016 + Math.sin(tp + w.ph) * .007).toFixed(4);
-              const bf2 = (.009 + Math.cos(tp * .65 + w.ph) * .004).toFixed(4);
-              w.tb.setAttribute('baseFrequency', `${bf1} ${bf2}`);
-              w.dp.setAttribute('scale', w.cur.toFixed(2));
-              any = true;
-            } else { w.dp.setAttribute('scale', '0'); if (w.cur > .04) any = true; }
-          });
-          if (any) aid = requestAnimationFrame(tick); else aid = null;
-        }
-        function go() { if (!aid) aid = requestAnimationFrame(tick); }
-        function ptr(px, py, spd) {
-          let mx2 = 0;
-          wf.forEach(w => {
-            const r = w.sp.getBoundingClientRect();
-            if (!r.width) return;
-            const dist = Math.sqrt((px - r.left - r.width / 2) ** 2 + (py - r.top - r.height / 2) ** 2);
-            const inf = Math.max(0, 1 - dist / 160);
-            w.tgt = inf > 0 ? Math.min(inf * (24 + spd * .25), 30) : 0;
-            mx2 = Math.max(mx2, w.tgt);
-          });
-          // Visual distortion only — no sound on letter hover
-          go();
-        }
-        document.addEventListener('mousemove', e => {
-          const s = Math.abs(e.clientX - lx) + Math.abs(e.clientY - ly);
-          lx = e.clientX; ly = e.clientY; ptr(e.clientX, e.clientY, s);
-        }, { passive: true });
-        document.addEventListener('touchmove', e => {
-          const t = e.touches[0]; ptr(t.clientX, t.clientY, 4);
-        }, { passive: true });
-        document.addEventListener('touchend', () => { wf.forEach(w => w.tgt = 0); go(); }, { passive: true });
-      }
-
-      // ── Audio toggle button ───────────────────────────────────────
-      const btn = document.createElement('button');
-      // On mobile, show a more prominent first-tap prompt
-      const isMobAudio = (innerWidth < 768);
-      btn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(224,216,240,.4);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s,opacity .3s;line-height:1';
-      if (isMobAudio) {
-        btn.style.cssText += 'font-size:1rem;bottom:2rem;right:2rem;background:rgba(0,0,0,0.45);border:1px solid rgba(224,216,240,0.2);border-radius:20px;padding:.5rem 1rem;color:rgba(224,216,240,0.7);letter-spacing:.1em;font-family:"DM Mono",monospace;font-size:.65rem;';
-        btn.textContent = '▶  AUDIO';
-      } else {
-        btn.textContent = '▶';
-      }
-      btn.title = 'Toggle audio';
-      btn.onmouseenter = () => btn.style.color = '#e0d8f0';
-      btn.onmouseleave = () => btn.style.color = 'rgba(224,216,240,.4)';
-      document.body.appendChild(btn);
-      function updateBtn() {
-        if (isMobAudio) { btn.textContent = audioPlaying ? '⏸' : '▶  AUDIO'; }
-        else { btn.textContent = audioPlaying ? '⏸' : '▶'; }
-      }
-      // Expose for animate loop
-      window._applyPreset = applyPreset;
-
-      btn.onclick = async () => {
-        if (!audioReady) { await initAudio(); return; }
-        if (audioPlaying) {
-          srcNode && srcNode.stop(); audioPlaying = false;
-        } else {
-          if (!audioBuffer) { await loadAndPlay(ctx, lpFilter); }
-          else {
-            srcNode = ctx.createBufferSource();
-            srcNode.buffer = audioBuffer; srcNode.loop = false;
-            srcNode.connect(lpFilter);
-            srcNode.onended = () => { if (audioPlaying) { const n = ctx.createBufferSource(); n.buffer = audioBuffer; n.connect(lpFilter); n.onended = srcNode.onended; n.start(); srcNode = n; } };
-            srcNode.start(); audioPlaying = true;
-          }
-        }
-        updateBtn();
-      };
-
-      // ── Scroll → section audio morphing ──────────────────────────
-      const BANDS = [{ lo: .00, hi: .12 }, { lo: .11, hi: .24 }, { lo: .22, hi: .35 }, { lo: .33, hi: .47 },
-      { lo: .45, hi: .57 }, { lo: .55, hi: .68 }, { lo: .66, hi: .78 }, { lo: .76, hi: 1.0 }];
-      window.addEventListener('scroll', () => {
-        if (!audioReady) return;
-        const s = window.scrollY / Math.max(1, document.body.scrollHeight - innerHeight);
-        for (let i = 0; i < BANDS.length; i++) {
-          const b = BANDS[i];
-          const center = (b.lo + b.hi) / 2;
-          // Trigger when scroll crosses section center point
-          if (s >= b.lo && s <= b.hi) { applyPreset(i); break; }
-        }
-      }, { passive: true });
-
-      // ── Auto-start on first user gesture ─────────────────────────
-      // Auto-start: fires on ANY interaction — capture phase, once
-      let _started = false;
-      async function onGesture() {
-        if (_started) return; _started = true;
-        await initAudio();
-      }
-      // On desktop try immediate autoplay; on mobile wait for explicit tap
-      if (!IS_MOB) {
-        setTimeout(async () => {
-          try { if (!_started) { _started = true; await initAudio(); } } catch (_) { }
-        }, 200);
-      }
-      // Any user gesture (desktop fallback + mobile primary)
-      ['click', 'keydown', 'touchstart', 'pointerdown', 'scroll'].forEach(ev => {
-        window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
+    function go(){ if(!aid) aid=requestAnimationFrame(tick); }
+    function ptr(px,py,spd){
+      let mx2=0;
+      wf.forEach(w=>{
+        const r=w.sp.getBoundingClientRect();
+        if(!r.width) return;
+        const dist=Math.sqrt((px-r.left-r.width/2)**2+(py-r.top-r.height/2)**2);
+        const inf=Math.max(0,1-dist/160);
+        w.tgt=inf>0?Math.min(inf*(24+spd*.25),30):0;
+        mx2=Math.max(mx2,w.tgt);
       });
+      // Visual distortion only — no sound on letter hover
+      go();
+    }
+    document.addEventListener('mousemove',e=>{
+      const s=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);
+      lx=e.clientX;ly=e.clientY; ptr(e.clientX,e.clientY,s);
+    },{passive:true});
+    document.addEventListener('touchmove',e=>{
+      const t=e.touches[0]; ptr(t.clientX,t.clientY,4);
+    },{passive:true});
+    document.addEventListener('touchend',()=>{ wf.forEach(w=>w.tgt=0); go(); },{passive:true});
+  }
 
-      // ── Init distortion after DOM ─────────────────────────────────
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupDistortion);
-      } else { setupDistortion(); }
+  // ── Audio toggle button ───────────────────────────────────────
+  const btn=document.createElement('button');
+  btn.style.cssText='position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(224,216,240,.4);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s;line-height:1';
+  btn.textContent='▶';
+  btn.title='Toggle audio';
+  btn.onmouseenter=()=>btn.style.color='#e0d8f0';
+  btn.onmouseleave=()=>btn.style.color='rgba(224,216,240,.4)';
+  document.body.appendChild(btn);
+  function updateBtn(){ btn.textContent=audioPlaying?'⏸':'▶'; }
+  // Expose for animate loop
+  window._applyPreset=applyPreset;
 
-    })();
-  </script>
-
-  <script>
-    // ═══════════════════════════════════════════════════════════════
-    // i18n — ES / EN / FR
-    // ═══════════════════════════════════════════════════════════════
-    (function () {
-      const T = {
-        es: {
-          'nav.services': 'Servicios', 'nav.process': 'Proceso', 'nav.work': 'Trabajo', 'nav.contact': 'Contacto',
-          'hero.eyebrow': 'Experiencias digitales', 'hero.sub': 'Arquitectura digital, experiencias inmersivas y productos que dejan huella.',
-          'scroll': 'Desplazar',
-          'p0.body': 'Arquitectura digital, experiencias inmersivas y productos que dejan huella.',
-          'p1.tag': 'Sobre el estudio', 'p1.title': 'Donde el <em>diseño</em><br>encuentra la<br>ingeniería.',
-          'p1.divider': '', 'p1.body': 'Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales que dejan huella.',
-          'p2.eyebrow': '01 — Artesanía digital', 'p2.title': 'Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.',
-          'p3.eyebrow': 'Lo que construimos', 'p3.title': 'Nuestro <em>craft</em>',
-          's1.name': 'Desarrollo Web Moderno', 's1.desc': 'React, Next.js y arquitecturas personalizadas.',
-          's2.name': 'Landing Pages', 's2.desc': 'Conversión, narrativa de marca y resultados.',
-          's3.name': 'Experiencias 3D', 's3.desc': 'Escenas WebGL inmersivas en tiempo real.',
-          's4.name': 'UX/UI Interfaces', 's4.desc': 'Del wireframe al sistema de alta fidelidad.',
-          's5.name': 'Automatizaciones', 's5.desc': 'Pipelines de API que eliminan la fricción.',
-          's6.name': 'Performance', 's6.desc': 'Sitios lentos → experiencias ultrarrápidas.',
-          'p4.eyebrow': '02 — Artesanía digital', 'p4.title': '<em>La interacción</em><br>convierte una página<br>en una experiencia.',
-          'p5.tag': 'Cómo trabajamos', 'p5.title': 'El <em>proceso</em>',
-          'st1': 'Descubrimiento', 'sd1': 'Objetivos, usuarios y contexto.',
-          'st2': 'Diseño', 'sd2': 'Sistémico y visual.',
-          'st3': 'Prototipo', 'sd3': 'Validar antes de construir.',
-          'st4': 'Desarrollo', 'sd4': 'Código limpio y medible.',
-          'st5': 'Lanzamiento', 'sd5': 'Deploy y refinamiento continuo.',
-          'p6.eyebrow': '03 — Artesanía digital', 'p6.title': 'El 3D no decora;<br>debe <em>contar<br>una historia.</em>',
-          'p7.eyebrow': '¿Listo para comenzar?', 'p7.title': 'Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em>',
-          'p7.body': 'Hablemos sobre tu proyecto.', 'p7.cta': 'hello@aminoacid.studio →',
-        },
-        en: {
-          'nav.services': 'Services', 'nav.process': 'Process', 'nav.work': 'Work', 'nav.contact': 'Contact',
-          'hero.eyebrow': 'Digital Experiences', 'hero.sub': 'Digital architecture, immersive experiences and products that leave a mark.',
-          'scroll': 'Scroll',
-          'p0.body': 'Digital architecture, immersive experiences and products that leave a mark.',
-          'p1.tag': 'About the studio', 'p1.title': 'Where <em>design</em><br>meets<br>engineering.',
-          'p1.body': 'We are a boutique studio at the intersection of technology and storytelling. We combine strategic thinking, precision engineering and obsessive attention to craft to build digital products that leave a mark.',
-          'p2.eyebrow': '01 — Digital craft', 'p2.title': 'A fast site <em>sells</em><br>before the user<br>thinks of leaving.',
-          'p3.eyebrow': 'What we build', 'p3.title': 'Our <em>craft</em>',
-          's1.name': 'Modern Web Development', 's1.desc': 'React, Next.js and custom architectures.',
-          's2.name': 'Landing Pages', 's2.desc': 'Conversion, brand narrative and results.',
-          's3.name': '3D Experiences', 's3.desc': 'Immersive WebGL scenes in real time.',
-          's4.name': 'UX/UI Interfaces', 's4.desc': 'From wireframe to high-fidelity system.',
-          's5.name': 'Automations', 's5.desc': 'API pipelines that eliminate friction.',
-          's6.name': 'Performance', 's6.desc': 'Slow sites → ultra-fast experiences.',
-          'p4.eyebrow': '02 — Digital craft', 'p4.title': '<em>Interaction</em><br>turns a page<br>into an experience.',
-          'p5.tag': 'How we work', 'p5.title': 'The <em>process</em>',
-          'st1': 'Discovery', 'sd1': 'Goals, users and context.',
-          'st2': 'Design', 'sd2': 'Systemic and visual.',
-          'st3': 'Prototype', 'sd3': 'Validate before building.',
-          'st4': 'Development', 'sd4': 'Clean, measurable code.',
-          'st5': 'Launch', 'sd5': 'Deploy and continuous refinement.',
-          'p6.eyebrow': '03 — Digital craft', 'p6.title': '3D doesn\u2019t decorate;<br>it must <em>tell<br>a story.</em>',
-          'p7.eyebrow': 'Ready to start?', 'p7.title': 'Your next site<br>doesn\u2019t have to look<br>like <em>another site.</em>',
-          'p7.body': 'Let\u2019s talk about your project.', 'p7.cta': 'hello@aminoacid.studio →',
-        },
-        fr: {
-          'nav.services': 'Services', 'nav.process': 'Processus', 'nav.work': 'Travaux', 'nav.contact': 'Contact',
-          'hero.eyebrow': 'Exp\u00e9riences num\u00e9riques', 'hero.sub': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
-          'scroll': 'D\u00e9filer',
-          'p0.body': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
-          'p1.tag': '\u00c0 propos du studio', 'p1.title': 'O\u00f9 le <em>design</em><br>rencontre<br>l\u2019ing\u00e9nierie.',
-          'p1.body': 'Nous sommes un studio boutique \u00e0 l\u2019intersection de la technologie et du storytelling. Nous combinons pens\u00e9e strat\u00e9gique, ing\u00e9nierie de pr\u00e9cision et attention obsessionnelle au craft.',
-          'p2.eyebrow': '01 \u2014 Artisanat num\u00e9rique', 'p2.title': 'Un site rapide <em>vend</em><br>avant que l\u2019utilisateur<br>pense \u00e0 partir.',
-          'p3.eyebrow': 'Ce que nous construisons', 'p3.title': 'Notre <em>craft</em>',
-          's1.name': 'D\u00e9veloppement Web Moderne', 's1.desc': 'React, Next.js et architectures personnalis\u00e9es.',
-          's2.name': 'Pages d\u2019atterrissage', 's2.desc': 'Conversion, r\u00e9cit de marque et r\u00e9sultats.',
-          's3.name': 'Exp\u00e9riences 3D', 's3.desc': 'Sc\u00e8nes WebGL immersives en temps r\u00e9el.',
-          's4.name': 'Interfaces UX/UI', 's4.desc': 'Du wireframe au syst\u00e8me haute fid\u00e9lit\u00e9.',
-          's5.name': 'Automatisations', 's5.desc': 'Pipelines API qui \u00e9liminent la friction.',
-          's6.name': 'Performance', 's6.desc': 'Sites lents \u2192 exp\u00e9riences ultra-rapides.',
-          'p4.eyebrow': '02 \u2014 Artisanat num\u00e9rique', 'p4.title': '<em>L\u2019interaction</em><br>transforme une page<br>en exp\u00e9rience.',
-          'p5.tag': 'Comment nous travaillons', 'p5.title': 'Le <em>processus</em>',
-          'st1': 'D\u00e9couverte', 'sd1': 'Objectifs, utilisateurs et contexte.',
-          'st2': 'Design', 'sd2': 'Syst\u00e9mique et visuel.',
-          'st3': 'Prototype', 'sd3': 'Valider avant de construire.',
-          'st4': 'D\u00e9veloppement', 'sd4': 'Code propre et mesurable.',
-          'st5': 'Lancement', 'sd5': 'D\u00e9ploiement et raffinement continu.',
-          'p6.eyebrow': '03 \u2014 Artisanat num\u00e9rique', 'p6.title': 'La 3D ne d\u00e9core pas;<br>elle doit <em>raconter<br>une histoire.</em>',
-          'p7.eyebrow': 'Pr\u00eat \u00e0 commencer?', 'p7.title': 'Votre prochain site<br>n\u2019a pas \u00e0 ressembler<br>\u00e0 <em>un autre site.</em>',
-          'p7.body': 'Parlons de votre projet.', 'p7.cta': 'hello@aminoacid.studio \u2192',
-        }
-      };
-
-      // Map keys to DOM elements via data-i18n attribute
-      function applyLang(lang) {
-        const dict = T[lang] || T.es;
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-          const key = el.getAttribute('data-i18n');
-          if (dict[key] !== undefined) el.innerHTML = dict[key];
-        });
-        document.querySelectorAll('.lang-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.lang === lang);
-        });
-        localStorage.setItem('amino-lang', lang);
+  btn.onclick=async()=>{
+    if(!audioReady){ await initAudio(); return; }
+    if(audioPlaying){
+      srcNode&&srcNode.stop(); audioPlaying=false;
+    } else {
+      if(!audioBuffer){ await loadAndPlay(ctx,lpFilter); }
+      else {
+        srcNode=ctx.createBufferSource();
+        srcNode.buffer=audioBuffer; srcNode.loop=false;
+        srcNode.connect(lpFilter);
+        srcNode.onended=()=>{ if(audioPlaying){ const n=ctx.createBufferSource(); n.buffer=audioBuffer; n.connect(lpFilter); n.onended=srcNode.onended; n.start(); srcNode=n; }};
+        srcNode.start(); audioPlaying=true;
       }
+    }
+    updateBtn();
+  };
 
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => applyLang(btn.dataset.lang));
-      });
+  // ── Scroll → section audio morphing ──────────────────────────
+  const BANDS=[{lo:.00,hi:.12},{lo:.11,hi:.24},{lo:.22,hi:.35},{lo:.33,hi:.47},
+               {lo:.45,hi:.57},{lo:.55,hi:.68},{lo:.66,hi:.78},{lo:.76,hi:1.0}];
+  window.addEventListener('scroll',()=>{
+    if(!audioReady) return;
+    const s=window.scrollY/Math.max(1,document.body.scrollHeight-innerHeight);
+    for(let i=0;i<BANDS.length;i++){
+      const b=BANDS[i];
+      const center=(b.lo+b.hi)/2;
+      // Trigger when scroll crosses section center point
+      if(s>=b.lo&&s<=b.hi){ applyPreset(i); break; }
+    }
+  },{passive:true});
 
-      // Apply saved or default lang
-      applyLang(localStorage.getItem('amino-lang') || 'es');
-    })();
-  </script>
+  // ── Auto-start on first user gesture ─────────────────────────
+  // Auto-start: fires on ANY interaction — capture phase, once
+  let _started=false;
+  async function onGesture(){
+    if(_started) return; _started=true;
+    await initAudio();
+  }
+  // Desktop: try immediate autoplay
+  if(!IS_MOB){
+    setTimeout(async()=>{
+      try{ if(!_started){ _started=true; await initAudio(); } }catch(_){}
+    }, 200);
+  }
+  // All devices: fire on first touchstart, scroll, click, or keydown
+  // touchstart = valid AudioContext gesture on iOS Safari + Android Chrome
+  ['touchstart','scroll','click','keydown','pointerdown'].forEach(ev=>{
+    window.addEventListener(ev, onGesture, {once:true, passive:true, capture:true});
+  });
+
+  // ── Init distortion after DOM ─────────────────────────────────
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',setupDistortion);
+  } else { setupDistortion(); }
+
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// i18n — ES / EN / FR
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  const T = {
+    es:{
+      'nav.services':'Servicios','nav.process':'Proceso','nav.work':'Trabajo','nav.contact':'Contacto',
+      'hero.eyebrow':'Experiencias digitales','hero.sub':'Arquitectura digital, experiencias inmersivas y productos que dejan huella.',
+      'scroll':'Desplazar',
+      'p0.body':'Arquitectura digital, experiencias inmersivas y productos que dejan huella.',
+      'p1.tag':'Sobre el estudio','p1.title':'Donde el <em>diseño</em><br>encuentra la<br>ingeniería.',
+      'p1.divider':'','p1.body':'Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales que dejan huella.',
+      'p2.eyebrow':'01 — Artesanía digital','p2.title':'Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.',
+      'p3.eyebrow':'Lo que construimos','p3.title':'Nuestro <em>craft</em>',
+      's1.name':'Desarrollo Web Moderno','s1.desc':'React, Next.js y arquitecturas personalizadas.',
+      's2.name':'Landing Pages','s2.desc':'Conversión, narrativa de marca y resultados.',
+      's3.name':'Experiencias 3D','s3.desc':'Escenas WebGL inmersivas en tiempo real.',
+      's4.name':'UX/UI Interfaces','s4.desc':'Del wireframe al sistema de alta fidelidad.',
+      's5.name':'Automatizaciones','s5.desc':'Pipelines de API que eliminan la fricción.',
+      's6.name':'Performance','s6.desc':'Sitios lentos → experiencias ultrarrápidas.',
+      'p4.eyebrow':'02 — Artesanía digital','p4.title':'<em>La interacción</em><br>convierte una página<br>en una experiencia.',
+      'p5.tag':'Cómo trabajamos','p5.title':'El <em>proceso</em>',
+      'st1':'Descubrimiento','sd1':'Objetivos, usuarios y contexto.',
+      'st2':'Diseño','sd2':'Sistémico y visual.',
+      'st3':'Prototipo','sd3':'Validar antes de construir.',
+      'st4':'Desarrollo','sd4':'Código limpio y medible.',
+      'st5':'Lanzamiento','sd5':'Deploy y refinamiento continuo.',
+      'p6.eyebrow':'03 — Artesanía digital','p6.title':'El 3D no decora;<br>debe <em>contar<br>una historia.</em>',
+      'p7.eyebrow':'¿Listo para comenzar?','p7.title':'Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em>',
+      'p7.body':'Hablemos sobre tu proyecto.','p7.cta':'hello@aminoacid.studio →',
+    },
+    en:{
+      'nav.services':'Services','nav.process':'Process','nav.work':'Work','nav.contact':'Contact',
+      'hero.eyebrow':'Digital Experiences','hero.sub':'Digital architecture, immersive experiences and products that leave a mark.',
+      'scroll':'Scroll',
+      'p0.body':'Digital architecture, immersive experiences and products that leave a mark.',
+      'p1.tag':'About the studio','p1.title':'Where <em>design</em><br>meets<br>engineering.',
+      'p1.body':'We are a boutique studio at the intersection of technology and storytelling. We combine strategic thinking, precision engineering and obsessive attention to craft to build digital products that leave a mark.',
+      'p2.eyebrow':'01 — Digital craft','p2.title':'A fast site <em>sells</em><br>before the user<br>thinks of leaving.',
+      'p3.eyebrow':'What we build','p3.title':'Our <em>craft</em>',
+      's1.name':'Modern Web Development','s1.desc':'React, Next.js and custom architectures.',
+      's2.name':'Landing Pages','s2.desc':'Conversion, brand narrative and results.',
+      's3.name':'3D Experiences','s3.desc':'Immersive WebGL scenes in real time.',
+      's4.name':'UX/UI Interfaces','s4.desc':'From wireframe to high-fidelity system.',
+      's5.name':'Automations','s5.desc':'API pipelines that eliminate friction.',
+      's6.name':'Performance','s6.desc':'Slow sites → ultra-fast experiences.',
+      'p4.eyebrow':'02 — Digital craft','p4.title':'<em>Interaction</em><br>turns a page<br>into an experience.',
+      'p5.tag':'How we work','p5.title':'The <em>process</em>',
+      'st1':'Discovery','sd1':'Goals, users and context.',
+      'st2':'Design','sd2':'Systemic and visual.',
+      'st3':'Prototype','sd3':'Validate before building.',
+      'st4':'Development','sd4':'Clean, measurable code.',
+      'st5':'Launch','sd5':'Deploy and continuous refinement.',
+      'p6.eyebrow':'03 — Digital craft','p6.title':'3D doesn\u2019t decorate;<br>it must <em>tell<br>a story.</em>',
+      'p7.eyebrow':'Ready to start?','p7.title':'Your next site<br>doesn\u2019t have to look<br>like <em>another site.</em>',
+      'p7.body':'Let\u2019s talk about your project.','p7.cta':'hello@aminoacid.studio →',
+    },
+    fr:{
+      'nav.services':'Services','nav.process':'Processus','nav.work':'Travaux','nav.contact':'Contact',
+      'hero.eyebrow':'Exp\u00e9riences num\u00e9riques','hero.sub':'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
+      'scroll':'D\u00e9filer',
+      'p0.body':'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
+      'p1.tag':'\u00c0 propos du studio','p1.title':'O\u00f9 le <em>design</em><br>rencontre<br>l\u2019ing\u00e9nierie.',
+      'p1.body':'Nous sommes un studio boutique \u00e0 l\u2019intersection de la technologie et du storytelling. Nous combinons pens\u00e9e strat\u00e9gique, ing\u00e9nierie de pr\u00e9cision et attention obsessionnelle au craft.',
+      'p2.eyebrow':'01 \u2014 Artisanat num\u00e9rique','p2.title':'Un site rapide <em>vend</em><br>avant que l\u2019utilisateur<br>pense \u00e0 partir.',
+      'p3.eyebrow':'Ce que nous construisons','p3.title':'Notre <em>craft</em>',
+      's1.name':'D\u00e9veloppement Web Moderne','s1.desc':'React, Next.js et architectures personnalis\u00e9es.',
+      's2.name':'Pages d\u2019atterrissage','s2.desc':'Conversion, r\u00e9cit de marque et r\u00e9sultats.',
+      's3.name':'Exp\u00e9riences 3D','s3.desc':'Sc\u00e8nes WebGL immersives en temps r\u00e9el.',
+      's4.name':'Interfaces UX/UI','s4.desc':'Du wireframe au syst\u00e8me haute fid\u00e9lit\u00e9.',
+      's5.name':'Automatisations','s5.desc':'Pipelines API qui \u00e9liminent la friction.',
+      's6.name':'Performance','s6.desc':'Sites lents \u2192 exp\u00e9riences ultra-rapides.',
+      'p4.eyebrow':'02 \u2014 Artisanat num\u00e9rique','p4.title':'<em>L\u2019interaction</em><br>transforme une page<br>en exp\u00e9rience.',
+      'p5.tag':'Comment nous travaillons','p5.title':'Le <em>processus</em>',
+      'st1':'D\u00e9couverte','sd1':'Objectifs, utilisateurs et contexte.',
+      'st2':'Design','sd2':'Syst\u00e9mique et visuel.',
+      'st3':'Prototype','sd3':'Valider avant de construire.',
+      'st4':'D\u00e9veloppement','sd4':'Code propre et mesurable.',
+      'st5':'Lancement','sd5':'D\u00e9ploiement et raffinement continu.',
+      'p6.eyebrow':'03 \u2014 Artisanat num\u00e9rique','p6.title':'La 3D ne d\u00e9core pas;<br>elle doit <em>raconter<br>une histoire.</em>',
+      'p7.eyebrow':'Pr\u00eat \u00e0 commencer?','p7.title':'Votre prochain site<br>n\u2019a pas \u00e0 ressembler<br>\u00e0 <em>un autre site.</em>',
+      'p7.body':'Parlons de votre projet.','p7.cta':'hello@aminoacid.studio \u2192',
+    }
+  };
+
+  // Map keys to DOM elements via data-i18n attribute
+  function applyLang(lang){
+    const dict=T[lang]||T.es;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key=el.getAttribute('data-i18n');
+      if(dict[key]!==undefined) el.innerHTML=dict[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(b=>{
+      b.classList.toggle('active',b.dataset.lang===lang);
+    });
+    localStorage.setItem('amino-lang',lang);
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>applyLang(btn.dataset.lang));
+  });
+
+  // Apply saved or default lang
+  applyLang(localStorage.getItem('amino-lang')||'es');
+})();
+</script>
 </body>
-
 </html>
