@@ -864,13 +864,16 @@
       gl_FragColor=vec4(sky,1.);
     }`
     });
-    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, IS_MOB ? 2 : 3), skyMat)); // reduced detail
+    if (!IS_MOB) {
+      scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, 3), skyMat));
+    }
+    // Mobile sky: just renderer clear color updated each frame (free)
 
 
     // ═══════════════════════════════════════════════════════════════
     // DESERT TERRAIN — procedural dunes with sand shader
     // ═══════════════════════════════════════════════════════════════
-    const TRES = IS_MOB ? 40 : 64;
+    const TRES = IS_MOB ? 24 : 64; // mobile: 24×24=576 quads only
     const desertMat = new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() }, uMobT: { value: IS_MOB ? 1.0 : 0.0 } },
       vertexShader: `
@@ -974,7 +977,16 @@
     }
     tPos.needsUpdate = true;
     tGeo.computeVertexNormals();
-    const terrain = new THREE.Mesh(tGeo, desertMat);
+    let terrain;
+    if (IS_MOB) {
+      // Mobile: simple material — no custom shader, just color + lighting
+      const mobTerrainMat = new THREE.MeshStandardMaterial({
+        color: 0x2a1a08, roughness: 1.0, metalness: 0.0
+      });
+      terrain = new THREE.Mesh(tGeo, mobTerrainMat);
+    } else {
+      terrain = new THREE.Mesh(tGeo, desertMat);
+    }
     terrain.receiveShadow = false;
     scene.add(terrain);
 
@@ -1050,11 +1062,15 @@
       gl_FragColor=vec4(col,clamp(.78+fr*.15,0.,1.));
     }`
     });
-    const wGeo = new THREE.PlaneGeometry(38, 38, IS_MOB ? 32 : 64, IS_MOB ? 32 : 64);
-    wGeo.rotateX(-Math.PI / 2);
-    const water = new THREE.Mesh(wGeo, waterMat);
-    water.position.y = -3.0;
-    scene.add(water);
+    // Water: only on desktop (too expensive for mobile)
+    let water = null;
+    if (!IS_MOB) {
+      const wGeo = new THREE.PlaneGeometry(38, 38, 64, 64);
+      wGeo.rotateX(-Math.PI / 2);
+      water = new THREE.Mesh(wGeo, waterMat);
+      water.position.y = -3.0;
+      scene.add(water);
+    }
 
     // ═══════════════════════════════════════════════════════════════
     // RAIN — instanced line segments falling with wind
@@ -1144,49 +1160,48 @@
       requestAnimationFrame(animate);
       _frame++;
       // Mobile: render at ~30fps (skip odd frames)
-      if (IS_MOB && (_frame & 1)) return;
+      // Mobile: ~20fps (every 3rd frame). Landscape is slow-moving, unnoticeable.
+      if (IS_MOB && (_frame % 3 !== 0)) return;
       const t = clock.getElapsedTime();
       scrollSmooth += (scrollRaw - scrollSmooth) * .12; // faster section transitions
       const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
 
-      // ── Animated color cycle — hue sweeps through spectrum ──────
-      // Match video: ~45s full cycle, multiple layers at offset phases
-      const h1 = t * .022;                    // ~45s period
-      const h2 = h1 + .33;                    // 120° offset
-      const h3 = h1 + .66;                    // 240° offset
-      colA.setHSL(h1 % 1, .85, .18);         // main color
-      colB.setHSL(h2 % 1, .80, .15);         // complementary
-      colC.setHSL(h3 % 1, .75, .12);         // triad
+      // ── Color cycle ──────────────────────────────────────────────
+      const h1 = t * .022, h2 = h1 + .33, h3 = h1 + .66;
+      colA.setHSL(h1 % 1, .85, .18);
+      colB.setHSL(h2 % 1, .80, .15);
+      colC.setHSL(h3 % 1, .75, .12);
 
-      // ── Sky ──────────────────────────────────────────────────────
-      skyMat.uniforms.uTime.value = t;
-
-      // ── Fog color follows sky hue ────────────────────────────────
-      // fog disabled
-
-      // ── Lights cycle in sync with colors ────────────────────────
-      colorLightA.color.copy(colA).multiplyScalar(2.0);
-      colorLightA.groundColor.copy(colC).multiplyScalar(0.5);
-      colorLightB.color.copy(colB).multiplyScalar(1.8);
-      colorLightC.color.copy(colC).multiplyScalar(1.4);
-      // Directional lights: just rotate direction, no position distance calc
-      colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
-      colorLightC.position.set(-15 + Math.cos(t * .04) * 8, 20, 10);
-
-      // ── Desert terrain color ─────────────────────────────────────
-      desertMat.uniforms.uTime.value = t;
-      desertMat.uniforms.uColA.value.copy(colA);
-      desertMat.uniforms.uColB.value.copy(colB);
-
-      // ── Water ───────────────────────────────────────────────────
-      waterMat.uniforms.uTime.value = t * .52;
-      waterMat.uniforms.uColA.value.copy(colA);
-      waterMat.uniforms.uColB.value.copy(colB);
+      if (IS_MOB) {
+        // Mobile: drive color via background clear color and hemisphere light only
+        renderer.setClearColor(colA.clone().multiplyScalar(0.12).getHex(), 1);
+        colorLightA.color.copy(colA).multiplyScalar(3.0);
+        colorLightA.groundColor.copy(colB).multiplyScalar(1.0);
+        colorLightB.color.copy(colB).multiplyScalar(2.5);
+        colorLightC.color.copy(colC).multiplyScalar(2.0);
+      } else {
+        // Desktop: full shader updates
+        skyMat.uniforms.uTime.value = t;
+        colorLightA.color.copy(colA).multiplyScalar(2.0);
+        colorLightA.groundColor.copy(colC).multiplyScalar(0.5);
+        colorLightB.color.copy(colB).multiplyScalar(1.8);
+        colorLightC.color.copy(colC).multiplyScalar(1.4);
+        colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
+        colorLightC.position.set(-15 + Math.cos(t * .04) * 8, 20, 10);
+        desertMat.uniforms.uTime.value = t;
+        desertMat.uniforms.uColA.value.copy(colA);
+        desertMat.uniforms.uColB.value.copy(colB);
+        if (water) {
+          waterMat.uniforms.uTime.value = t * .52;
+          waterMat.uniforms.uColA.value.copy(colA);
+          waterMat.uniforms.uColB.value.copy(colB);
+        }
+      }
 
       // ── Camera ──────────────────────────────────────────────────
-      cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04;
+      if (!IS_MOB) { cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04; }
       const ck = getCam(s);
-      const camX = ck.p[0] + cpmx * 1.2, camZ = ck.p[2];
+      const camX = ck.p[0] + (IS_MOB ? 0 : cpmx * 1.2), camZ = ck.p[2];
       // Enforce minimum camera height — always at least 4.5 units above terrain
       const floorH = terrainHeight(camX, camZ) + 4.5;
       const camY = Math.max(ck.p[1] + cpmy * -.5, floorH);
