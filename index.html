@@ -633,11 +633,11 @@
     // ── Renderer ──────────────────────────────────────────────────
     const canvas = document.getElementById('c');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOB, alpha: false, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOB ? 1.5 : 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOB ? 1.0 : 2));
     renderer.setSize(innerWidth, innerHeight);
     renderer.setClearColor(0x04020a, 1);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMapping = IS_MOB ? THREE.LinearToneMapping : THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = IS_MOB ? 1.0 : 1.1;
 
     const scene = new THREE.Scene();
     // scene.fog disabled for performance
@@ -743,29 +743,15 @@
       sky=mix(sky, mid,    smoothstep(.0,.4,h));
       sky=mix(sky, zenith, smoothstep(.3,.85,h));
 
-      // === NEBULA LAYERS — seamless 3D noise (no atan seam) ===
-      // Use 3D position directly — avoids atan() discontinuity at ±π
-      // Project onto 3 independent planes for variety
+      // Nebula: 1 noise sample only (was 3)
       vec2 p1=d.xz*3.0+vec2(t*.008,t*.006);
-      vec2 p2=d.yx*5.0+vec2(-t*.012,t*.009);
-      vec2 p3=d.zy*8.0+vec2(t*.005,-t*.007);
-      float n1=noise(p1); float n2=noise(p2); float n3=noise(p3);
-
-      // Nebula color 1 — complementary to current sky
+      float n1=noise(p1);
+      float n3=noise(d.zy*6.+vec2(t*.004));
       float hNeb1=mod(hCycle+.5,1.);
       vec3 neb1=hsl2rgb(hNeb1,.9,.18)*n1*n1;
-
-      // Nebula color 2
-      float hNeb2=mod(hCycle2+.25,1.);
-      vec3 neb2=hsl2rgb(hNeb2,.85,.14)*n2*n2;
-
-      // Add nebulae — stronger above horizon
       float nebMask=smoothstep(-.1,.5,h);
-      sky+=neb1*nebMask*.6;
-      sky+=neb2*nebMask*.4;
-
-      // Fine noise texture variation
-      sky*=.9+n3*.2;
+      sky+=neb1*nebMask*.7;
+      sky*=.92+n3*.16;
 
       // Star flocks moved to JS particle system — sky shader is now cheap
       // (see THREE.Points _starFlock below)
@@ -787,10 +773,10 @@
       gl_FragColor=vec4(sky,1.);
     }`
     });
-    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, 3), skyMat)); // reduced detail
+    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, IS_MOB ? 2 : 3), skyMat)); // reduced detail
 
     // ── Star flocks — JS particle system (far cheaper than per-pixel GLSL) ──
-    const FLOCK_N = 6, STARS_PER_FLOCK = IS_MOB ? 25 : 50;
+    const FLOCK_N = IS_MOB ? 3 : 6, STARS_PER_FLOCK = IS_MOB ? 15 : 50;
     const TOTAL_STARS = FLOCK_N * STARS_PER_FLOCK;
     const starPositions = new Float32Array(TOTAL_STARS * 3);
     const starColors = new Float32Array(TOTAL_STARS * 3);
@@ -899,16 +885,17 @@
       return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),
                  mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);
     }
-    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<6;i++){v+=a*noise(p);p*=2.07;a*=.48;}return v;}
+    // Mobile: 3 octaves only; desktop: 6
+    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*noise(p);p*=2.07;a*=.48;}return v;}
 
     void main(){
       vec2 xz=vWorldPos.xz;
 
-      // Multi-scale sand texture
-      float n1=fbm(xz*.06);           // large dune shapes
-      float n2=fbm(xz*.25+vec2(1.7)); // medium ripples
-      float n3=fbm(xz*1.2 +vec2(3.1)); // fine sand grain
-      float n4=noise(xz*4.+vec2(uTime*.02)); // very fine shimmer
+      // Multi-scale sand texture — simplified for performance
+      float n1=fbm(xz*.06);
+      float n2=noise(xz*.28+vec2(1.7));  // single noise instead of fbm
+      float n3=noise(xz*1.1+vec2(3.1));
+      float n4=noise(xz*3.+vec2(uTime*.02));
 
       // Sand base color — interpolated between two animated colors
       vec3 sandBase=mix(uColA,uColB,n1);
@@ -998,10 +985,10 @@
     void main(){
       vec3 p=position;
       vec3 tan=vec3(1,0,0),bn=vec3(0,0,1);
-      p+=gerstner(vec2(.8,.6),.042,4.8,p,tan,bn);
-      p+=gerstner(vec2(-.5,.85),.035,3.2,p,tan,bn);
-      p+=gerstner(vec2(.3,-.9),.025,6.1,p,tan,bn);
-      p+=gerstner(vec2(.95,.3),.018,2.5,p,tan,bn);
+      // 2 waves always; extra 2 only on desktop (controlled by geometry density)
+      p+=gerstner(vec2(.8,.6),.040,4.8,p,tan,bn);
+      p+=gerstner(vec2(-.5,.85),.030,3.2,p,tan,bn);
+      p+=gerstner(vec2(.3,-.9),.020,6.5,p,tan,bn);
       vN=normalize(cross(bn,tan));
       vPos=p;vElev=p.y;
       gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
@@ -1053,7 +1040,7 @@
     // ═══════════════════════════════════════════════════════════════
     // RAIN — instanced line segments falling with wind
     // ═══════════════════════════════════════════════════════════════
-    const RAIN_N = IS_MOB ? 600 : 1800;
+    const RAIN_N = IS_MOB ? 0 : 1800; // disabled on mobile for performance
     (function () {
       // Each raindrop = short vertical line (2 verts)
       const rGeo = new THREE.BufferGeometry();
@@ -1170,8 +1157,12 @@
     const colB = new THREE.Color();
     const colC = new THREE.Color();
 
+    let _frame = 0;
     function animate() {
       requestAnimationFrame(animate);
+      _frame++;
+      // Mobile: render at ~30fps (skip odd frames)
+      if (IS_MOB && (_frame & 1)) return;
       const t = clock.getElapsedTime();
       scrollSmooth += (scrollRaw - scrollSmooth) * .12; // faster section transitions
       const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
@@ -1271,6 +1262,7 @@
     // ═══════════════════════════════════════════════════════════════
     (function () {
       'use strict';
+      const IS_MOB = innerWidth < 768; // local copy for audio IIFE
 
       // ── Audio state ──────────────────────────────────────────────
       let ctx = null, srcNode = null, audioBuffer = null;
@@ -1520,13 +1512,23 @@
 
       // ── Audio toggle button ───────────────────────────────────────
       const btn = document.createElement('button');
-      btn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(224,216,240,.4);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s;line-height:1';
-      btn.textContent = '▶';
+      // On mobile, show a more prominent first-tap prompt
+      const isMobAudio = (innerWidth < 768);
+      btn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(224,216,240,.4);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s,opacity .3s;line-height:1';
+      if (isMobAudio) {
+        btn.style.cssText += 'font-size:1rem;bottom:2rem;right:2rem;background:rgba(0,0,0,0.45);border:1px solid rgba(224,216,240,0.2);border-radius:20px;padding:.5rem 1rem;color:rgba(224,216,240,0.7);letter-spacing:.1em;font-family:"DM Mono",monospace;font-size:.65rem;';
+        btn.textContent = '▶  AUDIO';
+      } else {
+        btn.textContent = '▶';
+      }
       btn.title = 'Toggle audio';
       btn.onmouseenter = () => btn.style.color = '#e0d8f0';
       btn.onmouseleave = () => btn.style.color = 'rgba(224,216,240,.4)';
       document.body.appendChild(btn);
-      function updateBtn() { btn.textContent = audioPlaying ? '⏸' : '▶'; }
+      function updateBtn() {
+        if (isMobAudio) { btn.textContent = audioPlaying ? '⏸' : '▶  AUDIO'; }
+        else { btn.textContent = audioPlaying ? '⏸' : '▶'; }
+      }
       // Expose for animate loop
       window._applyPreset = applyPreset;
 
@@ -1568,13 +1570,13 @@
         if (_started) return; _started = true;
         await initAudio();
       }
-      // Try immediate autoplay (works on some browsers/contexts)
-      setTimeout(async () => {
-        try {
-          if (!_started) { _started = true; await initAudio(); }
-        } catch (_) { }
-      }, 100);
-      // Fallback: any user gesture
+      // On desktop try immediate autoplay; on mobile wait for explicit tap
+      if (!IS_MOB) {
+        setTimeout(async () => {
+          try { if (!_started) { _started = true; await initAudio(); } } catch (_) { }
+        }, 200);
+      }
+      // Any user gesture (desktop fallback + mobile primary)
       ['click', 'keydown', 'touchstart', 'pointerdown', 'scroll'].forEach(ev => {
         window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
       });
