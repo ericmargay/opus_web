@@ -187,8 +187,7 @@
       text-align: center;
       pointer-events: none;
       transition: opacity .5s ease;
-      opacity: 0;
-      /* starts hidden — JS reveals after loader */
+      opacity: 1;
     }
 
     #hero-word-row {
@@ -489,88 +488,6 @@
 </head>
 
 <body>
-  <!-- Loading + Start screen — unified for mobile and desktop -->
-  <style>
-    @keyframes loaderFill {
-      from {
-        width: 0
-      }
-
-      to {
-        width: 100%
-      }
-    }
-
-    @keyframes loaderPulse {
-
-      0%,
-      100% {
-        opacity: .35
-      }
-
-      50% {
-        opacity: .8
-      }
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    #loader-cta {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .5s ease
-    }
-
-    #loader-cta.ready {
-      opacity: 1;
-      pointer-events: all;
-      animation: fadeInUp .6s ease forwards
-    }
-
-    #loader-cta:hover .cta-inner,
-    #loader-cta:active .cta-inner {
-      border-color: rgba(200, 180, 255, .55);
-      background: rgba(200, 180, 255, .06)
-    }
-  </style>
-  <div id="loader"
-    style="position:fixed;inset:0;z-index:9999;background:#04020a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .7s ease;font-family:'DM Mono',monospace;cursor:default;">
-    <!-- Logo -->
-    <div
-      style="color:rgba(200,180,255,.6);font-size:.58rem;letter-spacing:.45em;text-transform:uppercase;margin-bottom:2.5rem;animation:loaderPulse 2.4s ease-in-out infinite">
-      Aminoacid Studio</div>
-
-    <!-- Progress bar -->
-    <div style="width:180px;height:1px;background:rgba(200,180,255,.10);overflow:hidden;margin-bottom:.8rem;">
-      <div id="loader-bar" style="height:1px;width:0;background:rgba(200,180,255,.6);transition:width .15s linear;">
-      </div>
-    </div>
-    <div id="loader-status"
-      style="color:rgba(200,180,255,.28);font-size:.48rem;letter-spacing:.22em;margin-bottom:3.5rem">Cargando
-      experiencia...</div>
-
-    <!-- CTA button — hidden until scene ready, then becomes the gesture -->
-    <button id="loader-cta" onclick="window._loaderStart()"
-      style="background:none;border:none;cursor:pointer;padding:0;">
-      <div class="cta-inner"
-        style="border:1px solid rgba(200,180,255,.2);padding:1.1rem 2.4rem;transition:border-color .3s,background .3s;text-align:center;">
-        <div
-          style="color:rgba(200,180,255,.85);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;line-height:1.6">
-          Tócame para comenzar<br>la experiencia</div>
-      </div>
-    </button>
-  </div>
-
   <canvas id="c"></canvas>
 
   <!-- SVG distortion filters -->
@@ -619,7 +536,7 @@
 
   <div class="panel panel-left" id="p0">
     <div class="inner" style="margin-top:auto;padding-bottom:10vh">
-      <p class="body-text" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan
+      <p class="body-text" data-i18n="p0.body" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan
         huella.</p>
     </div>
   </div>
@@ -629,7 +546,7 @@
       <span class="tag" data-i18n="p1.tag">Sobre el estudio</span>
       <h2 class="display" data-i18n="p1.title">Donde el <em>diseño</em><br>encuentra la<br>ingeniería.</h2>
       <div class="divider"></div>
-      <p class="body-text">Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos
+      <p class="body-text" data-i18n="p1.body">Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos
         pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales
         que dejan huella.</p>
     </div>
@@ -645,32 +562,32 @@
 
   <div class="panel panel-left" id="p3">
     <div class="inner" style="max-width:680px">
-      <span class="eyebrow">Lo que construimos</span>
-      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">Nuestro <em>craft</em></h2>
+      <span class="eyebrow" data-i18n="p3.eyebrow">Lo que construimos</span>
+      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)" data-i18n="p3.title">Nuestro <em>craft</em></h2>
       <div class="svc-grid">
         <div class="svc-item"><span class="svc-num">01</span>
-          <div class="svc-name">Desarrollo Web Moderno</div>
-          <p class="svc-desc">React, Next.js y arquitecturas personalizadas.</p>
+          <div class="svc-name" data-i18n="s1.name">Desarrollo Web Moderno</div>
+          <p class="svc-desc" data-i18n="s1.desc">React, Next.js y arquitecturas personalizadas.</p>
         </div>
         <div class="svc-item"><span class="svc-num">02</span>
-          <div class="svc-name">Landing Pages</div>
-          <p class="svc-desc">Conversión, narrativa de marca y resultados.</p>
+          <div class="svc-name" data-i18n="s2.name">Landing Pages</div>
+          <p class="svc-desc" data-i18n="s2.desc">Conversión, narrativa de marca y resultados.</p>
         </div>
         <div class="svc-item"><span class="svc-num">03</span>
-          <div class="svc-name">Experiencias 3D</div>
-          <p class="svc-desc">Escenas WebGL inmersivas en tiempo real.</p>
+          <div class="svc-name" data-i18n="s3.name">Experiencias 3D</div>
+          <p class="svc-desc" data-i18n="s3.desc">Escenas WebGL inmersivas en tiempo real.</p>
         </div>
         <div class="svc-item"><span class="svc-num">04</span>
-          <div class="svc-name">UX/UI Interfaces</div>
-          <p class="svc-desc">Del wireframe al sistema de alta fidelidad.</p>
+          <div class="svc-name" data-i18n="s4.name">UX/UI Interfaces</div>
+          <p class="svc-desc" data-i18n="s4.desc">Del wireframe al sistema de alta fidelidad.</p>
         </div>
         <div class="svc-item"><span class="svc-num">05</span>
-          <div class="svc-name">Automatizaciones</div>
-          <p class="svc-desc">Pipelines de API que eliminan la fricción.</p>
+          <div class="svc-name" data-i18n="s5.name">Automatizaciones</div>
+          <p class="svc-desc" data-i18n="s5.desc">Pipelines de API que eliminan la fricción.</p>
         </div>
         <div class="svc-item"><span class="svc-num">06</span>
-          <div class="svc-name">Performance</div>
-          <p class="svc-desc">Sitios lentos → experiencias ultrarrápidas.</p>
+          <div class="svc-name" data-i18n="s6.name">Performance</div>
+          <p class="svc-desc" data-i18n="s6.desc">Sitios lentos → experiencias ultrarrápidas.</p>
         </div>
       </div>
     </div>
@@ -678,40 +595,40 @@
 
   <div class="panel panel-center" id="p4">
     <div class="inner">
-      <span class="eyebrow">02 — Artesanía digital</span>
-      <h2 class="display"><em>La interacción</em><br>convierte una página<br>en una experiencia.</h2>
+      <span class="eyebrow" data-i18n="p4.eyebrow">02 — Artesanía digital</span>
+      <h2 class="display" data-i18n="p4.title"><em>La interacción</em><br>convierte una página<br>en una experiencia.</h2>
     </div>
   </div>
 
   <div class="panel panel-right" id="p5">
     <div class="inner" style="max-width:540px">
-      <span class="tag">Cómo trabajamos</span>
-      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)">El <em>proceso</em></h2>
+      <span class="tag" data-i18n="p5.tag">Cómo trabajamos</span>
+      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)" data-i18n="p5.title">El <em>proceso</em></h2>
       <div class="process-row">
         <div class="step">
           <div class="step-dot"></div><span class="step-num">01</span>
-          <div class="step-name">Descubrimiento</div>
-          <p class="step-desc">Objetivos, usuarios y contexto.</p>
+          <div class="step-name" data-i18n="st1">Descubrimiento</div>
+          <p class="step-desc" data-i18n="sd1">Objetivos, usuarios y contexto.</p>
         </div>
         <div class="step">
           <div class="step-dot"></div><span class="step-num">02</span>
-          <div class="step-name">Diseño</div>
-          <p class="step-desc">Sistémico y visual.</p>
+          <div class="step-name" data-i18n="st2">Diseño</div>
+          <p class="step-desc" data-i18n="sd2">Sistémico y visual.</p>
         </div>
         <div class="step">
           <div class="step-dot"></div><span class="step-num">03</span>
-          <div class="step-name">Prototipo</div>
-          <p class="step-desc">Validar antes de construir.</p>
+          <div class="step-name" data-i18n="st3">Prototipo</div>
+          <p class="step-desc" data-i18n="sd3">Validar antes de construir.</p>
         </div>
         <div class="step">
           <div class="step-dot"></div><span class="step-num">04</span>
-          <div class="step-name">Desarrollo</div>
-          <p class="step-desc">Código limpio y medible.</p>
+          <div class="step-name" data-i18n="st4">Desarrollo</div>
+          <p class="step-desc" data-i18n="sd4">Código limpio y medible.</p>
         </div>
         <div class="step">
           <div class="step-dot"></div><span class="step-num">05</span>
-          <div class="step-name">Lanzamiento</div>
-          <p class="step-desc">Deploy y refinamiento continuo.</p>
+          <div class="step-name" data-i18n="st5">Lanzamiento</div>
+          <p class="step-desc" data-i18n="sd5">Deploy y refinamiento continuo.</p>
         </div>
       </div>
     </div>
@@ -719,18 +636,18 @@
 
   <div class="panel panel-center" id="p6">
     <div class="inner">
-      <span class="eyebrow">03 — Artesanía digital</span>
-      <h2 class="display">El 3D no decora;<br>debe <em>contar<br>una historia.</em></h2>
+      <span class="eyebrow" data-i18n="p6.eyebrow">03 — Artesanía digital</span>
+      <h2 class="display" data-i18n="p6.title">El 3D no decora;<br>debe <em>contar<br>una historia.</em></h2>
     </div>
   </div>
 
   <div class="panel panel-left" id="p7">
     <div class="inner">
-      <span class="eyebrow">¿Listo para comenzar?</span>
-      <h2 class="display">Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em></h2>
+      <span class="eyebrow" data-i18n="p7.eyebrow">¿Listo para comenzar?</span>
+      <h2 class="display" data-i18n="p7.title">Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em></h2>
       <div class="divider"></div>
-      <p class="body-text">Hablemos sobre tu proyecto.</p>
-      <a href="mailto:hello@aminoacid.studio" class="cta-link">hello@aminoacid.studio →</a>
+      <p class="body-text" data-i18n="p7.body">Hablemos sobre tu proyecto.</p>
+      <a href="mailto:hello@aminoacid.studio" class="cta-link" data-i18n="p7.cta">hello@aminoacid.studio →</a>
     </div>
   </div>
 
@@ -1268,46 +1185,6 @@
       renderer.render(scene, camera);
     }
 
-    // ── Loader + Start logic ────────────────────────────────────────
-    const _loaderEl = document.getElementById('loader');
-    const _loaderBar = document.getElementById('loader-bar');
-    const _loaderStat = document.getElementById('loader-status');
-    const _loaderCta = document.getElementById('loader-cta');
-    let _sceneReady = false;
-    let _loaderGone = false;
-    let _loadPct = 0;
-
-    // Animate loading bar in JS for precise control
-    function _tickLoad() {
-      if (_loaderGone) return;
-      // Ease toward 90% while scene builds; jumps to 100 when scene ready
-      const target = _sceneReady ? 100 : 88;
-      _loadPct += (target - _loadPct) * 0.06;
-      if (_loaderBar) _loaderBar.style.width = Math.min(_loadPct, 100).toFixed(1) + '%';
-      if (_loadPct < 99.5) requestAnimationFrame(_tickLoad);
-    }
-    requestAnimationFrame(_tickLoad);
-
-    // Called when Three.js renders its first frame
-    function _onSceneReady() {
-      if (_sceneReady) return;
-      _sceneReady = true;
-      if (_loaderStat) _loaderStat.textContent = 'Listo';
-      if (_loaderCta) _loaderCta.classList.add('ready');
-    }
-
-    // Called when user clicks/taps the CTA — starts audio AND hides loader
-    window._loaderStart = function () {
-      if (_loaderGone) return;
-      _loaderGone = true;
-      // Trigger audio (synchronous inside click handler = valid gesture)
-      if (window._audioOnGesture) window._audioOnGesture();
-      // Dismiss loader with fade
-      if (_loaderEl) {
-        _loaderEl.style.opacity = '0';
-        setTimeout(() => { _loaderEl.style.display = 'none'; }, 750);
-      }
-    };
 
     // ── Section color via IntersectionObserver (zero rAF cost) ──────
     // Works on BOTH desktop and mobile — browser native, compositor thread
@@ -1364,32 +1241,11 @@
 
     // ── Start animate loop (both desktop and mobile) ─────────────────
     animate();
-    // Detect first rendered frame → reveal CTA on desktop, auto-dismiss on mobile
-    const _origRender = renderer.render.bind(renderer);
-    renderer.render = function (sc, cam) {
-      _origRender(sc, cam);
-      if (!IS_MOB) {
-        _onSceneReady(); // desktop: show CTA button
-      } else {
-        // Mobile: auto-dismiss loader on first frame
-        if (!_loaderGone) {
-          _loaderGone = true;
-          if (_loaderEl) {
-            _loaderEl.style.opacity = '0';
-            setTimeout(() => { _loaderEl.style.display = 'none'; }, 600);
-          }
-          const p0 = document.getElementById('p0');
-          if (p0) p0.classList.add('active');
-          const hb = document.getElementById('hero-brand');
-          if (hb) hb.style.opacity = '1';
-          ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('active');
-          });
-        }
-      }
-      renderer.render = _origRender; // restore after first frame
-    };
+    // Mobile: activate p0 panel immediately (no loader to wait for)
+    if (IS_MOB) {
+      const p0 = document.getElementById('p0');
+      if (p0) p0.classList.add('active');
+    }
   </script>
 
   <script>
@@ -1446,7 +1302,7 @@
       async function loadAndPlay(ctx2, entry) {
         // Load via XHR — works on file:// and http:// alike
         const ab = await new Promise((resolve, reject) => {
-          const paths = ['soundtrack.mp3', '../agency-site/soundtrack.mp3', './soundtrack.mp3'];
+          const paths = ['assets/soundtrack.mp3'];
           let idx = 0;
           function tryNext() {
             if (idx >= paths.length) { reject(new Error('soundtrack not found')); return; }
@@ -1663,9 +1519,8 @@
       btn.onmouseleave = () => btn.style.color = 'rgba(224,216,240,.4)';
       document.body.appendChild(btn);
       function updateBtn() { btn.textContent = audioPlaying ? '⏸' : '▶'; }
-      // Expose for animate loop and loader
+      // Expose for animate loop
       window._applyPreset = applyPreset;
-      window._audioOnGesture = onGesture;
 
       btn.onclick = async () => {
         if (!audioReady) { await initAudio(); return; }
@@ -1704,12 +1559,10 @@
         if (_started) return; _started = true;
         initAudio(); // sync — AudioContext created synchronously inside gesture
       }
-      // Mobile needs gesture listeners (no CTA button on mobile)
-      if (IS_MOB) {
-        ['touchstart', 'click'].forEach(ev => {
-          window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
-        });
-      }
+      // Start audio on first user gesture (both desktop and mobile)
+      ['touchstart', 'click'].forEach(ev => {
+        window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
+      });
 
       // ── Init distortion after DOM ─────────────────────────────────
       // Distortion: desktop only — touchmove on mobile causes unwanted auto-distortion
