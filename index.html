@@ -7,7 +7,7 @@
   <title>Aminoacid Studio — Experiencias digitales</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&family=DM+Mono:wght@300&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap"
     rel="stylesheet">
   <style>
     *,
@@ -18,34 +18,35 @@
       padding: 0
     }
 
+    :root {
+      --bg: #f3f0fa;
+      --ink: #241c3a;
+      --ink-soft: rgba(36, 28, 58, .62);
+      --accent: #6a4fd8;
+      --accent2: #2bb8a3;
+      --peach: #ffb98a;
+      --mono: 'DM Mono', monospace;
+      --serif: 'Cormorant', serif;
+      --sans: 'DM Sans', sans-serif;
+    }
+
     html {
       font-size: 16px;
-      scroll-behavior: auto;
-      scroll-snap-type: y mandatory
+      scroll-behavior: auto
     }
 
     body {
-      background: #04020a;
-      color: #e0d8f0;
-      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
       font-weight: 300;
       overflow-x: hidden;
-      cursor: none;
-      transition: background 0.35s ease
+      cursor: none
     }
 
     #root {
       position: relative;
-      height: 800vh
-    }
-
-    .snap-pt {
-      scroll-snap-align: start;
-      height: 100vh;
-      width: 1px;
-      position: absolute;
-      left: 0;
-      pointer-events: none
+      height: 900vh
     }
 
     canvas {
@@ -54,113 +55,30 @@
       z-index: 0
     }
 
+    /* CURSOR */
     #cur {
       position: fixed;
-      width: 5px;
-      height: 5px;
-      background: #e0d8f0;
+      width: 6px;
+      height: 6px;
+      background: var(--ink);
       border-radius: 50%;
       pointer-events: none;
       z-index: 999;
-      transform: translate(-50%, -50%);
-      mix-blend-mode: exclusion
+      transform: translate(-50%, -50%)
     }
 
     #cur2 {
       position: fixed;
-      width: 28px;
-      height: 28px;
-      border: 1px solid rgba(224, 216, 240, .25);
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(36, 28, 58, .28);
       border-radius: 50%;
       pointer-events: none;
       z-index: 998;
       transform: translate(-50%, -50%)
     }
 
-    #prog {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 1px;
-      background: rgba(180, 160, 255, .5);
-      z-index: 200;
-      width: 0;
-      transition: width .08s linear
-    }
-
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 4rem
-    }
-
-    .logo {
-      font-family: 'Cormorant', serif;
-      font-size: 1rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: #e0d8f0;
-      text-decoration: none;
-      opacity: .9
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      list-style: none
-    }
-
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: .62rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: rgba(224, 216, 240, .5);
-      text-decoration: none;
-      transition: color .3s
-    }
-
-    .nav-links a:hover {
-      color: #e0d8f0
-    }
-
-    #lang-switcher {
-      display: flex;
-      gap: .5rem;
-      margin-left: 2rem
-    }
-
-    .lang-btn {
-      background: none;
-      border: none;
-      color: rgba(224, 216, 240, .4);
-      font-family: 'DM Mono', monospace;
-      font-size: .58rem;
-      letter-spacing: .18em;
-      cursor: pointer;
-      padding: .2rem .3rem;
-      transition: color .3s
-    }
-
-    .lang-btn.active,
-    .lang-btn:hover {
-      color: #e0d8f0
-    }
-
     @media(max-width:768px) {
-      .nav-links {
-        display: none
-      }
-
-      nav {
-        padding: 1.5rem
-      }
 
       #cur,
       #cur2 {
@@ -172,506 +90,855 @@
       }
     }
 
-    /* HERO BRAND */
-    #hero-brand.hidden {
-      opacity: 0;
-      pointer-events: none
+    /* LOADER */
+    @keyframes ldPulse {
+
+      0%,
+      100% {
+        opacity: .4
+      }
+
+      50% {
+        opacity: .9
+      }
     }
 
-    #hero-brand {
+    @keyframes ldIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    #loader {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 15;
-      text-align: center;
-      pointer-events: none;
-      transition: opacity .5s ease;
-      opacity: 1;
-    }
-
-    #hero-word-row {
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg);
       display: flex;
-      gap: 0;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      line-height: 1;
-      margin-bottom: .5rem;
-      flex-wrap: nowrap;
-      width: 100%;
-      max-width: 98vw;
+      transition: opacity .8s ease;
+      font-family: var(--mono)
+    }
+
+    #loader .ld-logo {
+      font-family: var(--serif);
+      font-size: .7rem;
+      letter-spacing: .5em;
+      text-transform: uppercase;
+      color: rgba(106, 79, 216, .75);
+      margin-bottom: 2.5rem;
+      animation: ldPulse 2.4s ease-in-out infinite
+    }
+
+    #ld-bar-w {
+      width: 200px;
+      height: 1px;
+      background: rgba(106, 79, 216, .15);
       overflow: hidden;
+      margin-bottom: .8rem
     }
 
-    .hw {
-      font-family: 'Cormorant', serif;
-      font-size: clamp(1.8rem, 9.5vw, 11rem);
-      font-weight: 300;
-      letter-spacing: .04em;
-      color: #e8e0f8;
-      text-shadow: 0 0 80px rgba(100, 80, 200, .4), 0 2px 60px rgba(0, 0, 0, .9);
-      display: inline-block;
-      will-change: filter;
+    #ld-bar {
+      height: 1px;
+      width: 0;
+      background: rgba(106, 79, 216, .75);
+      transition: width .15s linear
+    }
+
+    #ld-status {
+      color: rgba(36, 28, 58, .4);
+      font-size: .5rem;
+      letter-spacing: .25em;
+      margin-bottom: 3rem
+    }
+
+    #ld-cta {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .5s;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0
+    }
+
+    #ld-cta.ready {
+      opacity: 1;
       pointer-events: all;
-      cursor: none;
+      animation: ldIn .6s ease forwards
     }
 
-    #hero-sub-row {
-      text-align: center;
-      margin-top: .6rem;
+    #ld-cta .in {
+      border: 1px solid rgba(106, 79, 216, .35);
+      padding: 1.1rem 2.6rem;
+      transition: all .3s;
+      color: var(--ink);
+      font-size: .66rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      font-family: var(--mono)
     }
 
-    /* PANELS */
-    .panel {
+    #ld-cta:hover .in {
+      border-color: var(--accent);
+      background: rgba(106, 79, 216, .07)
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.8rem 3.5rem
+    }
+
+    .logo {
+      font-family: var(--serif);
+      font-size: .92rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: .92
+    }
+
+    .nav-r {
+      display: flex;
+      align-items: center;
+      gap: 2rem
+    }
+
+    .nav-r a {
+      font-family: var(--mono);
+      font-size: .58rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color .3s
+    }
+
+    .nav-r a:hover {
+      color: var(--ink)
+    }
+
+    @media(max-width:768px) {
+      nav {
+        padding: 1.2rem 1.4rem
+      }
+
+      .nav-r {
+        gap: 1rem
+      }
+    }
+
+    /* INSIGHTS */
+    #insights {
+      position: fixed;
+      bottom: 1.8rem;
+      left: 3.5rem;
+      z-index: 100;
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: .22em;
+      color: rgba(106, 79, 216, .75);
+      display: flex;
+      align-items: center;
+      gap: .8rem
+    }
+
+    #insights .cnt {
+      color: var(--ink);
+      font-size: .72rem
+    }
+
+    #insights .lbl {
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      font-size: .5rem
+    }
+
+    @media(max-width:768px) {
+      #insights {
+        left: 1.4rem;
+        bottom: 1.2rem
+      }
+    }
+
+    .insight-dot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(106, 79, 216, .7);
+      background: rgba(106, 79, 216, .14);
+      cursor: pointer;
+      z-index: 60;
+      pointer-events: all;
+      animation: insPulse 2.2s ease-in-out infinite;
+      transition: transform .3s, opacity .4s
+    }
+
+    .insight-dot:hover {
+      transform: scale(1.6)
+    }
+
+    .insight-dot.found {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(2.5)
+    }
+
+    @keyframes insPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(106, 79, 216, .3)
+      }
+
+      50% {
+        box-shadow: 0 0 0 10px rgba(106, 79, 216, 0)
+      }
+    }
+
+    /* SECTIONS */
+    .sect {
       position: fixed;
       inset: 0;
       z-index: 10;
-      display: flex;
-      align-items: center;
       pointer-events: none;
       opacity: 0;
-      transition: opacity .4s ease
+      transition: opacity .5s ease;
+      display: flex;
+      align-items: center
     }
 
-    .panel.active {
+    .sect.active {
       opacity: 1;
       pointer-events: auto
     }
 
-    @media(max-width:767px) {
-      body {
-        cursor: auto
-      }
-
-      #cur,
-      #cur2,
-      #prog {
-        display: none
-      }
-
-      /* Mobile panels: instant show/hide via active class only */
-      .panel {
-        transition: opacity .3s ease
-      }
-
-      /* No canvas on mobile */
+    .sect .in-l {
+      margin-left: 7vw;
+      max-width: 520px
     }
 
-    .panel-left .inner {
-      margin-left: 8vw;
-      max-width: 500px
-    }
-
-    #p0 {
-      flex-direction: column;
-      justify-content: flex-end
-    }
-
-    .panel-right .inner {
+    .sect .in-r {
       margin-left: auto;
-      margin-right: 8vw;
-      max-width: 500px
+      margin-right: 7vw;
+      max-width: 520px
     }
 
-    .panel-center .inner {
+    .sect .in-c {
       margin: 0 auto;
-      max-width: 640px;
+      max-width: 760px;
       text-align: center
     }
 
-    .eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: .6rem;
-      letter-spacing: .35em;
+    .ch-num {
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .4em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1.2rem
+    }
+
+    .ch-eyebrow {
+      font-family: var(--mono);
+      font-size: .56rem;
+      letter-spacing: .3em;
       text-transform: uppercase;
-      color: rgba(200, 180, 255, .65);
-      margin-bottom: 1.4rem;
-      display: block
+      color: var(--ink-soft);
+      display: block;
+      margin-bottom: 1rem
     }
 
-    .display {
-      font-family: 'Cormorant', serif;
-      font-size: clamp(2.6rem, 5.2vw, 5.8rem);
+    .ch-title {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 5vw, 5.4rem);
       font-weight: 300;
-      line-height: 1.0;
+      line-height: 1.02;
       letter-spacing: -.02em;
-      color: #e8e0f8;
-      text-shadow: 0 2px 60px rgba(0, 0, 0, .8)
+      color: var(--ink);
+      text-shadow: 0 2px 40px rgba(243, 240, 250, .9)
     }
 
-    .display em {
+    .ch-title em {
       font-style: italic;
-      color: rgba(200, 160, 255, .85)
+      color: var(--accent)
     }
 
-    .body-text {
-      margin-top: 1.8rem;
-      font-size: clamp(.88rem, 1.3vw, 1rem);
-      color: rgba(224, 216, 240, .55);
+    .ch-body {
+      margin-top: 1.6rem;
+      font-size: clamp(.86rem, 1.25vw, .98rem);
+      color: var(--ink-soft);
       line-height: 1.8
+    }
+
+    .ch-quote {
+      margin-top: 1.4rem;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--accent)
     }
 
     .divider {
       width: 36px;
       height: 1px;
-      background: rgba(180, 140, 255, .35);
-      margin: 1.6rem 0
+      background: rgba(106, 79, 216, .4);
+      margin: 1.5rem 0
     }
 
-    .tag {
-      display: inline-block;
-      font-family: 'DM Mono', monospace;
-      font-size: .56rem;
-      letter-spacing: .25em;
-      text-transform: uppercase;
-      border: 1px solid rgba(180, 140, 255, .25);
-      color: rgba(180, 140, 255, .55);
-      padding: .3rem .75rem;
-      margin-bottom: 1.2rem
-    }
-
-    .svc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-      margin-top: 1.8rem
-    }
-
-    .svc-item {
-      padding: 1.2rem 1.4rem;
-      border: 1px solid rgba(180, 140, 255, .1);
-      background: rgba(4, 2, 10, .55);
-      backdrop-filter: blur(12px)
-    }
-
-    .svc-num {
-      font-family: 'DM Mono', monospace;
-      font-size: .54rem;
-      letter-spacing: .3em;
-      color: rgba(180, 140, 255, .4);
-      display: block;
-      margin-bottom: .5rem
-    }
-
-    .svc-name {
-      font-family: 'Cormorant', serif;
-      font-size: 1.15rem;
-      color: #e8e0f8;
-      margin-bottom: .4rem
-    }
-
-    .svc-desc {
-      font-size: .76rem;
-      color: rgba(224, 216, 240, .45);
-      line-height: 1.55
-    }
-
-    .process-row {
-      display: flex;
-      gap: 1.8rem;
-      margin-top: 1.8rem;
-      flex-wrap: wrap
-    }
-
-    .step {
-      flex: 1;
-      min-width: 110px
-    }
-
-    .step-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      border: 1px solid rgba(180, 140, 255, .4);
-      margin-bottom: .9rem
-    }
-
-    .step-num {
-      font-family: 'DM Mono', monospace;
-      font-size: .54rem;
-      letter-spacing: .3em;
-      color: rgba(180, 140, 255, .4);
-      display: block;
-      margin-bottom: .4rem
-    }
-
-    .step-name {
-      font-family: 'Cormorant', serif;
-      font-size: 1.05rem;
-      color: #e8e0f8;
-      margin-bottom: .3rem
-    }
-
-    .step-desc {
-      font-size: .73rem;
-      color: rgba(224, 216, 240, .4);
-      line-height: 1.5
-    }
-
-    .cta-link {
-      display: inline-block;
-      margin-top: 2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: .68rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: rgba(200, 170, 255, .8);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(200, 170, 255, .3);
-      padding-bottom: .3rem;
-      transition: color .3s, border-color .3s
-    }
-
-    .cta-link:hover {
-      color: #e8e0f8;
-      border-color: rgba(224, 216, 240, .5)
-    }
-
-    #scroll-hint {
+    /* HERO */
+    #hero {
       position: fixed;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
+      inset: 0;
+      z-index: 12;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: .6rem;
+      justify-content: center;
       pointer-events: none;
-      transition: opacity .5s
+      opacity: 0;
+      transition: opacity .6s ease
     }
 
-    #scroll-hint .line {
-      width: 1px;
-      height: 48px;
-      background: linear-gradient(to bottom, rgba(200, 170, 255, .5), transparent);
-      animation: lp 2s ease-in-out infinite
+    #hero.show {
+      opacity: 1
     }
 
-    #scroll-hint span {
-      font-family: 'DM Mono', monospace;
-      font-size: .54rem;
-      letter-spacing: .28em;
+    #hero .h-eyebrow {
+      font-family: var(--mono);
+      font-size: .58rem;
+      letter-spacing: .45em;
       text-transform: uppercase;
-      color: rgba(200, 170, 255, .35)
+      color: var(--accent);
+      margin-bottom: 1.6rem
     }
 
-    @keyframes lp {
+    #hero .h-word {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2.6rem, 13vw, 13rem);
+      line-height: .92;
+      letter-spacing: .02em;
+      color: var(--ink);
+      text-align: center
+    }
+
+    #hero .h-sub {
+      margin-top: 2.2rem;
+      font-family: var(--mono);
+      font-size: .56rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--ink-soft)
+    }
+
+    @keyframes scrollBob {
 
       0%,
       100% {
-        opacity: .3;
-        transform: scaleY(1)
+        transform: translateY(0)
       }
 
       50% {
-        opacity: .9;
-        transform: scaleY(.85)
+        transform: translateY(6px)
       }
     }
 
+    #hero .h-scroll {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      animation: scrollBob 2.2s ease-in-out infinite
+    }
+
+    #hero .h-scroll .ln {
+      width: 1px;
+      height: 44px;
+      background: linear-gradient(to bottom, rgba(106, 79, 216, .7), transparent)
+    }
+
+    #hero .h-scroll span {
+      font-family: var(--mono);
+      font-size: .52rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent)
+    }
+
+    /* TIPS */
+    .tips-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.1rem;
+      margin-top: 2rem;
+      max-width: 860px
+    }
+
+    .tip-card {
+      border: 1px solid rgba(106, 79, 216, .18);
+      background: rgba(255, 255, 255, .55);
+      backdrop-filter: blur(14px);
+      padding: 1.3rem 1.4rem;
+      transition: all .3s;
+      pointer-events: all
+    }
+
+    .tip-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, .8)
+    }
+
+    .tip-num {
+      font-family: var(--mono);
+      font-size: .5rem;
+      letter-spacing: .3em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: .6rem
+    }
+
+    .tip-name {
+      font-family: var(--serif);
+      font-size: 1.14rem;
+      color: var(--ink);
+      margin-bottom: .4rem
+    }
+
+    .tip-desc {
+      font-size: .74rem;
+      color: var(--ink-soft);
+      line-height: 1.6
+    }
+
     @media(max-width:768px) {
-      .svc-grid {
-        grid-template-columns: 1fr
+      .tips-row {
+        grid-template-columns: 1fr;
+        gap: .7rem;
+        max-height: 52vh;
+        overflow-y: auto
+      }
+    }
+
+    /* MARQUEE */
+    @keyframes mq {
+      from {
+        transform: translateX(0)
       }
 
-      .panel-left .inner,
-      .panel-right .inner {
-        margin: 0 5vw;
-        max-width: 100%
+      to {
+        transform: translateX(-50%)
       }
+    }
 
-      .display {
-        font-size: clamp(2rem, 7vw, 3rem)
-      }
+    .marquee {
+      position: fixed;
+      bottom: 14vh;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      z-index: 11;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .5s
+    }
+
+    .marquee.show {
+      opacity: 1
+    }
+
+    .mq-track {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: mq 18s linear infinite
+    }
+
+    .mq-track span {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.6rem, 3.4vw, 3rem);
+      color: rgba(106, 79, 216, .4);
+      padding-right: 4rem
+    }
+
+    /* CTA */
+    .cta-link {
+      display: inline-block;
+      margin-top: 2rem;
+      font-family: var(--mono);
+      font-size: .66rem;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(106, 79, 216, .4);
+      padding-bottom: .3rem;
+      transition: all .3s;
+      pointer-events: all
+    }
+
+    .cta-link:hover {
+      color: var(--ink);
+      border-color: var(--ink)
+    }
+
+    .foot-meta {
+      margin-top: 3rem;
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .foot-meta a {
+      font-family: var(--mono);
+      font-size: .54rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color .3s;
+      pointer-events: all
+    }
+
+    .foot-meta a:hover {
+      color: var(--ink)
+    }
+
+    .foot-fin {
+      margin-top: 2.5rem;
+      font-family: var(--mono);
+      font-size: .5rem;
+      letter-spacing: .2em;
+      color: rgba(36, 28, 58, .35)
+    }
+
+    /* AUDIO PANEL */
+    #audio-panel {
+      position: fixed;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 500;
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid rgba(106, 79, 216, .25);
+      padding: 1rem 1.1rem;
+      font-family: var(--mono);
+      font-size: .56rem;
+      color: var(--ink);
+      letter-spacing: .1em;
+      min-width: 180px;
+      backdrop-filter: blur(12px);
+      user-select: none;
+      display: none
+    }
+
+    .ap-row {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      margin-bottom: .45rem
+    }
+
+    .ap-lbl {
+      width: 52px;
+      font-size: .52rem;
+      color: var(--ink-soft);
+      flex-shrink: 0
+    }
+
+    .ap-val {
+      width: 34px;
+      text-align: right;
+      font-size: .52rem;
+      color: var(--accent);
+      flex-shrink: 0
+    }
+
+    .ap-row input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 2px;
+      background: rgba(106, 79, 216, .25);
+      outline: none;
+      cursor: pointer
+    }
+
+    .ap-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer
+    }
+
+    .ap-btn {
+      background: none;
+      border: 1px solid rgba(106, 79, 216, .3);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: .5rem;
+      letter-spacing: .12em;
+      padding: .25rem .5rem;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .ap-btn:hover {
+      border-color: var(--accent);
+      background: rgba(106, 79, 216, .07)
+    }
+
+    #prog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 1px;
+      background: rgba(106, 79, 216, .6);
+      z-index: 200;
+      width: 0
     }
   </style>
 </head>
 
 <body>
-  <canvas id="c"></canvas>
 
-  <!-- SVG distortion filters -->
-  <svg id="svg-defs" style="position:absolute;width:0;height:0;overflow:hidden">
-    <defs id="svg-filter-defs"></defs>
-  </svg>
-  <div id="root">
-    <div class="snap-pt" style="top:0" data-section="0"></div>
-    <div class="snap-pt" style="top:100vh" data-section="1"></div>
-    <div class="snap-pt" style="top:200vh" data-section="2"></div>
-    <div class="snap-pt" style="top:300vh" data-section="3"></div>
-    <div class="snap-pt" style="top:400vh" data-section="4"></div>
-    <div class="snap-pt" style="top:500vh" data-section="5"></div>
-    <div class="snap-pt" style="top:600vh" data-section="6"></div>
-    <div class="snap-pt" style="top:700vh" data-section="7"></div>
-  </div>
+  <canvas id="c"></canvas>
+  <div id="root"></div>
   <div id="cur"></div>
   <div id="cur2"></div>
   <div id="prog"></div>
+
+  <div id="loader">
+    <div class="ld-logo">Aminoacid Studio</div>
+    <div id="ld-bar-w">
+      <div id="ld-bar"></div>
+    </div>
+    <div id="ld-status">Cargando experiencia...</div>
+    <button id="ld-cta" onclick="window._enterSite()">
+      <div class="in">Entrar al sitio</div>
+    </button>
+  </div>
+
   <nav>
     <a href="#" class="logo">Aminoacid Studio</a>
-    <ul class="nav-links">
-      <li><a href="#" data-i18n="nav.services">Servicios</a></li>
-      <li><a href="#" data-i18n="nav.process">Proceso</a></li>
-      <li><a href="#" data-i18n="nav.work">Trabajo</a></li>
-      <li><a href="#" data-i18n="nav.contact">Contacto</a></li>
-    </ul>
-    <div id="lang-switcher">
-      <button class="lang-btn active" data-lang="es">ES</button>
-      <button class="lang-btn" data-lang="en">EN</button>
-      <button class="lang-btn" data-lang="fr">FR</button>
+    <div class="nav-r">
+      <a href="#"
+        onclick="window.scrollTo({top:document.body.scrollHeight*.72,behavior:'smooth'});return false">Servicios</a>
+      <a href="#"
+        onclick="window.scrollTo({top:document.body.scrollHeight*.95,behavior:'smooth'});return false">Contacto</a>
     </div>
   </nav>
 
-  <!-- AMINOACID hero — standalone fixed, independent of panel system -->
-  <div id="hero-brand">
-    <div id="hero-word-row" aria-label="AMINOACID">
-      <span class="hw">A</span><span class="hw">M</span><span class="hw">I</span><span class="hw">N</span><span
-        class="hw">O</span><span class="hw">A</span><span class="hw">C</span><span class="hw">I</span><span
-        class="hw">D</span>
-    </div>
-    <div id="hero-sub-row">
-      <span class="eyebrow" style="margin-bottom:0;opacity:.65" data-i18n="hero.eyebrow">Experiencias digitales</span>
+  <div id="insights">
+    <span class="cnt" id="ins-cnt">00</span><span>/ 06</span>
+    <span class="lbl">Encuentra los insights</span>
+  </div>
+
+  <div id="hero">
+    <span class="h-eyebrow">La guía de experiencias digitales</span>
+    <div class="h-word">AMINO<br>ACID</div>
+    <span class="h-sub">Estudio creativo — Ingeniería &amp; Diseño</span>
+    <div class="h-scroll">
+      <div class="ln"></div><span>Scroll para explorar</span>
     </div>
   </div>
 
-  <div class="panel panel-left" id="p0">
-    <div class="inner" style="margin-top:auto;padding-bottom:10vh">
-      <p class="body-text" data-i18n="p0.body" style="max-width:380px">Arquitectura digital, experiencias inmersivas y productos que dejan
-        huella.</p>
+  <div class="sect" id="s1">
+    <div class="in-l">
+      <span class="ch-num">01</span>
+      <span class="ch-eyebrow">El estudio no es una agencia</span>
+      <h2 class="ch-title">Construimos<br><em>sistemas vivos,</em><br>no páginas.</h2>
+      <p class="ch-body">Cada proyecto es un organismo: estructura, ritmo y comportamiento. Combinamos ingeniería de
+        precisión con dirección de arte para que tu producto no solo funcione — respire.</p>
+      <p class="ch-quote">"Un sitio no se visita. Se experimenta."</p>
     </div>
   </div>
 
-  <div class="panel panel-right" id="p1">
-    <div class="inner">
-      <span class="tag" data-i18n="p1.tag">Sobre el estudio</span>
-      <h2 class="display" data-i18n="p1.title">Donde el <em>diseño</em><br>encuentra la<br>ingeniería.</h2>
+  <div class="sect" id="s2">
+    <div class="in-r">
+      <span class="ch-num">02</span>
+      <span class="ch-eyebrow">La importancia del ritmo correcto</span>
+      <h2 class="ch-title">El <em>ritmo</em><br>lo es todo.</h2>
+      <p class="ch-body">La velocidad de carga marca el tempo de cada interacción. Cuando un sitio responde en
+        milisegundos, el usuario fluye. Cuando tarda, el pulso se rompe — y la confianza también.</p>
       <div class="divider"></div>
-      <p class="body-text" data-i18n="p1.body">Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos
-        pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales
-        que dejan huella.</p>
+      <p class="ch-body">Un sistema estable no es solo técnica — es armonía.</p>
     </div>
   </div>
 
-  <div class="panel panel-center" id="p2">
-    <div class="inner">
-      <span class="eyebrow" data-i18n="p2.eyebrow">01 — Artesanía digital</span>
-      <h2 class="display" data-i18n="p2.title">Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en
-        irse.</h2>
+  <div class="sect" id="s3">
+    <div class="in-l">
+      <span class="ch-num">03</span>
+      <span class="ch-eyebrow">Trabaja con reloj</span>
+      <h2 class="ch-title">Sprint tras sprint,<br><em>sin quemar</em><br>el motor.</h2>
+      <p class="ch-body">Descubrimiento → Diseño → Prototipo → Desarrollo → Lanzamiento. Cinco fases, cada una con
+        entregables claros y validación temprana. Iteramos contigo desde el día uno.</p>
     </div>
   </div>
 
-  <div class="panel panel-left" id="p3">
-    <div class="inner" style="max-width:680px">
-      <span class="eyebrow" data-i18n="p3.eyebrow">Lo que construimos</span>
-      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)" data-i18n="p3.title">Nuestro <em>craft</em></h2>
-      <div class="svc-grid">
-        <div class="svc-item"><span class="svc-num">01</span>
-          <div class="svc-name" data-i18n="s1.name">Desarrollo Web Moderno</div>
-          <p class="svc-desc" data-i18n="s1.desc">React, Next.js y arquitecturas personalizadas.</p>
+  <div class="sect" id="s4">
+    <div class="in-c">
+      <span class="ch-num">04</span>
+      <span class="ch-eyebrow">Encuentra el balance</span>
+      <h2 class="ch-title">Ingeniería y arte<br>en <em>equilibrio.</em></h2>
+      <p class="ch-body" style="max-width:520px;margin-left:auto;margin-right:auto">El secreto no es la intensidad — es
+        el ritmo. Código limpio que sostiene visuales ambiciosos. Belleza que carga en menos de dos segundos.</p>
+    </div>
+  </div>
+
+  <div class="sect" id="s5">
+    <div class="in-r">
+      <span class="ch-num">05</span>
+      <span class="ch-eyebrow">El enemigo llamado genérico</span>
+      <h2 class="ch-title">Tu marca no es<br>una <em>plantilla.</em></h2>
+      <p class="ch-body">Los templates prometen velocidad, pero roban identidad. Tu negocio tiene un pulso propio —
+        nuestro trabajo es traducirlo a una experiencia que nadie más pueda copiar.</p>
+    </div>
+  </div>
+
+  <div class="sect" id="s6">
+    <div class="in-l">
+      <span class="ch-num">06</span>
+      <span class="ch-eyebrow">Las capas de un proyecto deseable</span>
+      <h2 class="ch-title">Nuestro<br><em>stack</em> por capas.</h2>
+      <p class="ch-body"><strong style="color:var(--accent);font-weight:400">La base</strong> — React, Next.js,
+        arquitecturas a medida.<br><br><strong style="color:var(--accent);font-weight:400">El movimiento</strong> —
+        WebGL, Three.js, GLSL.<br><br><strong style="color:var(--accent);font-weight:400">La conexión</strong> — APIs y
+        automatizaciones.<br><br><strong style="color:var(--accent);font-weight:400">El pulido</strong> — Performance y
+        accesibilidad.</p>
+    </div>
+  </div>
+
+  <div class="sect" id="s7">
+    <div class="in-c">
+      <span class="ch-num">07</span>
+      <span class="ch-eyebrow">Es hora de aplicar</span>
+      <h2 class="ch-title" style="font-size:clamp(1.8rem,3.6vw,3.6rem)">Cómo <em>rediseñamos</em><br>tu presencia
+        digital.</h2>
+      <div class="tips-row">
+        <div class="tip-card"><span class="tip-num">01 — Primero</span>
+          <div class="tip-name">🧭 Descubrimiento</div>
+          <p class="tip-desc">Objetivos, usuarios y contexto.</p>
         </div>
-        <div class="svc-item"><span class="svc-num">02</span>
-          <div class="svc-name" data-i18n="s2.name">Landing Pages</div>
-          <p class="svc-desc" data-i18n="s2.desc">Conversión, narrativa de marca y resultados.</p>
+        <div class="tip-card"><span class="tip-num">02 — Segundo</span>
+          <div class="tip-name">✏️ Diseño sistémico</div>
+          <p class="tip-desc">Identidad visual coherente.</p>
         </div>
-        <div class="svc-item"><span class="svc-num">03</span>
-          <div class="svc-name" data-i18n="s3.name">Experiencias 3D</div>
-          <p class="svc-desc" data-i18n="s3.desc">Escenas WebGL inmersivas en tiempo real.</p>
+        <div class="tip-card"><span class="tip-num">03 — Tercero</span>
+          <div class="tip-name">🧪 Prototipo</div>
+          <p class="tip-desc">Validar antes de construir.</p>
         </div>
-        <div class="svc-item"><span class="svc-num">04</span>
-          <div class="svc-name" data-i18n="s4.name">UX/UI Interfaces</div>
-          <p class="svc-desc" data-i18n="s4.desc">Del wireframe al sistema de alta fidelidad.</p>
+        <div class="tip-card"><span class="tip-num">04 — Cuarto</span>
+          <div class="tip-name">⚙️ Desarrollo</div>
+          <p class="tip-desc">Código limpio, sin deuda técnica.</p>
         </div>
-        <div class="svc-item"><span class="svc-num">05</span>
-          <div class="svc-name" data-i18n="s5.name">Automatizaciones</div>
-          <p class="svc-desc" data-i18n="s5.desc">Pipelines de API que eliminan la fricción.</p>
+        <div class="tip-card"><span class="tip-num">05 — Quinto</span>
+          <div class="tip-name">🚀 Lanzamiento</div>
+          <p class="tip-desc">Deploy con confianza y datos.</p>
         </div>
-        <div class="svc-item"><span class="svc-num">06</span>
-          <div class="svc-name" data-i18n="s6.name">Performance</div>
-          <p class="svc-desc" data-i18n="s6.desc">Sitios lentos → experiencias ultrarrápidas.</p>
+        <div class="tip-card"><span class="tip-num">06 — Sexto</span>
+          <div class="tip-name">🌱 Iteración</div>
+          <p class="tip-desc">Medir, ajustar, crecer.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="panel panel-center" id="p4">
-    <div class="inner">
-      <span class="eyebrow" data-i18n="p4.eyebrow">02 — Artesanía digital</span>
-      <h2 class="display" data-i18n="p4.title"><em>La interacción</em><br>convierte una página<br>en una experiencia.</h2>
+  <div class="sect" id="s8">
+    <div class="in-c">
+      <span class="ch-eyebrow">Ahora es tu turno</span>
+      <h2 class="ch-title">Tu próximo sitio<br>empieza con<br><em>una conversación.</em></h2>
+      <p class="ch-body" style="max-width:460px;margin:1.6rem auto 0">Hablemos de tu proyecto. Sin plantillas — solo
+        ideas y un plan claro.</p>
+      <a class="cta-link" href="mailto:hello@aminoacid.studio">hello@aminoacid.studio →</a>
+      <div class="foot-meta"><a href="#">LinkedIn</a><a href="#">Instagram</a><a href="#">GitHub</a></div>
+      <div class="foot-fin">© Aminoacid Studio — Hecho con Three.js, GLSL y café</div>
     </div>
   </div>
 
-  <div class="panel panel-right" id="p5">
-    <div class="inner" style="max-width:540px">
-      <span class="tag" data-i18n="p5.tag">Cómo trabajamos</span>
-      <h2 class="display" style="font-size:clamp(2rem,3.8vw,3.8rem)" data-i18n="p5.title">El <em>proceso</em></h2>
-      <div class="process-row">
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">01</span>
-          <div class="step-name" data-i18n="st1">Descubrimiento</div>
-          <p class="step-desc" data-i18n="sd1">Objetivos, usuarios y contexto.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">02</span>
-          <div class="step-name" data-i18n="st2">Diseño</div>
-          <p class="step-desc" data-i18n="sd2">Sistémico y visual.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">03</span>
-          <div class="step-name" data-i18n="st3">Prototipo</div>
-          <p class="step-desc" data-i18n="sd3">Validar antes de construir.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">04</span>
-          <div class="step-name" data-i18n="st4">Desarrollo</div>
-          <p class="step-desc" data-i18n="sd4">Código limpio y medible.</p>
-        </div>
-        <div class="step">
-          <div class="step-dot"></div><span class="step-num">05</span>
-          <div class="step-name" data-i18n="st5">Lanzamiento</div>
-          <p class="step-desc" data-i18n="sd5">Deploy y refinamiento continuo.</p>
-        </div>
-      </div>
+  <div class="marquee" id="mq">
+    <div class="mq-track">
+      <span>La experiencia es el mensaje</span><span>El ritmo es diseño</span><span>La experiencia es el
+        mensaje</span><span>El ritmo es diseño</span>
     </div>
   </div>
 
-  <div class="panel panel-center" id="p6">
-    <div class="inner">
-      <span class="eyebrow" data-i18n="p6.eyebrow">03 — Artesanía digital</span>
-      <h2 class="display" data-i18n="p6.title">El 3D no decora;<br>debe <em>contar<br>una historia.</em></h2>
+  <div id="audio-panel">
+    <div
+      style="font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:.9rem;display:flex;justify-content:space-between;align-items:center;">
+      <span id="ap-sect-label">S0</span><span>Audio FX</span>
+      <button onclick="document.getElementById('audio-panel').style.display='none'"
+        style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:.7rem;padding:0">✕</button>
     </div>
-  </div>
-
-  <div class="panel panel-left" id="p7">
-    <div class="inner">
-      <span class="eyebrow" data-i18n="p7.eyebrow">¿Listo para comenzar?</span>
-      <h2 class="display" data-i18n="p7.title">Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em></h2>
-      <div class="divider"></div>
-      <p class="body-text" data-i18n="p7.body">Hablemos sobre tu proyecto.</p>
-      <a href="mailto:hello@aminoacid.studio" class="cta-link" data-i18n="p7.cta">hello@aminoacid.studio →</a>
+    <div class="ap-row"><span class="ap-lbl">REVERB</span><span class="ap-val" id="av-reverb">0.15</span><input
+        type="range" id="as-reverb" min="0" max="1" step="0.01" value="0.15"
+        oninput="window._apSlider('reverb',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">REV.SIZE</span><span class="ap-val" id="av-revsize">2.5</span><input
+        type="range" id="as-revsize" min="0.2" max="12" step="0.1" value="2.5"
+        oninput="window._apSlider('revsize',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">DISTORT</span><span class="ap-val" id="av-distort">0.0</span><input
+        type="range" id="as-distort" min="0" max="1" step="0.01" value="0"
+        oninput="window._apSlider('distort',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">SATURAT</span><span class="ap-val" id="av-saturat">0.0</span><input
+        type="range" id="as-saturat" min="0" max="1" step="0.01" value="0"
+        oninput="window._apSlider('saturat',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">FUZZ</span><span class="ap-val" id="av-fuzz">0.0</span><input type="range"
+        id="as-fuzz" min="0" max="1" step="0.01" value="0" oninput="window._apSlider('fuzz',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">HI-PASS</span><span class="ap-val" id="av-hpf">20</span><input type="range"
+        id="as-hpf" min="20" max="2000" step="10" value="20" oninput="window._apSlider('hpf',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">LO-PASS</span><span class="ap-val" id="av-lpf">18000</span><input
+        type="range" id="as-lpf" min="200" max="18000" step="100" value="18000"
+        oninput="window._apSlider('lpf',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">PITCH</span><span class="ap-val" id="av-pitch">1.00</span><input
+        type="range" id="as-pitch" min="0.5" max="2.0" step="0.01" value="1.0"
+        oninput="window._apSlider('pitch',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">LOFI</span><span class="ap-val" id="av-lofi">0.0</span><input type="range"
+        id="as-lofi" min="0" max="1" step="0.01" value="0" oninput="window._apSlider('lofi',this.value)"></div>
+    <div class="ap-row"><span class="ap-lbl">VOLUME</span><span class="ap-val" id="av-vol">0.75</span><input
+        type="range" id="as-vol" min="0" max="1" step="0.01" value="0.75" oninput="window._apSlider('vol',this.value)">
     </div>
-  </div>
-
-  <div id="scroll-hint">
-    <div class="line"></div><span data-i18n="scroll">Desplazar</span>
+    <div style="margin-top:.8rem;display:flex;gap:.4rem">
+      <button class="ap-btn" onclick="window._apCopyPreset()">COPIAR</button>
+      <button class="ap-btn" onclick="window._apReset()">RESET</button>
+    </div>
+    <div id="ap-copy-out"
+      style="margin-top:.5rem;font-size:.48rem;color:var(--ink-soft);word-break:break-all;display:none"></div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     'use strict';
     const IS_MOB = innerWidth < 768;
-    if (IS_MOB) {
-      document.body.style.cursor = 'auto'; // no pointer cursor on touch
-    }
 
-    // ── Cursor ────────────────────────────────────────────────────
-    const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    if (!IS_MOB) { // Cursor only on desktop
+    if (!IS_MOB) {
+      const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
+      let mx = 0, my = 0, rx = 0, ry = 0;
       document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; }, { passive: true });
       (function ac() { rx += (mx - rx) * .1; ry += (my - ry) * .1; cur2.style.left = rx + 'px'; cur2.style.top = ry + 'px'; requestAnimationFrame(ac); })();
     }
 
-    // ── Scroll ────────────────────────────────────────────────────
     let scrollRaw = 0, scrollSmooth = 0;
     const prog = document.getElementById('prog');
     window.addEventListener('scroll', () => {
@@ -679,1035 +946,569 @@
       if (!IS_MOB) prog.style.width = (scrollRaw / Math.max(1, document.body.scrollHeight - innerHeight) * 100) + '%';
     }, { passive: true });
 
-    // ── Renderer ──────────────────────────────────────────────────
     const canvas = document.getElementById('c');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOB, alpha: IS_MOB, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOB, alpha: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOB ? 1.0 : 2));
     renderer.setSize(innerWidth, innerHeight);
-    renderer.setClearColor(IS_MOB ? 0x000000 : 0x04020a, IS_MOB ? 0 : 1);
-    renderer.toneMapping = IS_MOB ? THREE.LinearToneMapping : THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = IS_MOB ? 1.0 : 1.1;
-
+    renderer.setClearColor(0xf3f0fa, 1);
     const scene = new THREE.Scene();
-    // scene.fog disabled for performance
-
-    const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, .05, 600);
-    camera.position.set(0, 4, 28);
-
-    window.addEventListener('resize', () => {
-      camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
-
-    const lerp = (a, b, t) => a + (b - a) * t;
+    scene.fog = new THREE.Fog(0xf3f0fa, 14, 42);
+    const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, .05, 200);
+    camera.position.set(0, 0, 10);
+    window.addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
     function eio(t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t }
 
-    // ═══════════════════════════════════════════════════════════════
-    // LIGHTS
-    // ═══════════════════════════════════════════════════════════════
-    scene.add(new THREE.AmbientLight(0x0a0520, 5));
+    // ── Lights — soft daylight ────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0xffffff, .9));
+    const keyL = new THREE.DirectionalLight(0xffffff, .9); keyL.position.set(6, 10, 8); scene.add(keyL);
+    const fillL = new THREE.DirectionalLight(0xd7cdfa, .5); fillL.position.set(-8, 4, -6); scene.add(fillL);
 
-    // Blue-electric "star" light — main key
-    // Lights: starLight + hemisphere on ALL devices; colorB/C desktop only
-    const starLight = new THREE.DirectionalLight(0x2255ff, 2.8);
-    starLight.position.set(20, 12, -15); scene.add(starLight);
-    const colorLightA = new THREE.HemisphereLight(0xff00aa, 0x001122, 2.0);
-    scene.add(colorLightA);
-    const colorLightB = new THREE.DirectionalLight(0x00ffcc, 1.5);
-    const colorLightC = new THREE.DirectionalLight(0xaa00ff, 1.2);
-    if (!IS_MOB) {
-      colorLightB.position.set(30, 10, -20); scene.add(colorLightB);
-      colorLightC.position.set(-15, 20, 10); scene.add(colorLightC);
+    // Palette
+    const PAL = { violet: 0x6a4fd8, teal: 0x2bb8a3, peach: 0xffb98a, rose: 0xf98bb0, sky: 0x7fb8f7, cream: 0xfff6ea };
+    function mat(color, opts) { return new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .55, metalness: .05 }, opts || {})); }
+    function wire(color, op) { return new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: op || .5 }); }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 9 SECTION SCENES — each an original 3D vignette (group)
+    // Only the active group is visible; camera eases per section
+    // ═══════════════════════════════════════════════════════════════
+    const groups = [];
+    function G() { const g = new THREE.Group(); g.visible = false; scene.add(g); groups.push(g); return g; }
+
+    // ── G0 HERO: soft floating orbs (lucid dream clouds) ──────────
+    const g0 = G();
+    const heroOrbs = [];
+    for (let i = 0; i < (IS_MOB ? 8 : 16); i++) {
+      const r = .35 + Math.random() * .85;
+      const cols = [PAL.violet, PAL.teal, PAL.peach, PAL.rose, PAL.sky];
+      const o = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18),
+        mat(cols[i % cols.length], { roughness: .3, transparent: true, opacity: .85 }));
+      o.position.set((Math.random() - .5) * 14, (Math.random() - .5) * 8, (Math.random() - .5) * 8 - 2);
+      o.userData = { ph: Math.random() * 6.28, sp: .3 + Math.random() * .5, r0: o.position.clone() };
+      g0.add(o); heroOrbs.push(o);
+    }
+
+    // ── G1 SISTEMAS VIVOS: breathing icosahedron cluster ──────────
+    const g1 = G();
+    const core1 = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 1), mat(PAL.violet, { roughness: .35 }));
+    g1.add(core1);
+    const shell1 = new THREE.Mesh(new THREE.IcosahedronGeometry(2.4, 1), wire(PAL.teal, .45));
+    g1.add(shell1);
+    const sats1 = [];
+    for (let i = 0; i < 10; i++) {
+      const s = new THREE.Mesh(new THREE.SphereGeometry(.16, 12, 10), mat(PAL.peach, { roughness: .3 }));
+      s.userData = { ang: i / 10 * Math.PI * 2, r: 3.2 + Math.random() * .6, sp: .4 + Math.random() * .3, tilt: Math.random() * Math.PI };
+      g1.add(s); sats1.push(s);
+    }
+
+    // ── G2 RITMO: pulse rings + waveform bars ─────────────────────
+    const g2 = G();
+    const pulse2 = new THREE.Mesh(new THREE.SphereGeometry(1.0, 28, 22), mat(PAL.rose, { roughness: .25 }));
+    g2.add(pulse2);
+    const rings2 = [];
+    for (let i = 0; i < 3; i++) {
+      const r = new THREE.Mesh(new THREE.TorusGeometry(1.6 + i * .8, .03, 10, 60), wire(PAL.violet, .5 - i * .12));
+      r.rotation.x = Math.PI / 2; g2.add(r); rings2.push(r);
+    }
+    const bars2 = [];
+    for (let i = 0; i < 24; i++) {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(.14, .6, .14), mat(PAL.teal, { roughness: .4 }));
+      b.position.set(-3.4 + i * .3, -2.6, 0); b.userData = { i };
+      g2.add(b); bars2.push(b);
+    }
+
+    // ── G3 RELOJ/PROCESO: orbital clock of 5 phase blocks ─────────
+    const g3 = G();
+    const dial3 = new THREE.Mesh(new THREE.TorusGeometry(2.8, .05, 10, 80), wire(PAL.violet, .5));
+    dial3.rotation.x = Math.PI / 2.4; g3.add(dial3);
+    const blocks3 = [];
+    const phaseCols = [PAL.violet, PAL.teal, PAL.peach, PAL.rose, PAL.sky];
+    for (let i = 0; i < 5; i++) {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(.8, .8, .8), mat(phaseCols[i], { roughness: .35 }));
+      b.userData = { ang: i / 5 * Math.PI * 2 };
+      g3.add(b); blocks3.push(b);
+    }
+    const hand3 = new THREE.Mesh(new THREE.BoxGeometry(.06, 2.4, .06), mat(PAL.violet));
+    hand3.position.y = 0; g3.add(hand3);
+
+    // ── G4 EQUILIBRIO: balancing seesaw of shapes ─────────────────
+    const g4 = G();
+    const beam4 = new THREE.Mesh(new THREE.BoxGeometry(7, .14, .7), mat(PAL.violet, { roughness: .4 }));
+    g4.add(beam4);
+    const pivot4 = new THREE.Mesh(new THREE.ConeGeometry(.5, 1.1, 4), mat(PAL.teal, { roughness: .4 }));
+    pivot4.position.y = -.75; g4.add(pivot4);
+    const ballL = new THREE.Mesh(new THREE.SphereGeometry(.75, 22, 18), mat(PAL.peach, { roughness: .25 }));
+    const cubeR = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.05, 1.05), mat(PAL.rose, { roughness: .35 }));
+    g4.add(ballL); g4.add(cubeR);
+
+    // ── G5 ANTI-PLANTILLA: grid of gray cubes + one unique gem ────
+    const g5 = G();
+    const gridCubes = [];
+    for (let x = 0; x < 5; x++)for (let y = 0; y < 3; y++) {
+      if (x === 2 && y === 1) continue;
+      const cb = new THREE.Mesh(new THREE.BoxGeometry(.85, .85, .85), mat(0xcfc9e2, { roughness: .7 }));
+      cb.position.set((x - 2) * 1.5, (y - 1) * 1.5, 0);
+      g5.add(cb); gridCubes.push(cb);
+    }
+    const gem5 = new THREE.Mesh(new THREE.OctahedronGeometry(.72, 0), mat(PAL.violet, { roughness: .15, metalness: .3 }));
+    g5.add(gem5);
+
+    // ── G6 STACK POR CAPAS: floating translucent planes ───────────
+    const g6 = G();
+    const layers6 = [];
+    const layerCols = [PAL.violet, PAL.teal, PAL.peach, PAL.rose];
+    for (let i = 0; i < 4; i++) {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(4.6 - i * .5, .12, 3.2 - i * .35),
+        mat(layerCols[i], { roughness: .3, transparent: true, opacity: .85 }));
+      p.position.y = -1.5 + i * 1.05;
+      p.userData = { i };
+      g6.add(p); layers6.push(p);
+    }
+
+    // ── G7 TIPS: gentle particle field ─────────────────────────────
+    const g7 = G();
+    const PN = IS_MOB ? 120 : 320;
+    const pGeo = new THREE.BufferGeometry();
+    const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3);
+    const colArr = [[.42, .31, .85], [.17, .72, .64], [1, .73, .54], [.98, .55, .69]];
+    for (let i = 0; i < PN; i++) {
+      pPos[i * 3] = (Math.random() - .5) * 16; pPos[i * 3 + 1] = (Math.random() - .5) * 9; pPos[i * 3 + 2] = (Math.random() - .5) * 8 - 2;
+      const cc = colArr[i % 4]; pCol[i * 3] = cc[0]; pCol[i * 3 + 1] = cc[1]; pCol[i * 3 + 2] = cc[2];
+    }
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
+    g7.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ size: .09, vertexColors: true, transparent: true, opacity: .8 })));
+
+    // ── G8 CTA: calm horizon — sun disc + gentle wave lines ───────
+    const g8 = G();
+    const sun8 = new THREE.Mesh(new THREE.CircleGeometry(1.7, 48), mat(PAL.peach, { roughness: .2, emissive: PAL.peach, emissiveIntensity: .35 }));
+    sun8.position.set(0, 1.1, -4); g8.add(sun8);
+    const waves8 = [];
+    for (let i = 0; i < 6; i++) {
+      const wgeo = new THREE.PlaneGeometry(18, .05, 48, 1);
+      const w = new THREE.Mesh(wgeo, mat(i % 2 ? PAL.violet : PAL.teal, { transparent: true, opacity: .5 - i * .06 }));
+      w.position.set(0, -1.4 - i * .5, -2 - i * .7);
+      w.userData = { i, base: w.geometry.attributes.position.array.slice() };
+      g8.add(w); waves8.push(w);
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // SKY — full animated color cycle matching video
-    // HSL hue rotates over time: magenta→yellow→green→cyan→blue→purple→magenta
-    // Multiple "nebula" layers pulse at different rates
+    // SECTION BANDS + per-section camera
     // ═══════════════════════════════════════════════════════════════
-    const skyMat = new THREE.ShaderMaterial({
-      side: THREE.BackSide,
-      depthWrite: false,
-      uniforms: { uTime: { value: 0 }, uMob: { value: IS_MOB ? 1.0 : 0.0 } },
-      vertexShader: `varying vec3 vDir;void main(){vDir=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader: `
-    precision highp float;
-    uniform float uTime;
-    varying vec3 vDir;
-
-    vec3 hsl2rgb(float h,float s,float l){
-      h=mod(h,1.);
-      float c=(1.-abs(2.*l-1.))*s;
-      float x=c*(1.-abs(mod(h*6.,2.)-1.));
-      float m=l-c*.5;
-      vec3 rgb;
-      if     (h<1./6.) rgb=vec3(c,x,0.);
-      else if(h<2./6.) rgb=vec3(x,c,0.);
-      else if(h<3./6.) rgb=vec3(0.,c,x);
-      else if(h<4./6.) rgb=vec3(0.,x,c);
-      else if(h<5./6.) rgb=vec3(x,0.,c);
-      else             rgb=vec3(c,0.,x);
-      return rgb+m;
-    }
-
-    float hash21(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-    float hash31(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
-
-    // Smooth noise
-    float noise(vec2 p){
-      vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
-      return mix(mix(hash21(i),hash21(i+vec2(1,0)),u.x),
-                 mix(hash21(i+vec2(0,1)),hash21(i+vec2(1,1)),u.x),u.y);
-    }
-
-    uniform float uMob;
-    void main(){
-      float h=vDir.y;
-      vec3 d=normalize(vDir);
-      float t=uTime;
-
-      // Mobile fast path — simple gradient, no noise
-      if(uMob>0.5){
-        float hm=mod(t*.022,1.);
-        vec3 sky2=hsl2rgb(mod(hm+.15,1.),.80,mix(.04,.14,clamp(h*.5+.5,0.,1.)));
-        sky2=mix(sky2,hsl2rgb(mod(hm+.55,1.),.85,.18),clamp(1.-h*3.,0.,1.));
-        float sd2=max(0.,dot(d,normalize(vec3(.6,.12,-.8))));
-        sky2+=vec3(.05,.35,1.)*pow(sd2,14.)*.5;
-        sky2=mix(sky2,vec3(.95,1.,1.),smoothstep(.9990,.9998,sd2));
-        gl_FragColor=vec4(sky2,1.); return;
-      }
-
-      // === COLOR CYCLE — 5 hue bands rotating at different speeds ===
-      float hCycle  = mod(t*.022,1.);
-      float hCycle2 = mod(t*.038+.33,1.);
-      float hCycle3 = mod(t*.015+.66,1.);
-
-      // Horizontal noise — computed early so it can shift horizon hues
-      vec2 p1=d.xz*3.0+vec2(t*.008,t*.006);
-      float n1=noise(p1);
-      float n3=noise(d.zy*6.+vec2(t*.004));
-      // Second noise layer for extra horizontal variety
-      float n2=noise(d.xz*1.6+vec2(t*.005+.9,t*.004));
-
-      // Zenith color
-      float hZenith=mod(hCycle+.05,1.);
-      vec3 zenith=hsl2rgb(hZenith,.85,.08);
-
-      // Mid sky
-      float hMid=mod(hCycle2+.15+n2*.12,1.);
-      vec3 mid=hsl2rgb(hMid,.80,.12);
-
-      // Horizon — shifted by horizontal noise for color diversity
-      float hHoriz=mod(hCycle3+.42+n1*.28,1.);
-      vec3 horiz=hsl2rgb(hHoriz,.90,.18);
-
-      // Low horizon glow — second hue family driven by n2
-      float hLow=mod(hCycle+.55+n2*.35,1.);
-      vec3 low=hsl2rgb(hLow,.95,.15);
-
-      // Extra horizon color band (third hue) visible in patches
-      float hPatch=mod(hCycle2+.70+n1*.20,1.);
-      vec3 patchCol=hsl2rgb(hPatch,.88,.15);
-
-      // Build sky gradient
-      vec3 sky=mix(low, horiz, smoothstep(-.15,.05,h));
-      sky=mix(sky, mid,    smoothstep(.0,.4,h));
-      sky=mix(sky, zenith, smoothstep(.3,.85,h));
-      // Inject extra color near horizon where n1 is high
-      float patchW=n1*n1*(1.-smoothstep(-.1,.08,h));
-      sky=mix(sky, patchCol, patchW*.5);
-
-      // Nebula
-      float hNeb1=mod(hCycle+.5,1.);
-      vec3 neb1=hsl2rgb(hNeb1,.9,.18)*n1*n1;
-      float nebMask=smoothstep(-.1,.5,h);
-      sky+=neb1*nebMask*.7;
-      sky*=.92+n3*.16;
-
-            // === SOLAR ECLIPSE — black disc + tight flare corona ===
-      vec3 sunDir=normalize(vec3(.6,.12,-.8));
-      float sd2=max(0.,dot(d,sunDir));
-
-      vec3 sR=normalize(cross(sunDir,vec3(0.,1.,0.)));
-      vec3 sU=cross(sR,sunDir);
-      float angRad=atan(dot(d,sU),dot(d,sR));
-
-      // Disc fills outward — cMask = 1-disc, so no gap between them
-      float disc=smoothstep(.9980,.9984,sd2);
-      float cMask=1.-disc;
-
-      // Narrow flare spikes only — no base glow (avoids the ring)
-      float fl1=pow(max(0.,sin(angRad*5.+t*.55)),6.);
-      float fl2=pow(max(0.,sin(angRad*8.-t*.45+1.3)),6.);
-      float fl3=pow(max(0.,sin(angRad*12.+t*.35+2.7)),6.);
-      float fl4=pow(max(0.,cos(angRad*3.-t*.25+.9)),4.);
-      float flares=fl1*.5+fl2*.4+fl3*.25+fl4*.35;
-
-      // Very high exponents = flares barely extend past disc edge
-      float cor1=pow(sd2,800.)*cMask*flares;
-      float cor2=pow(sd2,2000.)*cMask*flares*.6;
-
-      float ch1=mod(angRad/6.2832+t*.28,1.);
-      float ch2=mod(angRad/6.2832*.8+t*.33+.33,1.);
-      sky+=hsl2rgb(ch1,.95,.55)*cor1;
-      sky+=hsl2rgb(ch2,.90,.45)*cor2;
-
-      // Black disc last
-      sky=mix(sky,vec3(0.),disc);
-
-      // Tone and clamp
-      sky=pow(max(sky,vec3(0.)),vec3(.88)); // slight gamma lift
-      gl_FragColor=vec4(sky,1.);
-    }`
-    });
-    // Sky dome: both devices (mobile uses simpler fast-path in shader via uMob)
-    scene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(300, IS_MOB ? 2 : 3), skyMat));
-
-
-    // ═══════════════════════════════════════════════════════════════
-    // DESERT TERRAIN — procedural dunes with sand shader
-    // ═══════════════════════════════════════════════════════════════
-    const TRES = IS_MOB ? 24 : 64; // mobile: 24×24=576 quads only
-    const desertMat = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 }, uColA: { value: new THREE.Color() }, uColB: { value: new THREE.Color() }, uMobT: { value: IS_MOB ? 1.0 : 0.0 } },
-      vertexShader: `
-    varying vec3 vWorldPos;
-    varying vec3 vNormal;
-    varying float vH;
-    void main(){
-      vec4 wp=modelMatrix*vec4(position,1.);
-      vWorldPos=wp.xyz;
-      vNormal=normalize(normalMatrix*normal);
-      vH=position.y;
-      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
-    }`,
-      fragmentShader: `
-    precision highp float;
-    uniform float uTime;
-    uniform vec3 uColA,uColB;
-    varying vec3 vWorldPos,vNormal;
-    varying float vH;
-
-    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
-    float noise(vec2 p){
-      vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
-      return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),
-                 mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);
-    }
-    uniform float uMobT;
-    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*noise(p);p*=2.07;a*=.48;}return v;}
-
-    void main(){
-      vec2 xz=vWorldPos.xz;
-      float n1,n2,n3,n4;
-      if(uMobT>0.5){
-        // Mobile: single noise per sample — 8x cheaper
-        n1=noise(xz*.06);
-        n2=noise(xz*.25+vec2(1.7));
-        n3=noise(xz*1.0+vec2(3.1));
-        n4=noise(xz*2.5+vec2(uTime*.02));
-      } else {
-        n1=fbm(xz*.06);
-        n2=noise(xz*.28+vec2(1.7));
-        n3=noise(xz*1.1+vec2(3.1));
-        n4=noise(xz*3.+vec2(uTime*.02));
-      }
-
-      // Sand base color — interpolated between two animated colors
-      vec3 sandBase=mix(uColA,uColB,n1);
-      // Warm golden base tint
-      vec3 sandWarm=vec3(.72,.52,.28);
-      sandBase=mix(sandBase,sandWarm,.45);
-
-      // Ripple shading — darker in troughs, lighter on crests
-      float ripple=n2*.5+n3*.25+n4*.1;
-      sandBase=mix(sandBase*.65,sandBase*1.2,ripple);
-
-      // Normal-based lighting (dune face shadowing)
-      vec3 lightDir=normalize(vec3(.6,.5,-.4));
-      float diff=max(0.,dot(normalize(vNormal),lightDir));
-
-      // Key light (animated color from uColA)
-      vec3 keyCol=uColA*3.+vec3(.2,.15,.05);
-      // Fill — complementary color from uColB
-      vec3 fillCol=uColB*1.5+vec3(.05,.03,.08);
-      // Ambient — very dark
-      vec3 amb=vec3(.04,.02,.06);
-
-      vec3 lit=sandBase*(amb+keyCol*diff*.6+fillCol*(1.-diff)*.25);
-
-      // Specular glint on sand crests — tiny bright points
-      float spec=pow(max(0.,dot(reflect(-lightDir,normalize(vNormal)),normalize(cameraPosition-vWorldPos))),80.);
-      lit+=vec3(.8,.9,1.)*spec*.3*n4;
-
-      // Subsurface glow in sand — fantasy world, sand glows faintly
-      lit+=uColB*.06*n1;
-
-      // Water zone — darken sand near water
-      float wDist=length(vWorldPos.xz)/18.;
-      lit*=mix(.55,1.,clamp(wDist,0.,1.));
-
-      gl_FragColor=vec4(lit,1.);
-    }`
-    });
-
-    // Build dune terrain geometry
-    const tGeo = new THREE.PlaneGeometry(160, 160, TRES, TRES); // reduced
-    tGeo.rotateX(-Math.PI / 2);
-    const tPos = tGeo.attributes.position;
-    for (let i = 0; i < tPos.count; i++) {
-      const x = tPos.getX(i), z = tPos.getZ(i);
-      // Layered dune profiles — different frequencies/amplitudes
-      let h = Math.sin(x * .028 + .4) * 6.5     // mega dunes
-        + Math.cos(z * .038 - .3) * 5.2
-        + Math.sin(x * .075 + z * .055) * 2.8  // medium dunes
-        + Math.cos(x * .12 - z * .09) * 1.8
-        + Math.sin((x + z) * .095) * .9      // small ripples
-        + Math.cos(x * .22 + z * .15) * .45;
-      // Flatten oasis zone
-      const d = Math.sqrt(x * x + z * z);
-      const flat = clamp(1 - d / 20, 0, 1);
-      tPos.setY(i, h * (1 - flat * flat * flat) - 3.0);
-    }
-    tPos.needsUpdate = true;
-    tGeo.computeVertexNormals();
-    // Terrain: both desktop and mobile (testing mobile performance)
-    {
-      const terrain = new THREE.Mesh(tGeo, desertMat);
-      terrain.receiveShadow = false;
-      scene.add(terrain);
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // WATER — improved Gerstner + fantasy color animation
-    // ═══════════════════════════════════════════════════════════════
-    const waterMat = new THREE.ShaderMaterial({
-      transparent: true,
-      side: THREE.DoubleSide,
-      uniforms: {
-        uTime: { value: 0 },
-        uColA: { value: new THREE.Color() },
-        uColB: { value: new THREE.Color() },
-      },
-      vertexShader: `
-    uniform float uTime;
-    varying vec3 vPos,vN;varying float vElev;
-
-    vec3 gerstner(vec2 dir,float steep,float wl,vec3 p,inout vec3 tan,inout vec3 bn){
-      float k=6.2832/wl,c=sqrt(9.8/k),a=steep/k;
-      float f=k*(dot(dir,p.xz)-c*uTime);
-      tan+=vec3(-dir.x*dir.x*(steep*sin(f)), dir.x*(steep*cos(f)),-dir.x*dir.y*(steep*sin(f)));
-      bn +=vec3(-dir.x*dir.y*(steep*sin(f)), dir.y*(steep*cos(f)),-dir.y*dir.y*(steep*sin(f)));
-      return vec3(dir.x*a*cos(f),a*sin(f),dir.y*a*cos(f));
-    }
-
-    void main(){
-      vec3 p=position;
-      vec3 tan=vec3(1,0,0),bn=vec3(0,0,1);
-      // 2 waves always; extra 2 only on desktop (controlled by geometry density)
-      p+=gerstner(vec2(.8,.6),.040,4.8,p,tan,bn);
-      p+=gerstner(vec2(-.5,.85),.030,3.2,p,tan,bn);
-      p+=gerstner(vec2(.3,-.9),.020,6.5,p,tan,bn);
-      vN=normalize(cross(bn,tan));
-      vPos=p;vElev=p.y;
-      gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
-    }`,
-      fragmentShader: `
-    precision highp float;
-    uniform float uTime;
-    uniform vec3 uColA,uColB;
-    varying vec3 vPos,vN;varying float vElev;
-
-    void main(){
-      // Water base color from animated sky palette
-      vec3 deep=uColA*.3+vec3(.02,.01,.04);
-      vec3 surf=uColB*.5+vec3(.04,.02,.08);
-      vec3 col=mix(deep,surf,clamp((vElev+.2)*4.,0.,1.));
-
-      // View-dependent fresnel
-      vec3 V=normalize(cameraPosition-vPos);
-      vec3 N=normalize(vN);
-      float fr=pow(1.-max(0.,dot(N,V)),3.5);
-
-      // Specular from two light sources
-      vec3 L1=normalize(vec3(.6,.5,-.4));
-      vec3 L2=normalize(vec3(-.5,.4,.3));
-      float s1=pow(max(0.,dot(reflect(-L1,N),V)),90.);
-      float s2=pow(max(0.,dot(reflect(-L2,N),V)),60.);
-      col+=uColA*s1*1.2;
-      col+=uColB*s2*.8;
-
-      // Fresnel reflection of sky color
-      col=mix(col,uColB*.6+uColA*.4,fr*.55);
-
-      // Foam on crests
-      float foam=smoothstep(.06,.16,vElev)*(.5+.5*sin(vPos.x*7.+vPos.z*5.+uTime))*.25;
-      col=mix(col,uColA*.8+vec3(.4,.4,.5),foam);
-
-      // Subsurface glow
-      col+=uColB*.04*clamp(1.-abs(vElev)/.3,0.,1.);
-
-      gl_FragColor=vec4(col,clamp(.78+fr*.15,0.,1.));
-    }`
-    });
-    // Water: only on desktop (too expensive for mobile)
-    let water = null;
-    if (!IS_MOB) {
-      const wGeo = new THREE.PlaneGeometry(38, 38, 64, 64);
-      wGeo.rotateX(-Math.PI / 2);
-      water = new THREE.Mesh(wGeo, waterMat);
-      water.position.y = -3.0;
-      scene.add(water);
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // RAIN — instanced line segments falling with wind
-    // ═══════════════════════════════════════════════════════════════
-    // ═══════════════════════════════════════════════════════════════
-    // CAMERA PATH — desert exploration
-    // 8 waypoints: wide establishing → dune closeup → water →
-    //              rise over dune → deep desert → cross oasis → pullback → final
-    // ═══════════════════════════════════════════════════════════════
-    // Approximate terrain height at a given XZ position
-    // (same formula as terrain vertex displacement)
-    function terrainHeight(x, z) {
-      return Math.sin(x * .028 + .4) * 6.5
-        + Math.cos(z * .038 - .3) * 5.2
-        + Math.sin(x * .075 + z * .055) * 2.8
-        + Math.cos(x * .12 - z * .09) * 1.8
-        + Math.sin((x + z) * .095) * .9
-        + Math.cos(x * .22 + z * .15) * .45
-        - 3.0;
-    }
-
-    const CAMS = [
-      { s: .00, p: [0, 14, 32], t: [0, 4, 0] },  // wide establishing — drone view
-      { s: .12, p: [-10, 10, 22], t: [2, 5, -4] },  // drift left, see dune ridge
-      { s: .24, p: [12, 8, 16], t: [0, 5, -6] },  // sweep right, golden dune flank
-      { s: .36, p: [2, 5, 9], t: [0, 2, -4] },  // descend toward oasis level
-      { s: .48, p: [-14, 14, 2], t: [0, 6, -10] },  // climb left dune spine, vista
-      { s: .60, p: [6, 18, -6], t: [0, 6, -18] },  // over major dune crest, deep desert
-      { s: .72, p: [-8, 11, -14], t: [6, 7, -6] }, // across far dune valley
-      { s: .84, p: [16, 9, -8], t: [-4, 5, -2] },  // far right ridge, looking back
-      { s: 1.0, p: [0, 28, 26], t: [0, 2, 0] }, // high drone pullback — full scene
+    const BANDS = [
+      { id: null, lo: .00, hi: .075, cam: [0, 0, 10] },
+      { id: 's1', lo: .07, hi: .185, cam: [0, .4, 8.5] },
+      { id: 's2', lo: .18, hi: .295, cam: [0, -.3, 8] },
+      { id: 's3', lo: .29, hi: .405, cam: [.8, 1.6, 8.5] },
+      { id: 's4', lo: .40, hi: .515, cam: [0, .5, 9] },
+      { id: 's5', lo: .51, hi: .625, cam: [0, 0, 9.5] },
+      { id: 's6', lo: .62, hi: .735, cam: [1.4, 1.2, 9] },
+      { id: 's7', lo: .73, hi: .86, cam: [0, 0, 10] },
+      { id: 's8', lo: .85, hi: 1.0, cam: [0, -.2, 8.5] },
     ];
-    function getCam(s) {
-      let lo = 0, hi = 1;
-      for (let i = 0; i < CAMS.length - 1; i++) { if (s >= CAMS[i].s && s <= CAMS[i + 1].s) { lo = i; hi = i + 1; break; } }
-      const span = CAMS[hi].s - CAMS[lo].s, f = span < .001 ? 0 : eio((s - CAMS[lo].s) / span);
-      const lp = CAMS[lo].p, hp = CAMS[hi].p, lt = CAMS[lo].t, ht = CAMS[hi].t;
-      return {
-        p: [lp[0] + (hp[0] - lp[0]) * f, lp[1] + (hp[1] - lp[1]) * f, lp[2] + (hp[2] - lp[2]) * f],
-        t: [lt[0] + (ht[0] - lt[0]) * f, lt[1] + (ht[1] - lt[1]) * f, lt[2] + (ht[2] - lt[2]) * f],
-      };
-    }
+    const sectEls = BANDS.map(b => ({ ...b, el: b.id ? document.getElementById(b.id) : null }));
+    const heroEl = document.getElementById('hero');
+    const mqEl = document.getElementById('mq');
+    let curSect = -1;
+    const camTarget = new THREE.Vector3(0, 0, 10);
 
-    // ═══════════════════════════════════════════════════════════════
-    // PANELS
-    // ═══════════════════════════════════════════════════════════════
-    const PANELS = [
-      { id: 'p0', lo: .00, hi: .12 }, { id: 'p1', lo: .11, hi: .24 },
-      { id: 'p2', lo: .22, hi: .35 }, { id: 'p3', lo: .33, hi: .47 },
-      { id: 'p4', lo: .45, hi: .57 }, { id: 'p5', lo: .55, hi: .68 },
-      { id: 'p6', lo: .66, hi: .78 }, { id: 'p7', lo: .76, hi: 1.0 },
-    ];
-    const pEls = PANELS.map(p => ({ ...p, el: document.getElementById(p.id) }));
-    const scrollHint = document.getElementById('scroll-hint');
-    function updatePanels(s) {
-      if (IS_MOB) return; // Mobile: panels driven by IntersectionObserver + scroll snap
-      pEls.forEach(p => {
-        if (!p.el) return;
-        const m = .035;
-        const active = s >= p.lo - m && s <= p.hi + m;
-        p.el.classList.toggle('active', active);
-        if (active) {
-          const raw = clamp((s - p.lo) / (p.hi - p.lo), 0, 1);
-          p.el.style.opacity = Math.min(clamp(raw / .1, 0, 1), clamp((1 - raw) / .1, 0, 1));
+    function updateSections(s) {
+      let active = -1;
+      for (let i = 0; i < BANDS.length; i++) { if (s >= BANDS[i].lo && s < BANDS[i].hi) { active = i; break; } }
+      if (active !== curSect) {
+        curSect = active;
+        sectEls.forEach((b, i) => { if (b.el) b.el.classList.toggle('active', i === active); });
+        groups.forEach((g, i) => { g.visible = (i === active); });
+        heroEl.classList.toggle('show', active === 0);
+        mqEl.classList.toggle('show', active === 4);
+        if (active >= 0) {
+          camTarget.set(...BANDS[active].cam);
+          if (window._applyPreset) window._applyPreset(active);
         }
-      });
-      scrollHint.style.opacity = Math.max(0, 1 - s * 10);
-      const heroEl = document.getElementById('hero-brand');
-      if (heroEl) heroEl.style.opacity = Math.max(0, 1 - clamp((s - .06) / .08, 0, 1));
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // ANIMATE
+    // INSIGHTS
+    // ═══════════════════════════════════════════════════════════════
+    let insightsFound = 0;
+    const INSIGHT_QUOTES = [
+      'La velocidad es una feature.', 'El detalle es la diferencia.',
+      'Menos plantilla, más carácter.', 'Cada pixel cuenta una historia.',
+      'El código limpio es diseño.', 'La emoción también se programa.',
+    ];
+    (function () {
+      const root = document.getElementById('root');
+      const positions = [
+        { top: '12%', left: '78%' }, { top: '25%', left: '12%' }, { top: '38%', left: '85%' },
+        { top: '52%', left: '8%' }, { top: '66%', left: '80%' }, { top: '79%', left: '15%' },
+      ];
+      positions.forEach((p, i) => {
+        const d = document.createElement('div');
+        d.className = 'insight-dot'; d.style.top = p.top; d.style.left = p.left;
+        d.addEventListener('click', () => {
+          if (d.classList.contains('found')) return;
+          d.classList.add('found'); insightsFound++;
+          document.getElementById('ins-cnt').textContent = String(insightsFound).padStart(2, '0');
+          const t = document.createElement('div');
+          t.style.cssText = 'position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);z-index:600;font-family:var(--serif);font-style:italic;font-size:1.05rem;color:#6a4fd8;background:rgba(255,255,255,.94);border:1px solid rgba(106,79,216,.3);padding:.8rem 1.6rem;opacity:0;transition:opacity .4s;pointer-events:none';
+          t.textContent = '"' + INSIGHT_QUOTES[i] + '"';
+          document.body.appendChild(t);
+          requestAnimationFrame(() => t.style.opacity = '1');
+          setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 2600);
+        });
+        root.appendChild(d);
+      });
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATE — per-scene motion
     // ═══════════════════════════════════════════════════════════════
     const clock = new THREE.Clock();
-    let pmx = 0, pmy = 0, cpmx = 0, cpmy = 0;
-    document.addEventListener('mousemove', e => { pmx = (e.clientX / innerWidth - .5) * 2; pmy = (e.clientY / innerHeight - .5) * 2; }, { passive: true });
+    let pmx = 0, pmy = 0, cpmx = 0, cpmy = 0, _frame = 0;
+    if (!IS_MOB) document.addEventListener('mousemove', e => { pmx = (e.clientX / innerWidth - .5) * 2; pmy = (e.clientY / innerHeight - .5) * 2; }, { passive: true });
 
-    // Pre-allocate color objects — avoid GC pressure
-    const colA = new THREE.Color();
-    const colB = new THREE.Color();
-    const colC = new THREE.Color();
-
-    let _frame = 0, _lastScrollRaw = -1, _needsRender = true;
-    // Mobile: only re-render when scroll position changed or color cycle tick
-    window.addEventListener('scroll', () => { _needsRender = true; }, { passive: true });
     function animate() {
       requestAnimationFrame(animate);
       _frame++;
-      // Mobile: render every other frame (~30fps) — skip for perf
-      if (IS_MOB && _frame % 2 !== 0) return;
+      if (IS_MOB && (_frame % 2 !== 0)) return;
       const t = clock.getElapsedTime();
-      scrollSmooth += (scrollRaw - scrollSmooth) * .12;
+      scrollSmooth += (scrollRaw - scrollSmooth) * .09;
       const s = clamp(scrollSmooth / Math.max(1, document.body.scrollHeight - innerHeight), 0, 1);
+      updateSections(s);
 
-      // ── Color cycle ──────────────────────────────────────────────
-      const h1 = t * .022, h2 = h1 + .33, h3 = h1 + .66;
-      colA.setHSL(h1 % 1, .85, .18);
-      colB.setHSL(h2 % 1, .80, .15);
-      colC.setHSL(h3 % 1, .75, .12);
+      // Camera eases toward section target + mouse parallax
+      if (!IS_MOB) { cpmx += (pmx - cpmx) * .05; cpmy += (pmy - cpmy) * .05; }
+      camera.position.x += (camTarget.x + cpmx * .7 - camera.position.x) * .05;
+      camera.position.y += (camTarget.y + cpmy * -.45 - camera.position.y) * .05;
+      camera.position.z += (camTarget.z - camera.position.z) * .05;
+      camera.lookAt(0, 0, 0);
 
-      // ── Scene updates: terrain always, sky+water desktop only ──────
-      // Terrain colors — both devices
-      desertMat.uniforms.uTime.value = t;
-      desertMat.uniforms.uColA.value.copy(colA);
-      desertMat.uniforms.uColB.value.copy(colB);
-      // Hemisphere light color — both devices
-      colorLightA.color.copy(colA).multiplyScalar(IS_MOB ? 3.0 : 2.0);
-      colorLightA.groundColor.copy(colC).multiplyScalar(IS_MOB ? 1.5 : 0.5);
-      // ── Sky + extra lights + water — desktop only for heavy items ──
-      skyMat.uniforms.uTime.value = t; // sky shader runs on both devices
-      if (!IS_MOB) {
-        colorLightB.color.copy(colB).multiplyScalar(1.8);
-        colorLightC.color.copy(colC).multiplyScalar(1.4);
-        colorLightB.position.set(30 + Math.sin(t * .06) * 8, 10, -20);
-        colorLightC.position.set(-15 + Math.cos(t * .04) * 8, 20, 10);
-        if (water) {
-          waterMat.uniforms.uTime.value = t * .52;
-          waterMat.uniforms.uColA.value.copy(colA);
-          waterMat.uniforms.uColB.value.copy(colB);
+      const a = curSect;
+      if (a === 0) { // hero orbs float
+        for (const o of heroOrbs) {
+          o.position.y = o.userData.r0.y + Math.sin(t * o.userData.sp + o.userData.ph) * .6;
+          o.position.x = o.userData.r0.x + Math.cos(t * o.userData.sp * .7 + o.userData.ph) * .35;
         }
-      }
-
-      // ── Camera — both desktop (with parallax) and mobile (no parallax) ──
-      {
-        if (!IS_MOB) { cpmx += (pmx - cpmx) * .04; cpmy += (pmy - cpmy) * .04; }
-        const ck = getCam(s);
-        const camX = ck.p[0] + (IS_MOB ? 0 : cpmx * 1.2), camZ = ck.p[2];
-        const floorH = terrainHeight(camX, camZ) + 4.5;
-        const camY = Math.max(ck.p[1] + (IS_MOB ? 0 : cpmy * -.5), floorH);
-        camera.position.set(camX, camY, camZ);
-        const tgtFloor = terrainHeight(ck.t[0], ck.t[2]) + 1.5;
-        camera.lookAt(ck.t[0], Math.max(ck.t[1], tgtFloor), ck.t[2]);
-      }
-
-      // ── Panels ──────────────────────────────────────────────────
-      updatePanels(s);
-
-      // ── Section audio trigger (checked every frame, not just on scroll) ──
-      if (window._applyPreset) {
-        const maxS2 = document.body.scrollHeight - innerHeight;
-        const sv = scrollSmooth / Math.max(1, maxS2);
-        const ABANDS = [{ lo: .00, hi: .12 }, { lo: .11, hi: .24 }, { lo: .22, hi: .35 }, { lo: .33, hi: .47 },
-        { lo: .45, hi: .57 }, { lo: .55, hi: .68 }, { lo: .66, hi: .78 }, { lo: .76, hi: 1.0 }];
-        for (let ai = 0; ai < ABANDS.length; ai++) {
-          if (sv >= ABANDS[ai].lo && sv < ABANDS[ai].hi) { window._applyPreset(ai); break; }
+      } else if (a === 1) { // breathing core
+        const br = 1 + Math.sin(t * 1.4) * .07;
+        core1.scale.set(br, br, br);
+        shell1.rotation.y = t * .25; shell1.rotation.x = Math.sin(t * .3) * .2;
+        for (const sM of sats1) {
+          const u = sM.userData; const an = u.ang + t * u.sp;
+          sM.position.set(Math.cos(an) * u.r, Math.sin(an * 1.3 + u.tilt) * .9, Math.sin(an) * u.r * .6);
         }
+      } else if (a === 2) { // pulse
+        const beat = Math.pow(Math.max(0, Math.sin(t * 2.6)), 6);
+        const sc = 1 + beat * .28; pulse2.scale.set(sc, sc, sc);
+        rings2.forEach((r, i) => { const rs = 1 + ((t * .6 + i * .33) % 1) * .9; r.scale.set(rs, rs, 1); r.material.opacity = .5 * (1 - ((t * .6 + i * .33) % 1)); });
+        bars2.forEach(b => { const h = .3 + Math.abs(Math.sin(t * 3 + b.userData.i * .6)) * 1.4; b.scale.y = h; b.position.y = -2.6 + h * .3; });
+      } else if (a === 3) { // clock
+        blocks3.forEach(b => {
+          const an = b.userData.ang + t * .35;
+          b.position.set(Math.cos(an) * 2.8, Math.sin(an) * 2.8 * Math.cos(Math.PI / 2.4 - Math.PI / 2) + Math.sin(an) * 1.1, Math.sin(an) * 1.4);
+          b.rotation.y = t * .6; b.rotation.x = t * .4;
+        });
+        hand3.rotation.z = -t * .7;
+      } else if (a === 4) { // seesaw
+        const tilt = Math.sin(t * .8) * .16;
+        beam4.rotation.z = tilt;
+        ballL.position.set(-3 + Math.cos(tilt) * 0, -Math.sin(tilt) * 3 + .65, 0);
+        ballL.position.x = -3 * Math.cos(tilt); ballL.position.y = -3 * Math.sin(tilt) + .68;
+        cubeR.position.x = 3 * Math.cos(tilt); cubeR.position.y = 3 * Math.sin(tilt) + .72;
+        cubeR.rotation.y = t * .5;
+      } else if (a === 5) { // grid + gem
+        gridCubes.forEach((cb, i) => { cb.rotation.y = Math.sin(t * .4 + i) * .06; });
+        gem5.rotation.y = t * 1.1; gem5.rotation.x = Math.sin(t * .8) * .3;
+        gem5.position.y = Math.sin(t * 1.3) * .25;
+        const gm = 1 + Math.sin(t * 2) * .05; gem5.scale.set(gm, gm, gm);
+      } else if (a === 6) { // layers
+        layers6.forEach(p => {
+          p.position.y = -1.5 + p.userData.i * 1.05 + Math.sin(t * .9 + p.userData.i * .9) * .12;
+          p.rotation.y = Math.sin(t * .3 + p.userData.i * .5) * .08;
+        });
+      } else if (a === 7) { // particles drift
+        g7.rotation.y = t * .05;
+      } else if (a === 8) { // waves
+        waves8.forEach(w => {
+          const arr = w.geometry.attributes.position.array, base = w.userData.base;
+          for (let vi = 0; vi < arr.length; vi += 3) {
+            arr[vi + 1] = base[vi + 1] + Math.sin(t * 1.2 + base[vi] * .6 + w.userData.i) * 0.16;
+          }
+          w.geometry.attributes.position.needsUpdate = true;
+        });
+        sun8.position.y = 1.1 + Math.sin(t * .5) * .1;
       }
-
 
       renderer.render(scene, camera);
     }
 
-
-    // ── Section color via IntersectionObserver (zero rAF cost) ──────
-    // Works on BOTH desktop and mobile — browser native, compositor thread
-    const SECT_COLS = ["#04020a", "#030810", "#0a0418", "#080215", "#030d12", "#0a0608", "#020a0a", "#080408"];
-    const _snapPts = document.querySelectorAll('.snap-pt');
-    if (_snapPts.length) {
-      const _sectIO = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            const idx = parseInt(e.target.dataset.section || '0');
-            document.body.style.background = SECT_COLS[idx] || SECT_COLS[0];
-            // Also trigger audio preset
-            if (window._applyPreset) window._applyPreset(idx);
-          }
-        });
-      }, { threshold: 0, rootMargin: '0px 0px -50% 0px' });
-      _snapPts.forEach(el => _sectIO.observe(el));
+    // ── Loader ────────────────────────────────────────────────────
+    const _ldEl = document.getElementById('loader');
+    const _ldBar = document.getElementById('ld-bar');
+    const _ldStat = document.getElementById('ld-status');
+    const _ldCta = document.getElementById('ld-cta');
+    let _sceneReady = false, _loaderGone = false, _ldPct = 0;
+    function _tickLd() {
+      if (_loaderGone) return;
+      const target = _sceneReady ? 100 : 88;
+      _ldPct += (target - _ldPct) * .06;
+      if (_ldBar) _ldBar.style.width = Math.min(_ldPct, 100).toFixed(1) + '%';
+      if (_ldPct < 99.5) requestAnimationFrame(_tickLd);
     }
-
-    // ── Mobile panels: driven by IntersectionObserver, not rAF ───────
-    if (IS_MOB) {
-      // Map section index → panel id
-      const MOB_PANELS = [
-        { sect: 0, id: 'p0' }, { sect: 1, id: 'p1' }, { sect: 2, id: 'p2' }, { sect: 3, id: 'p3' },
-        { sect: 4, id: 'p4' }, { sect: 5, id: 'p5' }, { sect: 6, id: 'p6' }, { sect: 7, id: 'p7' },
-      ];
-      // hero-brand and p0 are revealed by the auto-dismiss timer below
-      const _heroB = document.getElementById('hero-brand');
-
-      let _activeMobSection = -1;
-      const _panelIO = new IntersectionObserver((entries) => {
-        // Find the section with maximum intersection ratio
-        entries.forEach(e => {
-          if (!e.isIntersecting) return;
-          const idx = parseInt(e.target.dataset.section || '0');
-          if (idx === _activeMobSection) return;
-          // Deactivate previous panel
-          if (_activeMobSection >= 0) {
-            const prev = MOB_PANELS.find(m => m.sect === _activeMobSection);
-            const prevEl = prev ? document.getElementById(prev.id) : null;
-            if (prevEl) prevEl.classList.remove('active');
-          }
-          // Activate new panel
-          _activeMobSection = idx;
-          const mp = MOB_PANELS.find(m => m.sect === idx);
-          const panelEl = mp ? document.getElementById(mp.id) : null;
-          if (panelEl) panelEl.classList.add('active');
-          // Hero brand only on section 0
-          if (_heroB) _heroB.style.opacity = idx === 0 ? '1' : '0';
-        });
-      }, { threshold: 0.1, rootMargin: '0px 0px -45% 0px' });
-      _snapPts.forEach(el => _panelIO.observe(el));
+    requestAnimationFrame(_tickLd);
+    function _onReady() {
+      if (_sceneReady) return; _sceneReady = true;
+      if (_ldStat) _ldStat.textContent = 'Listo';
+      if (_ldCta) _ldCta.classList.add('ready');
     }
-
-    // ── Start animate loop (both desktop and mobile) ─────────────────
+    window._enterSite = function () {
+      if (_loaderGone) return; _loaderGone = true;
+      if (window._audioOnGesture) window._audioOnGesture();
+      if (_ldEl) { _ldEl.style.opacity = '0'; setTimeout(() => { _ldEl.style.display = 'none'; }, 850); }
+      updateSections(0);
+      groups[0].visible = true; heroEl.classList.add('show');
+    };
     animate();
-    // Mobile: activate p0 panel immediately (no loader to wait for)
-    if (IS_MOB) {
-      const p0 = document.getElementById('p0');
-      if (p0) p0.classList.add('active');
-    }
+    const _oR = renderer.render.bind(renderer);
+    renderer.render = function (sc, cam) { _oR(sc, cam); _onReady(); renderer.render = _oR; };
   </script>
 
   <script>
     // ═══════════════════════════════════════════════════════════════
-    // AUDIO — Web Audio API (native, no external deps)
-    // Soundtrack loop + per-section filter chain + organ pad on letters
+    // AUDIO — FX chain + panel (unchanged system)
     // ═══════════════════════════════════════════════════════════════
     (function () {
       'use strict';
-      const IS_MOB = innerWidth < 768; // local copy for audio IIFE
-
-      // ── Audio state ──────────────────────────────────────────────
+      const IS_MOB = innerWidth < 768;
       let ctx = null, srcNode = null, audioBuffer = null;
-      let masterGain, lpFilter, hpFilter, convolver, panner, compressor, dryG, wetG;
+      let masterGain, gainNode, hpFilter, lpFilter, saturator, distorter, fuzzer;
+      let convolver, dryG, wetG, lofiIn, lofiOut, pannerNode, compressor;
       let audioReady = false, audioPlaying = false, currentSection = -1;
 
-      // ── Build impulse response for convolver (room reverb) ───────
-      function makeIR(ctx2, dur, decay) {
-        const sr = ctx2.sampleRate, len = sr * dur;
-        const buf = ctx2.createBuffer(2, len, sr);
+      function makeIR(c2, dur, decay) {
+        const sr = c2.sampleRate, len = Math.floor(sr * dur);
+        const buf = c2.createBuffer(2, len, sr);
         for (let ch = 0; ch < 2; ch++) {
           const d = buf.getChannelData(ch);
-          for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+          for (let i = 0; i < len; i++)d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
         }
         return buf;
       }
-
-      // ── Build audio chain ────────────────────────────────────────
-      function buildChain(ctx2) {
-        // nodes
-        masterGain = ctx2.createGain(); masterGain.gain.value = 0.75;
-        lpFilter = ctx2.createBiquadFilter(); lpFilter.type = 'lowpass'; lpFilter.frequency.value = 18000;
-        hpFilter = ctx2.createBiquadFilter(); hpFilter.type = 'highpass'; hpFilter.frequency.value = 20;
-        convolver = ctx2.createConvolver(); convolver.buffer = makeIR(ctx2, 2.5, 2.2);
-        panner = ctx2.createStereoPanner(); panner.pan.value = 0;
-        compressor = ctx2.createDynamicsCompressor();
-        compressor.threshold.value = -24; compressor.knee.value = 12;
-        compressor.ratio.value = 4; compressor.attack.value = 0.003; compressor.release.value = 0.25;
-        // Dry/wet mix for reverb (exposed to outer scope for applyPreset)
-        dryG = ctx2.createGain(); dryG.gain.value = 0.78;
-        wetG = ctx2.createGain(); wetG.gain.value = 0.22;
-        // Route: source→lpFilter→hpFilter→panner→dryG→compressor→masterGain→destination
-        //                                         →convolver→wetG→compressor
-        lpFilter.connect(hpFilter);
-        hpFilter.connect(panner);
-        panner.connect(dryG); dryG.connect(compressor);
-        panner.connect(convolver); convolver.connect(wetG); wetG.connect(compressor);
-        compressor.connect(masterGain);
-        masterGain.connect(ctx2.destination);
-        return lpFilter; // entry point for source
+      function makeSatCurve(a) {
+        const n = 256, c2 = new Float32Array(n), k = a * 100 + .001;
+        for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c2[i] = (Math.PI + k) * x / (Math.PI + k * Math.abs(x)); } return c2;
+      }
+      function makeDistCurve(a) {
+        const n = 256, c2 = new Float32Array(n), thr = 1 - a * .9;
+        for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c2[i] = Math.max(-thr, Math.min(thr, x * 3)) / (thr || .001); } return c2;
+      }
+      function makeFuzzCurve(a) {
+        const n = 256, c2 = new Float32Array(n);
+        for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c2[i] = Math.tanh(x * (1 + a * 30)) * .7; } return c2;
       }
 
-      // ── Load and loop soundtrack ─────────────────────────────────
-      async function loadAndPlay(ctx2, entry) {
-        // Load via XHR — works on file:// and http:// alike
-        const ab = await new Promise((resolve, reject) => {
-          const paths = ['assets/soundtrack.mp3'];
-          let idx = 0;
-          function tryNext() {
-            if (idx >= paths.length) { reject(new Error('soundtrack not found')); return; }
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', paths[idx++], true);
+      let _curIRdur = 2.5;
+      function buildChain(c2) {
+        masterGain = c2.createGain(); masterGain.gain.value = 0;
+        gainNode = c2.createGain(); gainNode.gain.value = 1;
+        hpFilter = c2.createBiquadFilter(); hpFilter.type = 'highpass'; hpFilter.frequency.value = 20;
+        lpFilter = c2.createBiquadFilter(); lpFilter.type = 'lowpass'; lpFilter.frequency.value = 18000;
+        saturator = c2.createWaveShaper(); saturator.oversample = '2x'; saturator.curve = makeSatCurve(0);
+        distorter = c2.createWaveShaper(); distorter.oversample = '4x'; distorter.curve = makeDistCurve(0);
+        fuzzer = c2.createWaveShaper(); fuzzer.oversample = '4x'; fuzzer.curve = makeFuzzCurve(0);
+        convolver = c2.createConvolver(); convolver.buffer = makeIR(c2, _curIRdur, 2.2);
+        dryG = c2.createGain(); dryG.gain.value = .85;
+        wetG = c2.createGain(); wetG.gain.value = .15;
+        lofiIn = c2.createBiquadFilter(); lofiIn.type = 'lowpass'; lofiIn.frequency.value = 20000;
+        lofiOut = c2.createGain(); lofiOut.gain.value = 1;
+        pannerNode = c2.createStereoPanner(); pannerNode.pan.value = 0;
+        compressor = c2.createDynamicsCompressor();
+        compressor.threshold.value = -18; compressor.knee.value = 10; compressor.ratio.value = 3;
+        compressor.attack.value = .005; compressor.release.value = .2;
+        gainNode.connect(hpFilter); hpFilter.connect(lpFilter); lpFilter.connect(saturator);
+        saturator.connect(distorter); distorter.connect(fuzzer);
+        fuzzer.connect(dryG); dryG.connect(lofiIn);
+        fuzzer.connect(convolver); convolver.connect(wetG); wetG.connect(lofiIn);
+        lofiIn.connect(lofiOut); lofiOut.connect(pannerNode); pannerNode.connect(compressor);
+        compressor.connect(masterGain); masterGain.connect(c2.destination);
+        return gainNode;
+      }
+
+      async function loadAndPlay(c2, entry) {
+        const ab = await new Promise((res, rej) => {
+          const paths = ['soundtrack.mp3', '../agency-night/soundtrack.mp3', '../agency-site/soundtrack.mp3'];
+          let i = 0;
+          function next() {
+            if (i >= paths.length) { rej(new Error('not found')); return; }
+            const xhr = new XMLHttpRequest(); xhr.open('GET', paths[i++], true);
             xhr.responseType = 'arraybuffer';
-            xhr.onload = () => xhr.status < 400 ? resolve(xhr.response) : tryNext();
-            xhr.onerror = tryNext;
-            xhr.send();
+            xhr.onload = () => xhr.status < 400 ? res(xhr.response) : next();
+            xhr.onerror = next; xhr.send();
           }
-          tryNext();
+          next();
         });
-        audioBuffer = await ctx2.decodeAudioData(ab);
-        function startLoop(offset) {
-          srcNode = ctx2.createBufferSource();
-          srcNode.buffer = audioBuffer;
-          srcNode.loop = false;
-          srcNode.playbackRate.value = window._targetRate || 1.0;
+        audioBuffer = await c2.decodeAudioData(ab);
+        function loop(off) {
+          srcNode = c2.createBufferSource();
+          srcNode.buffer = audioBuffer; srcNode.loop = false;
+          srcNode.playbackRate.value = window._targetRate || 1;
           srcNode.connect(entry);
-          srcNode.onended = () => { if (audioPlaying) startLoop(0); };
-          srcNode.start(0, offset || 0);
+          srcNode.onended = () => { if (audioPlaying) loop(0); };
+          srcNode.start(0, off || 0);
         }
-        startLoop(0);
-        audioPlaying = true;
-        updateBtn();
+        loop(0); audioPlaying = true; updateBtn();
       }
 
-      function initAudio() {
-        // SYNCHRONOUS: AudioContext MUST be created in same call stack as gesture
-        if (audioReady) return;
-        audioReady = true;
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-        // Build chain synchronously
-        const entry = buildChain(ctx);
-        buildShaper(ctx);
-        masterGain.gain.setValueAtTime(0, ctx.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.75, ctx.currentTime + 0.3);
-        // Resume if suspended (some browsers start suspended)
-        if (ctx.state === 'suspended') {
-          ctx.resume().then(() => {
-            loadAndPlay(ctx, entry).catch(e => console.warn('Soundtrack:', e));
-          });
-        } else {
-          loadAndPlay(ctx, entry).catch(e => console.warn('Soundtrack:', e));
-        }
-      }
-
-      // ── Per-section effect presets — dramatically audible differences ──
-      // Add tremolo + shaper for extra timbral variety between sections
-      let shaperNode = null, tremoloGain = null, tremoloOsc = null;
-      function buildShaper(ctx2) {
-        // Route panner → shaper → dryG (shaper adds harmonic grit in S7)
-        shaperNode = ctx2.createWaveShaper();
-        const curve = new Float32Array(256);
-        for (let i = 0; i < 256; i++) { const x = i * 2 / 256 - 1; curve[i] = x * (1 - Math.abs(x) * 0.3); }
-        shaperNode.curve = curve; shaperNode.oversample = '4x';
-        // Tremolo LFO
-        tremoloOsc = ctx2.createOscillator(); tremoloOsc.type = 'sine';
-        tremoloOsc.frequency.value = 0; tremoloOsc.start();
-        tremoloGain = ctx2.createGain(); tremoloGain.gain.value = 1;
-        tremoloOsc.connect(tremoloGain.gain);
-      }
-
-      // Per-section presets — perceptible but musical, not jarring
-      // [lpFreq, hpFreq, wetGain, dryGain, masterVol, playbackRate]
+      // [reverb, revSize, distort, saturat, fuzz, hpf, lpf, pitch, lofi, vol]
       const PRESETS = [
-        [16000, 20, 0.15, 0.85, 0.72, 1.00], // S0: bright, clean, normal
-        [3500, 30, 0.55, 0.45, 0.68, 0.93], // S1: warm+dark, slight pitch down
-        [900, 20, 0.72, 0.28, 0.62, 0.88], // S2: deep+cavernous, lower
-        [14000, 120, 0.12, 0.88, 0.76, 1.06], // S3: bright+dry, slightly up
-        [18000, 20, 0.52, 0.48, 0.68, 1.08], // S4: full+spacious, highest
-        [600, 100, 0.65, 0.35, 0.65, 0.90], // S5: muffled+reverby, lower
-        [12000, 20, 0.80, 0.20, 0.60, 0.96], // S6: washed reverb, near normal
-        [2500, 80, 0.38, 0.62, 0.78, 0.94], // S7: dark return, punchy
+        [0.15, 2.5, 0.00, 0.0, 0.0, 20, 18000, 1.00, 0.0, 0.75], // HERO
+        [0.30, 3.5, 0.00, 0.2, 0.0, 20, 12000, 0.97, 0.0, 0.72], // S1
+        [0.55, 6.0, 0.00, 0.0, 0.0, 20, 3000, 0.90, 0.0, 0.66], // S2
+        [0.12, 1.8, 0.12, 0.3, 0.0, 70, 14000, 1.04, 0.0, 0.78], // S3
+        [0.45, 5.5, 0.00, 0.1, 0.0, 20, 18000, 1.07, 0.0, 0.70], // S4
+        [0.25, 3.0, 0.00, 0.0, 0.0, 140, 1000, 0.92, 0.35, 0.72], // S5
+        [0.70, 8.5, 0.00, 0.0, 0.0, 20, 15000, 0.96, 0.0, 0.64], // S6
+        [0.28, 3.2, 0.25, 0.35, 0.08, 90, 6000, 0.94, 0.0, 0.80], // S7
+        [0.40, 5.0, 0.00, 0.15, 0.0, 20, 16000, 1.00, 0.0, 0.74], // S8
       ];
-      const RAMP = 1.2; // faster transitions
+      const RAMP = 1.2;
+      function rampTo(p, v, r) {
+        if (!p) return; const t = ctx.currentTime;
+        try { p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.linearRampToValueAtTime(v, t + (r || RAMP)); } catch (e) { }
+      }
       function applyPreset(i) {
-        // Guard: only run after full audio chain is built
-        if (!audioReady || !ctx || !lpFilter || !hpFilter) return;
+        if (!audioReady || !ctx || !lpFilter) return;
         if (i === currentSection) return;
         currentSection = i;
         const p = PRESETS[Math.min(i, PRESETS.length - 1)];
-        const now = ctx.currentTime;
-        function ramp(param, val) {
-          try {
-            param.cancelScheduledValues(now);
-            param.setValueAtTime(param.value, now);
-            param.linearRampToValueAtTime(val, now + RAMP);
-          } catch (e) { }
+        _applyValues(...p); _syncPanel(p);
+        const sl = document.getElementById('ap-sect-label');
+        if (sl) sl.textContent = i === 0 ? 'HERO' : 'S' + i;
+      }
+      function _applyValues(reverb, revSize, distort, saturat, fuzz, hpf, lpf, pitch, lofi, vol) {
+        if (!ctx) return;
+        rampTo(wetG && wetG.gain, reverb); rampTo(dryG && dryG.gain, 1 - reverb);
+        if (Math.abs(revSize - _curIRdur) > .3) {
+          _curIRdur = revSize;
+          const nb = makeIR(ctx, revSize, Math.max(.5, 3 - revSize * .15));
+          const now = ctx.currentTime;
+          if (wetG) { wetG.gain.setValueAtTime(reverb, now); wetG.gain.linearRampToValueAtTime(0, now + .3); }
+          setTimeout(() => {
+            if (convolver) convolver.buffer = nb;
+            if (wetG) { wetG.gain.setValueAtTime(0, ctx.currentTime); wetG.gain.linearRampToValueAtTime(reverb, ctx.currentTime + .3); }
+          }, 350);
         }
-        ramp(lpFilter.frequency, p[0]);
-        ramp(hpFilter.frequency, p[1]);
-        if (wetG) ramp(wetG.gain, p[2]);
-        if (dryG) ramp(dryG.gain, p[3]);
+        if (saturator) saturator.curve = makeSatCurve(saturat);
+        if (distorter) distorter.curve = makeDistCurve(distort);
+        if (fuzzer) fuzzer.curve = makeFuzzCurve(fuzz);
+        rampTo(hpFilter && hpFilter.frequency, hpf);
+        rampTo(lpFilter && lpFilter.frequency, lpf);
+        rampTo(lofiIn && lofiIn.frequency, lofi > .01 ? 18000 - lofi * 16500 : 20000);
+        window._targetRate = pitch;
         if (srcNode) {
           try {
-            srcNode.playbackRate.cancelScheduledValues(now);
-            srcNode.playbackRate.setValueAtTime(srcNode.playbackRate.value, now);
-            srcNode.playbackRate.linearRampToValueAtTime(p[5], now + RAMP);
+            srcNode.playbackRate.cancelScheduledValues(ctx.currentTime);
+            srcNode.playbackRate.setValueAtTime(srcNode.playbackRate.value, ctx.currentTime);
+            srcNode.playbackRate.linearRampToValueAtTime(pitch, ctx.currentTime + RAMP);
           } catch (e) { }
         }
-        window._targetRate = p[5];
-        setTimeout(() => { if (masterGain && audioPlaying) ramp(masterGain.gain, p[4]); }, 300);
+        setTimeout(() => { if (masterGain && audioPlaying) rampTo(masterGain.gain, vol, .8); }, 300);
       }
-
-      // ── Church organ pad (native oscillators) ────────────────────
-      const CM = [130.81, 146.83, 155.56, 174.61, 196, 207.65, 233.08,
-        261.63, 293.66, 311.13, 349.23, 392, 415.3, 466.16];
-      let padOn = false, padTimer;
-      function playPad() {
-        // Auto-init audio context if not ready (e.g. first mouse interaction)
-        if (!ctx && !_started) { _started = true; initAudio(); return; }
-        if (!ctx || padOn) return;
-        padOn = true;
-        const freq = CM[Math.floor(Math.random() * CM.length)];
-        const padGain = ctx.createGain();
-        padGain.gain.setValueAtTime(0, ctx.currentTime);
-        padGain.gain.linearRampToValueAtTime(0.45, ctx.currentTime + 0.06);
-        padGain.gain.setValueAtTime(0.45, ctx.currentTime + 0.5);
-        padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.8);
-        // Reverb for pad
-        const padRev = ctx.createConvolver(); padRev.buffer = makeIR(ctx, 3.5, 1.8);
-        const padDry = ctx.createGain(); padDry.gain.value = 0.4;
-        const padWet = ctx.createGain(); padWet.gain.value = 0.6;
-        padGain.connect(padDry); padDry.connect(ctx.destination);
-        padGain.connect(padRev); padRev.connect(padWet); padWet.connect(ctx.destination);
-        // Organ harmonics (pipe organ stops)
-        [1, 2, 3, 4, 0.5].forEach((mult, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = 'sawtooth';
-          o.frequency.value = freq * mult;
-          o.detune.value = (Math.random() - .5) * 3;
-          g.gain.value = [1, .65, .45, .28, .2][i] / 5;
-          o.connect(g); g.connect(padGain);
-          o.start(ctx.currentTime);
-          o.stop(ctx.currentTime + 3.2);
+      function _syncPanel(p) {
+        const ids = ['reverb', 'revsize', 'distort', 'saturat', 'fuzz', 'hpf', 'lpf', 'pitch', 'lofi', 'vol'];
+        ids.forEach((id, i) => {
+          const sl = document.getElementById('as-' + id), vl = document.getElementById('av-' + id);
+          if (sl) sl.value = p[i];
+          if (vl) vl.textContent = parseFloat(p[i]).toFixed(id === 'hpf' || id === 'lpf' ? 0 : 2);
         });
-        clearTimeout(padTimer);
-        padTimer = setTimeout(() => padOn = false, 1300);
       }
-
-      // ── Per-letter visual distortion only ────────────────────────
-      // (organ pad fires separately above, distortion is only visual)
-      function setupDistortion() {
-        const defs = document.getElementById('svg-filter-defs');
-        const letters = [...document.querySelectorAll('.hw')];
-        if (!defs || !letters.length) return;
-        const wf = letters.map((sp, i) => {
-          const f = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-          f.id = `hf${i}`;
-          f.setAttribute('x', '-30%'); f.setAttribute('y', '-30%');
-          f.setAttribute('width', '160%'); f.setAttribute('height', '160%');
-          const tb = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
-          tb.setAttribute('type', 'turbulence');
-          tb.setAttribute('baseFrequency', '0.016 0.009');
-          tb.setAttribute('numOctaves', '3');
-          tb.setAttribute('seed', String(i * 13 + 5));
-          tb.setAttribute('result', 'noise');
-          const dp = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
-          dp.setAttribute('in', 'SourceGraphic'); dp.setAttribute('in2', 'noise');
-          dp.setAttribute('scale', '0');
-          dp.setAttribute('xChannelSelector', 'R'); dp.setAttribute('yChannelSelector', 'G');
-          f.appendChild(tb); f.appendChild(dp); defs.appendChild(f);
-          sp.style.filter = `url(#hf${i})`;
-          sp.style.willChange = 'filter';
-          return { sp, tb, dp, cur: 0, tgt: 0, ph: Math.random() * Math.PI * 2 };
-        });
-        let tp = 0, aid = null, pAt = -999, lx = 0, ly = 0;
-        function tick() {
-          tp += .016; let any = false;
-          wf.forEach(w => {
-            w.cur += (w.tgt - w.cur) * .09;
-            if (w.cur > .3) {
-              const bf1 = (.016 + Math.sin(tp + w.ph) * .007).toFixed(4);
-              const bf2 = (.009 + Math.cos(tp * .65 + w.ph) * .004).toFixed(4);
-              w.tb.setAttribute('baseFrequency', `${bf1} ${bf2}`);
-              w.dp.setAttribute('scale', w.cur.toFixed(2));
-              any = true;
-            } else { w.dp.setAttribute('scale', '0'); if (w.cur > .04) any = true; }
-          });
-          if (any) aid = requestAnimationFrame(tick); else aid = null;
+      window._apSlider = function (id, val) {
+        const v = parseFloat(val);
+        const el = document.getElementById('av-' + id);
+        if (el) el.textContent = v.toFixed(id === 'hpf' || id === 'lpf' ? 0 : 2);
+        if (!ctx) return;
+        const now = ctx.currentTime, fast = .05;
+        if (id === 'reverb') { rampTo(wetG.gain, v, fast); rampTo(dryG.gain, 1 - v, fast); }
+        else if (id === 'revsize') {
+          _curIRdur = v; const nb = makeIR(ctx, v, Math.max(.5, 3 - v * .15));
+          const rv = parseFloat((document.getElementById('as-reverb') || { value: .15 }).value);
+          if (wetG) { wetG.gain.setValueAtTime(rv, now); wetG.gain.linearRampToValueAtTime(0, now + .2); }
+          setTimeout(() => {
+            if (convolver) convolver.buffer = nb;
+            if (wetG) { wetG.gain.setValueAtTime(0, ctx.currentTime); wetG.gain.linearRampToValueAtTime(rv, ctx.currentTime + .2); }
+          }, 220);
         }
-        function go() { if (!aid) aid = requestAnimationFrame(tick); }
-        function ptr(px, py, spd) {
-          let mx2 = 0;
-          wf.forEach(w => {
-            const r = w.sp.getBoundingClientRect();
-            if (!r.width) return;
-            const dist = Math.sqrt((px - r.left - r.width / 2) ** 2 + (py - r.top - r.height / 2) ** 2);
-            const inf = Math.max(0, 1 - dist / 160);
-            w.tgt = inf > 0 ? Math.min(inf * (24 + spd * .25), 30) : 0;
-            mx2 = Math.max(mx2, w.tgt);
-          });
-          // Visual distortion only — no sound on letter hover
-          go();
-        }
-        document.addEventListener('mousemove', e => {
-          const s = Math.abs(e.clientX - lx) + Math.abs(e.clientY - ly);
-          lx = e.clientX; ly = e.clientY; ptr(e.clientX, e.clientY, s);
-        }, { passive: true });
-        document.addEventListener('touchmove', e => {
-          const t = e.touches[0]; ptr(t.clientX, t.clientY, 4);
-        }, { passive: true });
-        document.addEventListener('touchend', () => { wf.forEach(w => w.tgt = 0); go(); }, { passive: true });
-      }
-
-      // ── Audio toggle button ───────────────────────────────────────
-      const btn = document.createElement('button');
-      btn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(224,216,240,.4);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s;line-height:1';
-      btn.textContent = '▶';
-      btn.title = 'Toggle audio';
-      btn.onmouseenter = () => btn.style.color = '#e0d8f0';
-      btn.onmouseleave = () => btn.style.color = 'rgba(224,216,240,.4)';
-      document.body.appendChild(btn);
-      function updateBtn() { btn.textContent = audioPlaying ? '⏸' : '▶'; }
-      // Expose for animate loop
-      window._applyPreset = applyPreset;
-
-      btn.onclick = async () => {
-        if (!audioReady) { await initAudio(); return; }
-        if (audioPlaying) {
-          srcNode && srcNode.stop(); audioPlaying = false;
-        } else {
-          if (!audioBuffer) { await loadAndPlay(ctx, lpFilter); }
-          else {
-            srcNode = ctx.createBufferSource();
-            srcNode.buffer = audioBuffer; srcNode.loop = false;
-            srcNode.connect(lpFilter);
-            srcNode.onended = () => { if (audioPlaying) { const n = ctx.createBufferSource(); n.buffer = audioBuffer; n.connect(lpFilter); n.onended = srcNode.onended; n.start(); srcNode = n; } };
-            srcNode.start(); audioPlaying = true;
+        else if (id === 'distort') { if (distorter) distorter.curve = makeDistCurve(v); }
+        else if (id === 'saturat') { if (saturator) saturator.curve = makeSatCurve(v); }
+        else if (id === 'fuzz') { if (fuzzer) fuzzer.curve = makeFuzzCurve(v); }
+        else if (id === 'hpf') { rampTo(hpFilter.frequency, v, fast); }
+        else if (id === 'lpf') { rampTo(lpFilter.frequency, v, fast); }
+        else if (id === 'pitch') {
+          window._targetRate = v;
+          if (srcNode) {
+            try {
+              srcNode.playbackRate.cancelScheduledValues(now);
+              srcNode.playbackRate.setValueAtTime(srcNode.playbackRate.value, now);
+              srcNode.playbackRate.linearRampToValueAtTime(v, now + fast);
+            } catch (e) { }
           }
+        }
+        else if (id === 'lofi') { rampTo(lofiIn.frequency, v > .01 ? 18000 - v * 16500 : 20000, fast); }
+        else if (id === 'vol') { rampTo(masterGain.gain, v, fast); }
+      };
+      window._apCopyPreset = function () {
+        const ids = ['reverb', 'revsize', 'distort', 'saturat', 'fuzz', 'hpf', 'lpf', 'pitch', 'lofi', 'vol'];
+        const vals = ids.map(id => { const sl = document.getElementById('as-' + id); return sl ? parseFloat(sl.value) : 0; });
+        const txt = '[' + vals.map((v, i) => i === 5 || i === 6 ? v.toFixed(0) : v.toFixed(2)).join(', ') + '] // ' + (currentSection === 0 ? 'HERO' : 'S' + currentSection);
+        navigator.clipboard && navigator.clipboard.writeText(txt);
+        const out = document.getElementById('ap-copy-out');
+        if (out) { out.textContent = txt; out.style.display = 'block'; setTimeout(() => out.style.display = 'none', 4000); }
+      };
+      window._apReset = function () {
+        const p = PRESETS[Math.max(0, currentSection)];
+        _syncPanel(p); _applyValues(...p);
+      };
+
+      const btn = document.createElement('button');
+      btn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(36,28,58,.5);cursor:pointer;font-size:1.1rem;padding:.25rem;transition:color .3s;line-height:1';
+      btn.textContent = '▶'; document.body.appendChild(btn);
+      function updateBtn() { btn.textContent = audioPlaying ? '⏸' : '▶'; }
+      btn.onclick = () => {
+        if (!audioReady) return;
+        if (audioPlaying) { srcNode && srcNode.stop(); audioPlaying = false; }
+        else if (audioBuffer) {
+          const s = ctx.createBufferSource(); s.buffer = audioBuffer;
+          s.playbackRate.value = window._targetRate || 1; s.connect(gainNode);
+          s.onended = () => { if (audioPlaying) { const n = ctx.createBufferSource(); n.buffer = audioBuffer; n.connect(gainNode); n.onended = s.onended; n.start(); srcNode = n; } };
+          s.start(); srcNode = s; audioPlaying = true;
         }
         updateBtn();
       };
 
-      // ── Scroll → section audio morphing ──────────────────────────
-      const BANDS = [{ lo: .00, hi: .12 }, { lo: .11, hi: .24 }, { lo: .22, hi: .35 }, { lo: .33, hi: .47 },
-      { lo: .45, hi: .57 }, { lo: .55, hi: .68 }, { lo: .66, hi: .78 }, { lo: .76, hi: 1.0 }];
-      window.addEventListener('scroll', () => {
-        if (!audioReady) return;
-        const s = window.scrollY / Math.max(1, document.body.scrollHeight - innerHeight);
-        for (let i = 0; i < BANDS.length; i++) {
-          const b = BANDS[i];
-          const center = (b.lo + b.hi) / 2;
-          // Trigger when scroll crosses section center point
-          if (s >= b.lo && s <= b.hi) { applyPreset(i); break; }
-        }
-      }, { passive: true });
-
-      // ── Audio: desktop via CTA button, mobile via first touch/scroll ──
       let _started = false;
-      function onGesture() {
-        if (_started) return; _started = true;
-        initAudio(); // sync — AudioContext created synchronously inside gesture
-      }
-      // Start audio on first user gesture (both desktop and mobile)
-      ['touchstart', 'click'].forEach(ev => {
-        window.addEventListener(ev, onGesture, { once: true, passive: true, capture: true });
-      });
-
-      // ── Init distortion after DOM ─────────────────────────────────
-      // Distortion: desktop only — touchmove on mobile causes unwanted auto-distortion
-      if (!IS_MOB) {
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', setupDistortion);
-        } else { setupDistortion(); }
+      window._applyPreset = applyPreset;
+      window._audioOnGesture = function () { if (_started) return; _started = true; initAudio(); };
+      if (IS_MOB) {
+        ['touchstart', 'click'].forEach(ev => window.addEventListener(ev, () => window._audioOnGesture(), { once: true, passive: true, capture: true }));
       }
 
-    })();
-  </script>
-
-  <script>
-    // ═══════════════════════════════════════════════════════════════
-    // i18n — ES / EN / FR
-    // ═══════════════════════════════════════════════════════════════
-    (function () {
-      const T = {
-        es: {
-          'nav.services': 'Servicios', 'nav.process': 'Proceso', 'nav.work': 'Trabajo', 'nav.contact': 'Contacto',
-          'hero.eyebrow': 'Experiencias digitales', 'hero.sub': 'Arquitectura digital, experiencias inmersivas y productos que dejan huella.',
-          'scroll': 'Desplazar',
-          'p0.body': 'Arquitectura digital, experiencias inmersivas y productos que dejan huella.',
-          'p1.tag': 'Sobre el estudio', 'p1.title': 'Donde el <em>diseño</em><br>encuentra la<br>ingeniería.',
-          'p1.divider': '', 'p1.body': 'Somos un estudio boutique en la intersección de la tecnología y el storytelling. Combinamos pensamiento estratégico, ingeniería de precisión y atención obsesiva al craft para construir productos digitales que dejan huella.',
-          'p2.eyebrow': '01 — Artesanía digital', 'p2.title': 'Un sitio rápido <em>vende</em><br>antes de que el usuario<br>piense en irse.',
-          'p3.eyebrow': 'Lo que construimos', 'p3.title': 'Nuestro <em>craft</em>',
-          's1.name': 'Desarrollo Web Moderno', 's1.desc': 'React, Next.js y arquitecturas personalizadas.',
-          's2.name': 'Landing Pages', 's2.desc': 'Conversión, narrativa de marca y resultados.',
-          's3.name': 'Experiencias 3D', 's3.desc': 'Escenas WebGL inmersivas en tiempo real.',
-          's4.name': 'UX/UI Interfaces', 's4.desc': 'Del wireframe al sistema de alta fidelidad.',
-          's5.name': 'Automatizaciones', 's5.desc': 'Pipelines de API que eliminan la fricción.',
-          's6.name': 'Performance', 's6.desc': 'Sitios lentos → experiencias ultrarrápidas.',
-          'p4.eyebrow': '02 — Artesanía digital', 'p4.title': '<em>La interacción</em><br>convierte una página<br>en una experiencia.',
-          'p5.tag': 'Cómo trabajamos', 'p5.title': 'El <em>proceso</em>',
-          'st1': 'Descubrimiento', 'sd1': 'Objetivos, usuarios y contexto.',
-          'st2': 'Diseño', 'sd2': 'Sistémico y visual.',
-          'st3': 'Prototipo', 'sd3': 'Validar antes de construir.',
-          'st4': 'Desarrollo', 'sd4': 'Código limpio y medible.',
-          'st5': 'Lanzamiento', 'sd5': 'Deploy y refinamiento continuo.',
-          'p6.eyebrow': '03 — Artesanía digital', 'p6.title': 'El 3D no decora;<br>debe <em>contar<br>una historia.</em>',
-          'p7.eyebrow': '¿Listo para comenzar?', 'p7.title': 'Tu próximo sitio<br>no tiene que verse<br>como <em>otro sitio.</em>',
-          'p7.body': 'Hablemos sobre tu proyecto.', 'p7.cta': 'hello@aminoacid.studio →',
-        },
-        en: {
-          'nav.services': 'Services', 'nav.process': 'Process', 'nav.work': 'Work', 'nav.contact': 'Contact',
-          'hero.eyebrow': 'Digital Experiences', 'hero.sub': 'Digital architecture, immersive experiences and products that leave a mark.',
-          'scroll': 'Scroll',
-          'p0.body': 'Digital architecture, immersive experiences and products that leave a mark.',
-          'p1.tag': 'About the studio', 'p1.title': 'Where <em>design</em><br>meets<br>engineering.',
-          'p1.body': 'We are a boutique studio at the intersection of technology and storytelling. We combine strategic thinking, precision engineering and obsessive attention to craft to build digital products that leave a mark.',
-          'p2.eyebrow': '01 — Digital craft', 'p2.title': 'A fast site <em>sells</em><br>before the user<br>thinks of leaving.',
-          'p3.eyebrow': 'What we build', 'p3.title': 'Our <em>craft</em>',
-          's1.name': 'Modern Web Development', 's1.desc': 'React, Next.js and custom architectures.',
-          's2.name': 'Landing Pages', 's2.desc': 'Conversion, brand narrative and results.',
-          's3.name': '3D Experiences', 's3.desc': 'Immersive WebGL scenes in real time.',
-          's4.name': 'UX/UI Interfaces', 's4.desc': 'From wireframe to high-fidelity system.',
-          's5.name': 'Automations', 's5.desc': 'API pipelines that eliminate friction.',
-          's6.name': 'Performance', 's6.desc': 'Slow sites → ultra-fast experiences.',
-          'p4.eyebrow': '02 — Digital craft', 'p4.title': '<em>Interaction</em><br>turns a page<br>into an experience.',
-          'p5.tag': 'How we work', 'p5.title': 'The <em>process</em>',
-          'st1': 'Discovery', 'sd1': 'Goals, users and context.',
-          'st2': 'Design', 'sd2': 'Systemic and visual.',
-          'st3': 'Prototype', 'sd3': 'Validate before building.',
-          'st4': 'Development', 'sd4': 'Clean, measurable code.',
-          'st5': 'Launch', 'sd5': 'Deploy and continuous refinement.',
-          'p6.eyebrow': '03 — Digital craft', 'p6.title': '3D doesn\u2019t decorate;<br>it must <em>tell<br>a story.</em>',
-          'p7.eyebrow': 'Ready to start?', 'p7.title': 'Your next site<br>doesn\u2019t have to look<br>like <em>another site.</em>',
-          'p7.body': 'Let\u2019s talk about your project.', 'p7.cta': 'hello@aminoacid.studio →',
-        },
-        fr: {
-          'nav.services': 'Services', 'nav.process': 'Processus', 'nav.work': 'Travaux', 'nav.contact': 'Contact',
-          'hero.eyebrow': 'Exp\u00e9riences num\u00e9riques', 'hero.sub': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
-          'scroll': 'D\u00e9filer',
-          'p0.body': 'Architecture num\u00e9rique, exp\u00e9riences immersives et produits qui marquent.',
-          'p1.tag': '\u00c0 propos du studio', 'p1.title': 'O\u00f9 le <em>design</em><br>rencontre<br>l\u2019ing\u00e9nierie.',
-          'p1.body': 'Nous sommes un studio boutique \u00e0 l\u2019intersection de la technologie et du storytelling. Nous combinons pens\u00e9e strat\u00e9gique, ing\u00e9nierie de pr\u00e9cision et attention obsessionnelle au craft.',
-          'p2.eyebrow': '01 \u2014 Artisanat num\u00e9rique', 'p2.title': 'Un site rapide <em>vend</em><br>avant que l\u2019utilisateur<br>pense \u00e0 partir.',
-          'p3.eyebrow': 'Ce que nous construisons', 'p3.title': 'Notre <em>craft</em>',
-          's1.name': 'D\u00e9veloppement Web Moderne', 's1.desc': 'React, Next.js et architectures personnalis\u00e9es.',
-          's2.name': 'Pages d\u2019atterrissage', 's2.desc': 'Conversion, r\u00e9cit de marque et r\u00e9sultats.',
-          's3.name': 'Exp\u00e9riences 3D', 's3.desc': 'Sc\u00e8nes WebGL immersives en temps r\u00e9el.',
-          's4.name': 'Interfaces UX/UI', 's4.desc': 'Du wireframe au syst\u00e8me haute fid\u00e9lit\u00e9.',
-          's5.name': 'Automatisations', 's5.desc': 'Pipelines API qui \u00e9liminent la friction.',
-          's6.name': 'Performance', 's6.desc': 'Sites lents \u2192 exp\u00e9riences ultra-rapides.',
-          'p4.eyebrow': '02 \u2014 Artisanat num\u00e9rique', 'p4.title': '<em>L\u2019interaction</em><br>transforme une page<br>en exp\u00e9rience.',
-          'p5.tag': 'Comment nous travaillons', 'p5.title': 'Le <em>processus</em>',
-          'st1': 'D\u00e9couverte', 'sd1': 'Objectifs, utilisateurs et contexte.',
-          'st2': 'Design', 'sd2': 'Syst\u00e9mique et visuel.',
-          'st3': 'Prototype', 'sd3': 'Valider avant de construire.',
-          'st4': 'D\u00e9veloppement', 'sd4': 'Code propre et mesurable.',
-          'st5': 'Lancement', 'sd5': 'D\u00e9ploiement et raffinement continu.',
-          'p6.eyebrow': '03 \u2014 Artisanat num\u00e9rique', 'p6.title': 'La 3D ne d\u00e9core pas;<br>elle doit <em>raconter<br>une histoire.</em>',
-          'p7.eyebrow': 'Pr\u00eat \u00e0 commencer?', 'p7.title': 'Votre prochain site<br>n\u2019a pas \u00e0 ressembler<br>\u00e0 <em>un autre site.</em>',
-          'p7.body': 'Parlons de votre projet.', 'p7.cta': 'hello@aminoacid.studio \u2192',
-        }
-      };
-
-      // Map keys to DOM elements via data-i18n attribute
-      function applyLang(lang) {
-        const dict = T[lang] || T.es;
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-          const key = el.getAttribute('data-i18n');
-          if (dict[key] !== undefined) el.innerHTML = dict[key];
-        });
-        document.querySelectorAll('.lang-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.lang === lang);
-        });
-        localStorage.setItem('amino-lang', lang);
+      function initAudio() {
+        if (audioReady) return; audioReady = true;
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const entry = buildChain(ctx);
+        masterGain.gain.setValueAtTime(0, ctx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(.75, ctx.currentTime + .3);
+        const go = () => loadAndPlay(ctx, entry).catch(e => console.warn('Soundtrack:', e));
+        ctx.state === 'suspended' ? ctx.resume().then(go) : go();
+        const pb = document.createElement('button');
+        pb.style.cssText = 'position:fixed;bottom:3.5rem;right:1.5rem;z-index:200;background:none;border:none;color:rgba(106,79,216,.45);cursor:pointer;font-size:.9rem;padding:.25rem;transition:color .3s;line-height:1';
+        pb.textContent = '⚙'; pb.title = 'Audio FX';
+        pb.onclick = () => { const p = document.getElementById('audio-panel'); if (p) p.style.display = p.style.display === 'none' ? 'block' : 'none'; };
+        document.body.appendChild(pb);
       }
-
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => applyLang(btn.dataset.lang));
-      });
-
-      // Apply saved or default lang
-      applyLang(localStorage.getItem('amino-lang') || 'es');
     })();
   </script>
 </body>
