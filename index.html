@@ -779,54 +779,82 @@
       }
 
       // === COLOR CYCLE — 5 hue bands rotating at different speeds ===
-      // Base hue cycles at different speeds per sky zone
-      // This creates the multi-color effect seen in the video
-      float hCycle  = mod(t*.022,1.);            // main slow cycle ~45s period
-      float hCycle2 = mod(t*.038+.33,1.);        // second layer, offset
-      float hCycle3 = mod(t*.015+.66,1.);        // third layer, slower
+      float hCycle  = mod(t*.022,1.);
+      float hCycle2 = mod(t*.038+.33,1.);
+      float hCycle3 = mod(t*.015+.66,1.);
 
-      // Zenith color — deep saturated, slowly cycling
+      // Horizontal noise — computed early so it can shift horizon hues
+      vec2 p1=d.xz*3.0+vec2(t*.008,t*.006);
+      float n1=noise(p1);
+      float n3=noise(d.zy*6.+vec2(t*.004));
+      // Second noise layer for extra horizontal variety
+      float n2=noise(d.xz*1.6+vec2(t*.005+.9,t*.004));
+
+      // Zenith color
       float hZenith=mod(hCycle+.05,1.);
       vec3 zenith=hsl2rgb(hZenith,.85,.08);
 
-      // Mid sky — different hue, brighter
-      float hMid=mod(hCycle2+.15,1.);
+      // Mid sky
+      float hMid=mod(hCycle2+.15+n2*.12,1.);
       vec3 mid=hsl2rgb(hMid,.80,.12);
 
-      // Horizon — brightest, third hue family
-      float hHoriz=mod(hCycle3+.42,1.);
+      // Horizon — shifted by horizontal noise for color diversity
+      float hHoriz=mod(hCycle3+.42+n1*.28,1.);
       vec3 horiz=hsl2rgb(hHoriz,.90,.18);
 
-      // Low horizon glow
-      float hLow=mod(hCycle+.55,1.);
+      // Low horizon glow — second hue family driven by n2
+      float hLow=mod(hCycle+.55+n2*.35,1.);
       vec3 low=hsl2rgb(hLow,.95,.15);
+
+      // Extra horizon color band (third hue) visible in patches
+      float hPatch=mod(hCycle2+.70+n1*.20,1.);
+      vec3 patchCol=hsl2rgb(hPatch,.88,.15);
 
       // Build sky gradient
       vec3 sky=mix(low, horiz, smoothstep(-.15,.05,h));
       sky=mix(sky, mid,    smoothstep(.0,.4,h));
       sky=mix(sky, zenith, smoothstep(.3,.85,h));
+      // Inject extra color near horizon where n1 is high
+      float patchW=n1*n1*(1.-smoothstep(-.1,.08,h));
+      sky=mix(sky, patchCol, patchW*.5);
 
-      // Nebula: 1 noise sample only (was 3)
-      vec2 p1=d.xz*3.0+vec2(t*.008,t*.006);
-      float n1=noise(p1);
-      float n3=noise(d.zy*6.+vec2(t*.004));
+      // Nebula
       float hNeb1=mod(hCycle+.5,1.);
       vec3 neb1=hsl2rgb(hNeb1,.9,.18)*n1*n1;
       float nebMask=smoothstep(-.1,.5,h);
       sky+=neb1*nebMask*.7;
       sky*=.92+n3*.16;
 
-            // === ELECTRIC BLUE SUN DISC ===
+            // === SOLAR ECLIPSE — black disc + tight flare corona ===
       vec3 sunDir=normalize(vec3(.6,.12,-.8));
       float sd2=max(0.,dot(d,sunDir));
-      float disc   =smoothstep(.9990,.9998,sd2);
-      float corona1=pow(sd2,14.)*.6;
-      float corona2=pow(sd2,30.)*.4;
-      float corona3=pow(sd2,80.)*.3;
-      sky=mix(sky,vec3(.92,.97,1.),disc);
-      sky+=vec3(.05,.35,1.)*corona1;
-      sky+=vec3(.3,.6,1.) *corona2;
-      sky+=vec3(.7,.85,1.)*corona3;
+
+      vec3 sR=normalize(cross(sunDir,vec3(0.,1.,0.)));
+      vec3 sU=cross(sR,sunDir);
+      float angRad=atan(dot(d,sU),dot(d,sR));
+
+      // Disc fills outward — cMask = 1-disc, so no gap between them
+      float disc=smoothstep(.9980,.9984,sd2);
+      float cMask=1.-disc;
+
+      // Narrow flare spikes only — no base glow (avoids the ring)
+      float fl1=pow(max(0.,sin(angRad*5.+t*.55)),6.);
+      float fl2=pow(max(0.,sin(angRad*8.-t*.45+1.3)),6.);
+      float fl3=pow(max(0.,sin(angRad*12.+t*.35+2.7)),6.);
+      float fl4=pow(max(0.,cos(angRad*3.-t*.25+.9)),4.);
+      float flares=fl1*.5+fl2*.4+fl3*.25+fl4*.35;
+
+      // Very high exponents = flares barely extend past disc edge
+      float cor1=pow(sd2,800.)*cMask*flares;
+      float cor2=pow(sd2,2000.)*cMask*flares*.6;
+
+      float ch1=mod(angRad/6.2832+t*.28,1.);
+      float ch2=mod(angRad/6.2832*.8+t*.33+.33,1.);
+      sky+=hsl2rgb(ch1,.95,.55)*cor1;
+      sky+=hsl2rgb(ch2,.90,.45)*cor2;
+
+      // Black disc last
+      sky=mix(sky,vec3(0.),disc);
 
       // Tone and clamp
       sky=pow(max(sky,vec3(0.)),vec3(.88)); // slight gamma lift
